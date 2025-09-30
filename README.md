@@ -4,7 +4,7 @@ A comprehensive Django REST Framework API built on the Classic Models tutorial d
 
 ## 🎯 Overview
 
-This is a **demo application** that showcases a complete REST API implementation using Django and Django REST Framework. The application is built on the Classic Models database, which is a well-known sample database used for learning SQL and database design.
+This demo application showcases a complete REST API implementation using Django and Django REST Framework. Built on the Classic Models database, a well-known sample database used for learning SQL and database design.
 
 ### Key Features
 
@@ -14,7 +14,6 @@ This is a **demo application** that showcases a complete REST API implementation
 - 📚 **Interactive API Documentation** (Swagger/ReDoc)
 - 📮 **Complete Postman Collection** with all endpoints and sample data
 - 🐳 **Docker & Docker Compose** for easy deployment
-- 🏗️ **Production-ready** architecture and best practices
 - 🧪 **Comprehensive Test Suite** with 100+ test cases
 - 🛠️ **Makefile** for easy development workflow
 
@@ -26,69 +25,50 @@ This is a **demo application** that showcases a complete REST API implementation
 - [Docker Compose](https://docs.docker.com/compose/install/)
 - [Make](https://www.gnu.org/software/make/) (optional but recommended)
 
-### 1. Clone and Setup
+### Setup & Run
 
-```bash
-git clone <repository-url>
-cd classic-models-api
-```
+1. **Clone and Setup**
+   ```bash
+   git clone <repository-url>
+   cd classic-models-api
+   ```
 
-### 2. Environment Configuration
+2. **Environment Configuration**
+   Create a `.env` file in the root directory:
+   ```env
+   # Database Configuration
+   MYSQL_HOST=mysql
+   MYSQL_PORT=3306
+   MYSQL_DATABASE=classicmodels
+   MYSQL_USER=classicuser
+   MYSQL_PASSWORD=classicpass
+   MYSQL_ROOT_PASSWORD=rootpassword
 
-Create a `.env` file in the root directory:
+   # Django Configuration
+   DEBUG=1
+   SECRET_KEY=your-secret-key-here-change-in-production
+   ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
 
-```env
-# Database Configuration
-MYSQL_HOST=mysql
-MYSQL_PORT=3306
-MYSQL_DATABASE=classicmodels
-MYSQL_USER=classicuser
-MYSQL_PASSWORD=classicpass
-MYSQL_ROOT_PASSWORD=rootpassword
+   # API Configuration
+   CORS_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+   ```
 
-# Django Configuration
-DEBUG=1
-SECRET_KEY=your-secret-key-here-change-in-production
-ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
+3. **Run the Application**
+   ```bash
+   # Option A: Using Make (Recommended)
+   make setup-docker
 
-# API Configuration
-CORS_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
-```
+   # Option B: Using Docker Compose directly
+   docker-compose up --build
+   ```
 
-### 3. Run the Application
+4. **Access the API**
+   - **API Documentation**: http://localhost:8000/api/docs/
+   - **ReDoc Documentation**: http://localhost:8000/api/redoc/
+   - **API Base URL**: http://localhost:8000/api/v1/
+   - **Postman Collection**: Import `Classic_Models_API.postman_collection.json`
 
-#### Option A: Using Make (Recommended)
-
-```bash
-# Complete setup with Docker
-make setup-docker
-
-# Or step by step
-make build          # Build Docker images
-make up             # Start services
-make db-migrate     # Run migrations
-make load-data      # Load sample data
-```
-
-#### Option B: Using Docker Compose Directly
-
-```bash
-# Start all services
-docker-compose up --build
-
-# Or run in background
-docker-compose up -d --build
-```
-
-### 4. Access the API
-
-- **API Documentation**: http://localhost:8000/api/docs/
-- **ReDoc Documentation**: http://localhost:8000/api/redoc/
-- **API Base URL**: http://localhost:8000/api/v1/
-- **MySQL Database**: localhost:3306
-- **Postman Collection**: Import `Classic_Models_API.postman_collection.json` for easy API testing
-
-### 5. Demo User Credentials
+### Demo Credentials
 
 - **Username**: `demo`
 - **Password**: `demo123`
@@ -193,7 +173,6 @@ erDiagram
     PRODUCTS ||--o{ ORDERDETAILS : "included in"
 ```
 
-
 ## 🔌 API Structure
 
 ### Authentication
@@ -280,15 +259,6 @@ curl -X POST http://localhost:8000/api/v1/classicmodels/products/ \
 
 For easy API testing and exploration, we've included a comprehensive Postman collection with all endpoints and sample data.
 
-### Collection Features
-
-- 🔐 **Complete Authentication Flow** - Login, register, token refresh, logout
-- 📦 **Full CRUD Operations** - All entities with Create, Read, Update, Delete
-- 🎯 **Realistic Sample Data** - Proper field values matching model constraints
-- 🔄 **Automatic Token Management** - JWT tokens are automatically extracted and stored
-- 📚 **Organized by Resource** - Logical grouping of related endpoints
-- 🛠️ **Environment Variables** - Easy configuration for different environments
-
 ### Quick Start with Postman
 
 1. **Import the Collection**
@@ -304,10 +274,14 @@ For easy API testing and exploration, we've included a comprehensive Postman col
    - Run "Login User" to authenticate and get JWT tokens
    - All subsequent requests will automatically use the stored access token
 
-4. **Explore the API**
-   - Browse through the organized folders for different resources
-   - Each folder contains complete CRUD operations
-   - Sample data is pre-configured for immediate testing
+### Collection Features
+
+- 🔐 **Complete Authentication Flow** - Login, register, token refresh, logout
+- 📦 **Full CRUD Operations** - All entities with Create, Read, Update, Delete
+- 🎯 **Realistic Sample Data** - Proper field values matching model constraints
+- 🔄 **Automatic Token Management** - JWT tokens are automatically extracted and stored
+- 📚 **Organized by Resource** - Logical grouping of related endpoints
+- 🛠️ **Environment Variables** - Easy configuration for different environments
 
 ### Collection Structure
 
@@ -320,19 +294,9 @@ Classic Models API
 │   ├── Get Current User
 │   └── Logout User
 ├── Product Lines
-│   ├── List Product Lines
-│   ├── Create Product Line
-│   ├── Get Product Line
-│   ├── Update Product Line
-│   ├── Partial Update Product Line
-│   └── Delete Product Line
+│   └── [Complete CRUD operations]
 ├── Products
-│   ├── List Products
-│   ├── Create Product
-│   ├── Get Product
-│   ├── Update Product
-│   ├── Partial Update Product
-│   └── Delete Product
+│   └── [Complete CRUD operations]
 ├── Offices
 │   └── [Complete CRUD operations]
 ├── Employees
@@ -351,39 +315,11 @@ Classic Models API
     └── ReDoc
 ```
 
-### Sample Data Included
-
-The collection includes realistic sample data that matches your model constraints:
-
-- **Products**: Classic car models with proper codes, pricing, and descriptions
-- **Offices**: Realistic office locations with complete address information
-- **Employees**: Staff records with job titles, extensions, and contact details
-- **Customers**: Customer information with credit limits and contact details
-- **Orders**: Order data with proper status values and dates
-- **Payments**: Payment records with check numbers and amounts
-
-### Environment Variables
-
-The collection uses these variables for easy configuration:
-
-- `{{base_url}}` - API base URL (default: `http://localhost:8000`)
-- `{{access_token}}` - JWT access token (auto-managed)
-- `{{refresh_token}}` - JWT refresh token (auto-managed)
-
-### Advanced Usage
-
-- **Testing Workflows**: Use Postman's collection runner to test complete workflows
-- **Environment Switching**: Create different environments for dev/staging/production
-- **Documentation**: Each request includes detailed descriptions and examples
-- **Pre-request Scripts**: Automatic token extraction and validation
-- **Test Scripts**: Response validation and data extraction
-
-
 ## 🛠️ Development
 
 ### Using Make Commands (Recommended)
 
-The project includes a comprehensive Makefile with convenient commands for development:
+The project includes a comprehensive Makefile with convenient commands:
 
 ```bash
 # Show all available commands
@@ -441,20 +377,6 @@ make load-data
 make run
 ```
 
-### Database Management
-
-```bash
-# Using Make commands
-make db-shell          # Access MySQL container
-make db-backup         # Backup database
-make db-reset          # Reset database (WARNING: deletes all data)
-make logs-db           # View database logs
-
-# Or using Docker Compose directly
-docker-compose exec mysql mysql -u root -p
-docker-compose logs mysql
-```
-
 ## 🧪 Testing
 
 The project includes a comprehensive test suite with 100+ test cases:
@@ -486,27 +408,6 @@ make test-coverage-docker
 For detailed testing information, see [tests/README.md](tests/README.md).
 
 ## 🐛 Troubleshooting
-
-### Using Make Commands
-
-```bash
-# Check environment setup
-make env-check
-
-# Check application health
-make health-check
-
-# View service status
-make status
-
-# View logs
-make logs              # All services
-make logs-api          # API service only
-make logs-db           # Database service only
-
-# Restart services
-make restart
-```
 
 ### Common Issues
 
@@ -551,12 +452,6 @@ make restart
    make test-coverage
    ```
 
-### Demo User Credentials
-
-- **Username**: `demo`
-- **Password**: `demo123`
-- **Email**: `demo@classicmodels.com`
-
 ## 📚 Learning Resources
 
 This demo application demonstrates:
@@ -577,32 +472,6 @@ This demo application demonstrates:
 3. **Testing**: Unit tests, integration tests, and API testing
 4. **DevOps**: Docker, Make, and development automation
 5. **Code Quality**: Linting, formatting, and best practices
-
-## 🚀 Quick Commands Reference
-
-```bash
-# Development
-make setup              # Complete local setup
-make run                # Start development server
-make test               # Run all tests
-make format             # Format code
-
-# Docker
-make setup-docker       # Complete Docker setup
-make up                 # Start services
-make logs               # View logs
-make down               # Stop services
-
-# Database
-make db-migrate         # Run migrations
-make db-shell           # Access database
-make db-backup          # Backup database
-
-# Utilities
-make help               # Show all commands
-make clean              # Clean up files
-make health-check       # Check application health
-```
 
 ## 🤝 Contributing
 
