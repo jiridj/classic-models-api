@@ -1,0 +1,257 @@
+"""
+Pytest configuration and shared fixtures for the Classic Models API tests.
+"""
+import pytest
+
+# Configure pytest-django to allow database access by default
+pytest_plugins = ['pytest_django']
+
+# Allow database access for all tests by default
+# pytestmark = pytest.mark.django_db  # This doesn't seem to work properly
+
+from django.db import connection
+from django.core.management import execute_from_command_line
+from django.contrib.auth.models import User
+from django.test import Client
+from rest_framework.test import APIClient
+from rest_framework_simplejwt.tokens import RefreshToken
+
+from classicmodels.models import (
+    Customer,
+    Employee,
+    Office,
+    Order,
+    Orderdetail,
+    Payment,
+    Product,
+    ProductLine,
+)
+
+# Override models to be managed for testing
+Office._meta.managed = True
+ProductLine._meta.managed = True
+Product._meta.managed = True
+Employee._meta.managed = True
+Customer._meta.managed = True
+Order._meta.managed = True
+Orderdetail._meta.managed = True
+Payment._meta.managed = True
+
+
+
+
+@pytest.fixture
+def api_client():
+    """API client for testing endpoints."""
+    return APIClient()
+
+
+@pytest.fixture
+def django_client():
+    """Django test client for testing views."""
+    return Client()
+
+
+@pytest.fixture
+def authenticated_api_client(api_client, user):
+    """API client with authentication."""
+    refresh = RefreshToken.for_user(user)
+    api_client.credentials(HTTP_AUTHORIZATION=f'Bearer {refresh.access_token}')
+    return api_client
+
+
+@pytest.fixture
+def user():
+    """Create a test user."""
+    return User.objects.create_user(
+        username='testuser',
+        email='test@example.com',
+        password='testpass123',
+        first_name='Test',
+        last_name='User'
+    )
+
+
+@pytest.fixture
+def admin_user():
+    """Create an admin user."""
+    return User.objects.create_superuser(
+        username='admin',
+        email='admin@example.com',
+        password='adminpass123'
+    )
+
+
+@pytest.fixture
+def office():
+    """Create a test office."""
+    return Office.objects.create(
+        officecode='TEST001',
+        city='Test City',
+        phone='+1-555-0123',
+        addressline1='123 Test Street',
+        country='USA',
+        postalcode='12345',
+        territory='NA'
+    )
+
+
+@pytest.fixture
+def employee(office):
+    """Create a test employee."""
+    return Employee.objects.create(
+        employeenumber=1001,
+        lastname='Doe',
+        firstname='John',
+        extension='1234',
+        email='john.doe@example.com',
+        officecode=office,
+        jobtitle='Sales Rep'
+    )
+
+
+@pytest.fixture
+def manager_employee(office):
+    """Create a test manager employee."""
+    return Employee.objects.create(
+        employeenumber=1000,
+        lastname='Smith',
+        firstname='Jane',
+        extension='5678',
+        email='jane.smith@example.com',
+        officecode=office,
+        jobtitle='Sales Manager'
+    )
+
+
+@pytest.fixture
+def customer(employee):
+    """Create a test customer."""
+    return Customer.objects.create(
+        customernumber=1001,
+        customername='Test Customer Inc.',
+        contactlastname='Johnson',
+        contactfirstname='Bob',
+        phone='+1-555-0456',
+        addressline1='456 Customer Ave',
+        city='Customer City',
+        country='USA',
+        salesrepemployeenumber=employee,
+        creditlimit=50000.00
+    )
+
+
+@pytest.fixture
+def product_line():
+    """Create a test product line."""
+    return ProductLine.objects.create(
+        productline='Test Line',
+        textdescription='Test product line description',
+        htmldescription='<p>Test HTML description</p>'
+    )
+
+
+@pytest.fixture
+def product(product_line):
+    """Create a test product."""
+    return Product.objects.create(
+        productcode='TEST001',
+        productname='Test Product',
+        productline=product_line,
+        productscale='1:10',
+        productvendor='Test Vendor',
+        productdescription='A test product for testing purposes',
+        quantityinstock=100,
+        buyprice=25.50,
+        msrp=45.99
+    )
+
+
+@pytest.fixture
+def order(customer):
+    """Create a test order."""
+    return Order.objects.create(
+        ordernumber=10001,
+        orderdate='2024-01-15',
+        requireddate='2024-01-20',
+        shippeddate='2024-01-18',
+        status='Shipped',
+        comments='Test order',
+        customernumber=customer
+    )
+
+
+@pytest.fixture
+def order_detail(order, product):
+    """Create a test order detail."""
+    return Orderdetail.objects.create(
+        ordernumber=order,
+        productcode=product,
+        quantityordered=5,
+        priceeach=45.99,
+        orderlinenumber=1
+    )
+
+
+@pytest.fixture
+def payment(customer):
+    """Create a test payment."""
+    return Payment.objects.create(
+        customernumber=customer,
+        checknumber='TEST001',
+        paymentdate='2024-01-20',
+        amount=229.95
+    )
+
+
+@pytest.fixture
+def multiple_offices():
+    """Create multiple test offices."""
+    offices = []
+    for i in range(3):
+        office = Office.objects.create(
+            officecode=f'OFF{i+1:03d}',
+            city=f'City {i+1}',
+            phone=f'+1-555-{1000+i:04d}',
+            addressline1=f'{100+i} Street',
+            country='USA',
+            postalcode=f'{10000+i}',
+            territory='NA'
+        )
+        offices.append(office)
+    return offices
+
+
+@pytest.fixture
+def multiple_products(product_line):
+    """Create multiple test products."""
+    products = []
+    for i in range(5):
+        product = Product.objects.create(
+            productcode=f'PROD{i+1:03d}',
+            productname=f'Product {i+1}',
+            productline=product_line,
+            productscale='1:10',
+            productvendor=f'Vendor {i+1}',
+            productdescription=f'Description for product {i+1}',
+            quantityinstock=50 + i * 10,
+            buyprice=20.00 + i * 5.00,
+            msrp=35.00 + i * 8.00
+        )
+        products.append(product)
+    return products
+
+
+@pytest.fixture
+def sample_data(office, employee, customer, product_line, product, order, order_detail, payment):
+    """Create a complete set of sample data for testing."""
+    return {
+        'office': office,
+        'employee': employee,
+        'customer': customer,
+        'product_line': product_line,
+        'product': product,
+        'order': order,
+        'order_detail': order_detail,
+        'payment': payment
+    }

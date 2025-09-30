@@ -1,0 +1,55 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: classic-models-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: classicmodels
+      MYSQL_USER: classicuser
+      MYSQL_PASSWORD: classicpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./db/mysqlsampledatabase.sql:/docker-entrypoint-initdb.d/01-init.sql
+    networks:
+      - classic-models-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      timeout: 20s
+      retries: 10
+      interval: 10s
+      start_period: 40s
+
+  api:
+    build: .
+    container_name: classic-models-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=1
+      - DATABASE_URL=mysql://classicuser:classicpass@mysql:3306/classicmodels
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_DATABASE=classicmodels
+      - MYSQL_USER=classicuser
+      - MYSQL_PASSWORD=classicpass
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - classic-models-network
+    volumes:
+      - .:/app
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+
+volumes:
+  mysql_data:
+
+networks:
+  classic-models-network:
+    driver: bridge

@@ -1,0 +1,1025 @@
+{
+  "info": {
+    "name": "Classic Models API",
+    "description": "Complete API collection for Classic Models e-commerce system",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refresh_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"testuser\",\n  \"email\": \"test@example.com\",\n  \"first_name\": \"Test\",\n  \"last_name\": \"User\",\n  \"password\": \"testpass123\",\n  \"password_confirm\": \"testpass123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register", ""]
+            }
+          }
+        },
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('access_token', response.access);",
+                  "    pm.collectionVariables.set('refresh_token', response.refresh);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"testpass123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login", ""]
+            }
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/refresh/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "refresh", ""]
+            }
+          }
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/auth/me/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "me", ""]
+            }
+          }
+        },
+        {
+          "name": "Logout User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/logout/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "logout", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Product Lines",
+      "item": [
+        {
+          "name": "List Product Lines",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/productlines/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "productlines", ""]
+            }
+          }
+        },
+        {
+          "name": "Create Product Line",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productline\": \"Classic Cars\",\n  \"textdescription\": \"Classic and vintage automobiles\",\n  \"htmldescription\": \"<p>Classic and vintage automobiles</p>\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/productlines/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "productlines", ""]
+            }
+          }
+        },
+        {
+          "name": "Get Product Line",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/productlines/Classic Cars/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "productlines", "Classic Cars", ""]
+            }
+          }
+        },
+        {
+          "name": "Update Product Line",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productline\": \"Classic Cars\",\n  \"textdescription\": \"Updated description\",\n  \"htmldescription\": \"<p>Updated HTML description</p>\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/productlines/Classic Cars/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "productlines", "Classic Cars", ""]
+            }
+          }
+        },
+        {
+          "name": "Partial Update Product Line",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"textdescription\": \"Partially updated description\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/productlines/Classic Cars/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "productlines", "Classic Cars", ""]
+            }
+          }
+        },
+        {
+          "name": "Delete Product Line",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/productlines/Classic Cars/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "productlines", "Classic Cars", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "List Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/products/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "products", ""]
+            }
+          }
+        },
+        {
+          "name": "Create Product",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productcode\": \"S10_1678\",\n  \"productname\": \"1969 Harley Davidson Ultimate Chopper\",\n  \"productline\": \"Classic Cars\",\n  \"productscale\": \"1:10\",\n  \"productvendor\": \"Min Lin Diecast\",\n  \"productdescription\": \"This replica features working kickstand, front suspension, gear-shift lever, footpegs, detachable rear wheel, sprocket and chain.\",\n  \"quantityinstock\": 7933,\n  \"buyprice\": \"48.81\",\n  \"msrp\": \"95.70\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/products/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "products", ""]
+            }
+          }
+        },
+        {
+          "name": "Get Product",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/products/S10_1678/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "products", "S10_1678", ""]
+            }
+          }
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productcode\": \"S10_1678\",\n  \"productname\": \"Updated Product Name\",\n  \"productline\": \"Classic Cars\",\n  \"productscale\": \"1:10\",\n  \"productvendor\": \"Updated Vendor\",\n  \"productdescription\": \"Updated description\",\n  \"quantityinstock\": 8000,\n  \"buyprice\": \"50.00\",\n  \"msrp\": \"100.00\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/products/S10_1678/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "products", "S10_1678", ""]
+            }
+          }
+        },
+        {
+          "name": "Partial Update Product",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productname\": \"Partially Updated Product\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/products/S10_1678/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "products", "S10_1678", ""]
+            }
+          }
+        },
+        {
+          "name": "Delete Product",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/products/S10_1678/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "products", "S10_1678", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Offices",
+      "item": [
+        {
+          "name": "List Offices",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/offices/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "offices", ""]
+            }
+          }
+        },
+        {
+          "name": "Create Office",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"officecode\": \"NYC\",\n  \"city\": \"New York\",\n  \"phone\": \"+1 212 555 0100\",\n  \"addressline1\": \"123 Broadway\",\n  \"addressline2\": \"Suite 100\",\n  \"state\": \"NY\",\n  \"country\": \"USA\",\n  \"postalcode\": \"10001\",\n  \"territory\": \"NA\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/offices/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "offices", ""]
+            }
+          }
+        },
+        {
+          "name": "Get Office",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/offices/NYC/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "offices", "NYC", ""]
+            }
+          }
+        },
+        {
+          "name": "Update Office",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"officecode\": \"NYC\",\n  \"city\": \"New York City\",\n  \"phone\": \"+1 212 555 0101\",\n  \"addressline1\": \"123 Broadway\",\n  \"addressline2\": \"Suite 200\",\n  \"state\": \"NY\",\n  \"country\": \"USA\",\n  \"postalcode\": \"10001\",\n  \"territory\": \"NA\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/offices/NYC/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "offices", "NYC", ""]
+            }
+          }
+        },
+        {
+          "name": "Partial Update Office",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"+1 212 555 0102\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/offices/NYC/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "offices", "NYC", ""]
+            }
+          }
+        },
+        {
+          "name": "Delete Office",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/offices/NYC/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "offices", "NYC", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Employees",
+      "item": [
+        {
+          "name": "List Employees",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/employees/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "employees", ""]
+            }
+          }
+        },
+        {
+          "name": "Create Employee",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employeenumber\": 1001,\n  \"lastname\": \"Smith\",\n  \"firstname\": \"John\",\n  \"extension\": \"x5800\",\n  \"email\": \"john.smith@classicmodels.com\",\n  \"officecode\": \"NYC\",\n  \"reportsto\": null,\n  \"jobtitle\": \"Sales Manager\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/employees/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "employees", ""]
+            }
+          }
+        },
+        {
+          "name": "Get Employee",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/employees/1001/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "employees", "1001", ""]
+            }
+          }
+        },
+        {
+          "name": "Update Employee",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employeenumber\": 1001,\n  \"lastname\": \"Smith\",\n  \"firstname\": \"John\",\n  \"extension\": \"x5801\",\n  \"email\": \"john.smith@classicmodels.com\",\n  \"officecode\": \"NYC\",\n  \"reportsto\": null,\n  \"jobtitle\": \"Senior Sales Manager\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/employees/1001/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "employees", "1001", ""]
+            }
+          }
+        },
+        {
+          "name": "Partial Update Employee",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobtitle\": \"Regional Sales Manager\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/employees/1001/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "employees", "1001", ""]
+            }
+          }
+        },
+        {
+          "name": "Delete Employee",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/employees/1001/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "employees", "1001", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Customers",
+      "item": [
+        {
+          "name": "List Customers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/customers/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "customers", ""]
+            }
+          }
+        },
+        {
+          "name": "Create Customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customernumber\": 1001,\n  \"customername\": \"Atelier graphique\",\n  \"contactlastname\": \"Schmitt\",\n  \"contactfirstname\": \"Carine \",\n  \"phone\": \"40.32.2555\",\n  \"addressline1\": \"54, rue Royale\",\n  \"addressline2\": null,\n  \"city\": \"Nantes\",\n  \"state\": null,\n  \"postalcode\": \"44000\",\n  \"country\": \"France\",\n  \"salesrepemployeenumber\": 1001,\n  \"creditlimit\": \"21000.00\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/customers/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "customers", ""]
+            }
+          }
+        },
+        {
+          "name": "Get Customer",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/customers/1001/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "customers", "1001", ""]
+            }
+          }
+        },
+        {
+          "name": "Update Customer",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customernumber\": 1001,\n  \"customername\": \"Updated Atelier graphique\",\n  \"contactlastname\": \"Schmitt\",\n  \"contactfirstname\": \"Carine\",\n  \"phone\": \"40.32.2556\",\n  \"addressline1\": \"54, rue Royale\",\n  \"addressline2\": null,\n  \"city\": \"Nantes\",\n  \"state\": null,\n  \"postalcode\": \"44000\",\n  \"country\": \"France\",\n  \"salesrepemployeenumber\": 1001,\n  \"creditlimit\": \"22000.00\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/customers/1001/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "customers", "1001", ""]
+            }
+          }
+        },
+        {
+          "name": "Partial Update Customer",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"creditlimit\": \"25000.00\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/customers/1001/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "customers", "1001", ""]
+            }
+          }
+        },
+        {
+          "name": "Delete Customer",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/customers/1001/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "customers", "1001", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "List Orders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/orders/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "orders", ""]
+            }
+          }
+        },
+        {
+          "name": "Create Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ordernumber\": 10100,\n  \"orderdate\": \"2024-01-15\",\n  \"requireddate\": \"2024-01-20\",\n  \"shippeddate\": \"2024-01-18\",\n  \"status\": \"Shipped\",\n  \"comments\": \"Order processed successfully\",\n  \"customernumber\": 1001\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/orders/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "orders", ""]
+            }
+          }
+        },
+        {
+          "name": "Get Order",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/orders/10100/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "orders", "10100", ""]
+            }
+          }
+        },
+        {
+          "name": "Update Order",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ordernumber\": 10100,\n  \"orderdate\": \"2024-01-15\",\n  \"requireddate\": \"2024-01-20\",\n  \"shippeddate\": \"2024-01-19\",\n  \"status\": \"Delivered\",\n  \"comments\": \"Order delivered successfully\",\n  \"customernumber\": 1001\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/orders/10100/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "orders", "10100", ""]
+            }
+          }
+        },
+        {
+          "name": "Partial Update Order",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Cancelled\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/orders/10100/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "orders", "10100", ""]
+            }
+          }
+        },
+        {
+          "name": "Delete Order",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/orders/10100/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "orders", "10100", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Order Details",
+      "item": [
+        {
+          "name": "List Order Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/orderdetails/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "orderdetails", ""]
+            }
+          }
+        },
+        {
+          "name": "Create Order Detail",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ordernumber\": 10100,\n  \"productcode\": \"S10_1678\",\n  \"quantityordered\": 30,\n  \"priceeach\": \"136.00\",\n  \"orderlinenumber\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/orderdetails/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "orderdetails", ""]
+            }
+          }
+        },
+        {
+          "name": "Get Order Detail",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/orderdetails/10100/S10_1678/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "orderdetails", "10100", "S10_1678", ""]
+            }
+          }
+        },
+        {
+          "name": "Update Order Detail",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ordernumber\": 10100,\n  \"productcode\": \"S10_1678\",\n  \"quantityordered\": 35,\n  \"priceeach\": \"140.00\",\n  \"orderlinenumber\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/orderdetails/10100/S10_1678/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "orderdetails", "10100", "S10_1678", ""]
+            }
+          }
+        },
+        {
+          "name": "Partial Update Order Detail",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantityordered\": 40\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/orderdetails/10100/S10_1678/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "orderdetails", "10100", "S10_1678", ""]
+            }
+          }
+        },
+        {
+          "name": "Delete Order Detail",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/orderdetails/10100/S10_1678/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "orderdetails", "10100", "S10_1678", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "item": [
+        {
+          "name": "List Payments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/payments/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "payments", ""]
+            }
+          }
+        },
+        {
+          "name": "Create Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customernumber\": 1001,\n  \"checknumber\": \"HQ336336\",\n  \"paymentdate\": \"2024-01-15\",\n  \"amount\": \"6066.78\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/payments/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "payments", ""]
+            }
+          }
+        },
+        {
+          "name": "Get Payment",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/payments/1001/HQ336336/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "payments", "1001", "HQ336336", ""]
+            }
+          }
+        },
+        {
+          "name": "Update Payment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customernumber\": 1001,\n  \"checknumber\": \"HQ336336\",\n  \"paymentdate\": \"2024-01-16\",\n  \"amount\": \"6100.00\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/payments/1001/HQ336336/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "payments", "1001", "HQ336336", ""]
+            }
+          }
+        },
+        {
+          "name": "Partial Update Payment",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": \"6200.00\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/payments/1001/HQ336336/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "payments", "1001", "HQ336336", ""]
+            }
+          }
+        },
+        {
+          "name": "Delete Payment",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/classicmodels/payments/1001/HQ336336/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "classicmodels", "payments", "1001", "HQ336336", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "API Documentation",
+      "item": [
+        {
+          "name": "OpenAPI Schema",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/schema/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "schema", ""]
+            }
+          }
+        },
+        {
+          "name": "Swagger UI",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/docs/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "docs", ""]
+            }
+          }
+        },
+        {
+          "name": "ReDoc",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/redoc/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "redoc", ""]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
