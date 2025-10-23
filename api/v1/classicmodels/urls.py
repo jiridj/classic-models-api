@@ -1,17 +1,9 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from .views import (
-    CustomerViewSet,
-    EmployeeViewSet,
-    OfficeViewSet,
-    OrderViewSet,
-    OrderdetailViewSet,
-    PaymentViewSet,
-    ProductLineViewSet,
-    ProductViewSet,
-)
-
+from .views import (CustomerViewSet, EmployeeViewSet, OfficeViewSet,
+                    OrderdetailViewSet, OrderViewSet, PaymentViewSet,
+                    ProductLineViewSet, ProductViewSet)
 
 router = DefaultRouter()
 router.register(r"productlines", ProductLineViewSet, basename="productline")
@@ -27,7 +19,14 @@ urlpatterns = [
     # Composite-key resources
     path(
         "payments/<int:customerNumber>/<str:checkNumber>/",
-        PaymentViewSet.as_view({"get": "retrieve", "put": "update", "patch": "partial_update", "delete": "destroy"}),
+        PaymentViewSet.as_view(
+            {
+                "get": "retrieve",
+                "put": "update",
+                "patch": "partial_update",
+                "delete": "destroy",
+            }
+        ),
         name="payment-detail",
     ),
     path(
@@ -37,7 +36,14 @@ urlpatterns = [
     ),
     path(
         "orderdetails/<int:orderNumber>/<str:productCode>/",
-        OrderdetailViewSet.as_view({"get": "retrieve", "put": "update", "patch": "partial_update", "delete": "destroy"}),
+        OrderdetailViewSet.as_view(
+            {
+                "get": "retrieve",
+                "put": "update",
+                "patch": "partial_update",
+                "delete": "destroy",
+            }
+        ),
         name="orderdetail-detail",
     ),
     path(
@@ -46,5 +52,3 @@ urlpatterns = [
         name="orderdetail-list",
     ),
 ]
-
-

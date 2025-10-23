@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
 
-
 BASE_DIR = Path(__file__).resolve().parents[2]
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key")
@@ -113,7 +112,7 @@ SPECTACULAR_SETTINGS = {
                 "type": "http",
                 "scheme": "bearer",
                 "bearerFormat": "JWT",
-                "description": "JWT token obtained from /api/auth/login/"
+                "description": "JWT token obtained from /api/auth/login/",
             }
         }
     },
@@ -179,5 +178,3 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-

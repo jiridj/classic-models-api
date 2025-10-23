@@ -2,9 +2,15 @@ from django.db import models
 
 
 class ProductLine(models.Model):
-    productline = models.CharField(db_column="productLine", primary_key=True, max_length=50)
-    textdescription = models.CharField(db_column="textDescription", max_length=4000, blank=True, null=True)
-    htmldescription = models.TextField(db_column="htmlDescription", blank=True, null=True)
+    productline = models.CharField(
+        db_column="productLine", primary_key=True, max_length=50
+    )
+    textdescription = models.CharField(
+        db_column="textDescription", max_length=4000, blank=True, null=True
+    )
+    htmldescription = models.TextField(
+        db_column="htmlDescription", blank=True, null=True
+    )
     image = models.BinaryField(blank=True, null=True)
 
     def __str__(self):
@@ -16,14 +22,20 @@ class ProductLine(models.Model):
 
 
 class Product(models.Model):
-    productcode = models.CharField(db_column="productCode", primary_key=True, max_length=15)
+    productcode = models.CharField(
+        db_column="productCode", primary_key=True, max_length=15
+    )
     productname = models.CharField(db_column="productName", max_length=70)
-    productline = models.ForeignKey(ProductLine, models.DO_NOTHING, db_column="productLine")
+    productline = models.ForeignKey(
+        ProductLine, models.DO_NOTHING, db_column="productLine"
+    )
     productscale = models.CharField(db_column="productScale", max_length=10)
     productvendor = models.CharField(db_column="productVendor", max_length=50)
     productdescription = models.TextField(db_column="productDescription")
     quantityinstock = models.SmallIntegerField(db_column="quantityInStock")
-    buyprice = models.DecimalField(db_column="buyPrice", max_digits=10, decimal_places=2)
+    buyprice = models.DecimalField(
+        db_column="buyPrice", max_digits=10, decimal_places=2
+    )
     msrp = models.DecimalField(db_column="MSRP", max_digits=10, decimal_places=2)
 
     def __str__(self):
@@ -35,11 +47,15 @@ class Product(models.Model):
 
 
 class Office(models.Model):
-    officecode = models.CharField(db_column="officeCode", primary_key=True, max_length=10)
+    officecode = models.CharField(
+        db_column="officeCode", primary_key=True, max_length=10
+    )
     city = models.CharField(max_length=50)
     phone = models.CharField(max_length=50)
     addressline1 = models.CharField(db_column="addressLine1", max_length=50)
-    addressline2 = models.CharField(db_column="addressLine2", max_length=50, blank=True, null=True)
+    addressline2 = models.CharField(
+        db_column="addressLine2", max_length=50, blank=True, null=True
+    )
     state = models.CharField(max_length=50, blank=True, null=True)
     country = models.CharField(max_length=50)
     postalcode = models.CharField(db_column="postalCode", max_length=15)
@@ -61,7 +77,12 @@ class Employee(models.Model):
     email = models.CharField(max_length=100)
     officecode = models.ForeignKey(Office, models.DO_NOTHING, db_column="officeCode")
     reportsto = models.ForeignKey(
-        "self", models.DO_NOTHING, db_column="reportsTo", blank=True, null=True, to_field="employeenumber"
+        "self",
+        models.DO_NOTHING,
+        db_column="reportsTo",
+        blank=True,
+        null=True,
+        to_field="employeenumber",
     )
     jobtitle = models.CharField(db_column="jobTitle", max_length=50)
 
@@ -80,15 +101,26 @@ class Customer(models.Model):
     contactfirstname = models.CharField(db_column="contactFirstName", max_length=50)
     phone = models.CharField(max_length=50)
     addressline1 = models.CharField(db_column="addressLine1", max_length=50)
-    addressline2 = models.CharField(db_column="addressLine2", max_length=50, blank=True, null=True)
+    addressline2 = models.CharField(
+        db_column="addressLine2", max_length=50, blank=True, null=True
+    )
     city = models.CharField(max_length=50)
     state = models.CharField(max_length=50, blank=True, null=True)
-    postalcode = models.CharField(db_column="postalCode", max_length=15, blank=True, null=True)
+    postalcode = models.CharField(
+        db_column="postalCode", max_length=15, blank=True, null=True
+    )
     country = models.CharField(max_length=50)
     salesrepemployeenumber = models.ForeignKey(
-        Employee, models.DO_NOTHING, db_column="salesRepEmployeeNumber", blank=True, null=True, to_field="employeenumber"
+        Employee,
+        models.DO_NOTHING,
+        db_column="salesRepEmployeeNumber",
+        blank=True,
+        null=True,
+        to_field="employeenumber",
     )
-    creditlimit = models.DecimalField(db_column="creditLimit", max_digits=10, decimal_places=2, blank=True, null=True)
+    creditlimit = models.DecimalField(
+        db_column="creditLimit", max_digits=10, decimal_places=2, blank=True, null=True
+    )
 
     def __str__(self):
         return str(self.customernumber)
@@ -99,7 +131,12 @@ class Customer(models.Model):
 
 
 class Payment(models.Model):
-    customernumber = models.ForeignKey(Customer, models.DO_NOTHING, db_column="customerNumber", to_field="customernumber")
+    customernumber = models.ForeignKey(
+        Customer,
+        models.DO_NOTHING,
+        db_column="customerNumber",
+        to_field="customernumber",
+    )
     checknumber = models.CharField(db_column="checkNumber", max_length=50)
     paymentdate = models.DateField(db_column="paymentDate")
     amount = models.DecimalField(max_digits=10, decimal_places=2)
@@ -120,7 +157,12 @@ class Order(models.Model):
     shippeddate = models.DateField(db_column="shippedDate", blank=True, null=True)
     status = models.CharField(max_length=15)
     comments = models.TextField(blank=True, null=True)
-    customernumber = models.ForeignKey(Customer, models.DO_NOTHING, db_column="customerNumber", to_field="customernumber")
+    customernumber = models.ForeignKey(
+        Customer,
+        models.DO_NOTHING,
+        db_column="customerNumber",
+        to_field="customernumber",
+    )
 
     def __str__(self):
         return str(self.ordernumber)
@@ -131,10 +173,16 @@ class Order(models.Model):
 
 
 class Orderdetail(models.Model):
-    ordernumber = models.ForeignKey(Order, models.DO_NOTHING, db_column="orderNumber", to_field="ordernumber")
-    productcode = models.ForeignKey(Product, models.DO_NOTHING, db_column="productCode", to_field="productcode")
+    ordernumber = models.ForeignKey(
+        Order, models.DO_NOTHING, db_column="orderNumber", to_field="ordernumber"
+    )
+    productcode = models.ForeignKey(
+        Product, models.DO_NOTHING, db_column="productCode", to_field="productcode"
+    )
     quantityordered = models.IntegerField(db_column="quantityOrdered")
-    priceeach = models.DecimalField(db_column="priceEach", max_digits=10, decimal_places=2)
+    priceeach = models.DecimalField(
+        db_column="priceEach", max_digits=10, decimal_places=2
+    )
     orderlinenumber = models.SmallIntegerField(db_column="orderLineNumber")
 
     def __str__(self):
@@ -144,5 +192,3 @@ class Orderdetail(models.Model):
         managed = False
         db_table = "orderdetails"
         unique_together = ("ordernumber", "productcode")
-
-

@@ -44,5 +44,3 @@ class OrderAdmin(admin.ModelAdmin):
 @admin.register(models.Orderdetail)
 class OrderdetailAdmin(admin.ModelAdmin):
     list_display = ("ordernumber", "productcode", "quantityordered", "priceeach")
-
-

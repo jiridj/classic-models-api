@@ -11,7 +11,6 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - mysql_data:/var/lib/mysql
       - ./db/mysqlsampledatabase.sql:/docker-entrypoint-initdb.d/01-init.sql
     networks:
       - classic-models-network
@@ -46,9 +45,6 @@ services:
     command: >
       sh -c "python manage.py migrate &&
              python manage.py runserver 0.0.0.0:8000"
-
-volumes:
-  mysql_data:
 
 networks:
   classic-models-network:

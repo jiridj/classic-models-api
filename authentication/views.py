@@ -1,17 +1,17 @@
-from rest_framework import status, permissions
+from drf_spectacular.utils import extend_schema
+from rest_framework import permissions, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework_simplejwt.exceptions import TokenError
-from drf_spectacular.utils import extend_schema, extend_schema_view
 
-from .serializers import LoginSerializer, UserSerializer, RegisterSerializer
+from .serializers import LoginSerializer, RegisterSerializer, UserSerializer
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     """Custom login view with detailed responses"""
-    
+
     @extend_schema(
         operation_id="login",
         summary="User Login",
@@ -33,27 +33,30 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                                 "first_name": "Demo",
                                 "last_name": "User",
                                 "is_active": True,
-                                "date_joined": "2024-01-01T00:00:00Z"
-                            }
+                                "date_joined": "2024-01-01T00:00:00Z",
+                            },
                         }
                     }
-                }
+                },
             },
             400: {"description": "Invalid credentials"},
-        }
+        },
     )
     def post(self, request, *args, **kwargs):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
-            user = serializer.validated_data['user']
+            user = serializer.validated_data["user"]
             refresh = RefreshToken.for_user(user)
-            
-            return Response({
-                'access': str(refresh.access_token),
-                'refresh': str(refresh),
-                'user': UserSerializer(user).data
-            }, status=status.HTTP_200_OK)
-        
+
+            return Response(
+                {
+                    "access": str(refresh.access_token),
+                    "refresh": str(refresh),
+                    "user": UserSerializer(user).data,
+                },
+                status=status.HTTP_200_OK,
+            )
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -65,42 +68,35 @@ class CustomTokenObtainPairView(TokenObtainPairView):
     request={
         "type": "object",
         "properties": {
-            "refresh": {
-                "type": "string",
-                "description": "Refresh token to blacklist"
-            }
+            "refresh": {"type": "string", "description": "Refresh token to blacklist"}
         },
-        "required": ["refresh"]
+        "required": ["refresh"],
     },
     responses={
         200: {"description": "Logout successful"},
         400: {"description": "Invalid token"},
-    }
+    },
 )
-@api_view(['POST'])
+@api_view(["POST"])
 @permission_classes([permissions.IsAuthenticated])
 def logout_view(request):
     """Logout view that blacklists the refresh token"""
     try:
-        refresh_token = request.data.get('refresh')
+        refresh_token = request.data.get("refresh")
         if not refresh_token:
             return Response(
-                {'error': 'Refresh token is required'}, 
-                status=status.HTTP_400_BAD_REQUEST
+                {"error": "Refresh token is required"},
+                status=status.HTTP_400_BAD_REQUEST,
             )
-        
+
         token = RefreshToken(refresh_token)
         token.blacklist()
-        
+
         return Response(
-            {'message': 'Successfully logged out'}, 
-            status=status.HTTP_200_OK
+            {"message": "Successfully logged out"}, status=status.HTTP_200_OK
         )
     except TokenError:
-        return Response(
-            {'error': 'Invalid token'}, 
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        return Response({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @extend_schema(
@@ -123,27 +119,27 @@ def logout_view(request):
                             "first_name": "New",
                             "last_name": "User",
                             "is_active": True,
-                            "date_joined": "2024-01-01T00:00:00Z"
-                        }
+                            "date_joined": "2024-01-01T00:00:00Z",
+                        },
                     }
                 }
-            }
+            },
         },
         400: {"description": "Invalid data"},
-    }
+    },
 )
-@api_view(['POST'])
+@api_view(["POST"])
 @permission_classes([permissions.AllowAny])
 def register_view(request):
     """Register a new user"""
     serializer = RegisterSerializer(data=request.data)
     if serializer.is_valid():
         user = serializer.save()
-        return Response({
-            'message': 'User created successfully',
-            'user': UserSerializer(user).data
-        }, status=status.HTTP_201_CREATED)
-    
+        return Response(
+            {"message": "User created successfully", "user": UserSerializer(user).data},
+            status=status.HTTP_201_CREATED,
+        )
+
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -164,15 +160,15 @@ def register_view(request):
                         "first_name": "Demo",
                         "last_name": "User",
                         "is_active": True,
-                        "date_joined": "2024-01-01T00:00:00Z"
+                        "date_joined": "2024-01-01T00:00:00Z",
                     }
                 }
-            }
+            },
         },
         401: {"description": "Authentication required"},
-    }
+    },
 )
-@api_view(['GET'])
+@api_view(["GET"])
 @permission_classes([permissions.IsAuthenticated])
 def current_user_view(request):
     """Get current user information"""
