@@ -23,26 +23,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy project
 COPY . /app/
 
-# Create a script to wait for MySQL
-RUN echo '#!/bin/bash\n\
-set -e\n\
-\n\
-host="$1"\n\
-shift\n\
-cmd="$@"\n\
-\n\
-until nc -z "$host" 3306; do\n\
-  >&2 echo "MySQL is unavailable - sleeping"\n\
-  sleep 1\n\
-done\n\
-\n\
->&2 echo "MySQL is up - executing command"\n\
-exec $cmd' > /usr/local/bin/wait-for-mysql.sh
-
-RUN chmod +x /usr/local/bin/wait-for-mysql.sh
+# Make startup script executable
+RUN chmod +x /app/scripts/start.sh
 
 # Expose port
 EXPOSE 8000
 
-# Run the application
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Run the application using the startup script with bash to ensure permissions
+CMD ["bash", "/app/scripts/start.sh"]

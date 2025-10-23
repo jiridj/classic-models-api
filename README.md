@@ -34,6 +34,13 @@ This demo application showcases a complete REST API implementation using Django 
    make start
    ```
 
+   The Docker setup will automatically:
+   - Start MySQL database with sample data
+   - Wait for database to be ready
+   - Run Django migrations
+   - Create demo user (username: `demo`, password: `demo123`)
+   - Start the Django development server
+
 2. **Access the API**
    - **API Documentation**: http://localhost:8000/api/docs/
    - **ReDoc Documentation**: http://localhost:8000/api/redoc/
