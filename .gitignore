@@ -255,3 +255,6 @@ dmypy.json
 
 # Cursor AI
 .cursor/
+
+# Postman
+postman-test-results.json
