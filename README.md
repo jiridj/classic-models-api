@@ -12,10 +12,10 @@ This demo application showcases a complete REST API implementation using Django 
 - 🚀 **Django REST Framework** API with full CRUD operations
 - 🔐 **JWT Authentication** with user management
 - 📚 **Interactive API Documentation** (Swagger/ReDoc)
-- 📮 **Complete Postman Collection** with all endpoints and sample data
+- 📮 **Complete Postman Collection** with automated testing
 - 🐳 **Docker & Docker Compose** for easy deployment
 - 🧪 **Comprehensive Test Suite** with 100+ test cases
-- 🛠️ **Makefile** for easy development workflow
+- 🛠️ **Makefile** for streamlined development workflow
 
 ## 🚀 Quick Start
 
@@ -27,42 +27,14 @@ This demo application showcases a complete REST API implementation using Django 
 
 ### Setup & Run
 
-1. **Clone and Setup**
+1. **Clone and Start**
    ```bash
    git clone <repository-url>
    cd classic-models-api
+   make start
    ```
 
-2. **Environment Configuration**
-   Create a `.env` file in the root directory:
-   ```env
-   # Database Configuration
-   MYSQL_HOST=mysql
-   MYSQL_PORT=3306
-   MYSQL_DATABASE=classicmodels
-   MYSQL_USER=classicuser
-   MYSQL_PASSWORD=classicpass
-   MYSQL_ROOT_PASSWORD=rootpassword
-
-   # Django Configuration
-   DEBUG=1
-   SECRET_KEY=your-secret-key-here-change-in-production
-   ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
-
-   # API Configuration
-   CORS_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
-   ```
-
-3. **Run the Application**
-   ```bash
-   # Option A: Using Make (Recommended)
-   make setup-docker
-
-   # Option B: Using Docker Compose directly
-   docker-compose up --build
-   ```
-
-4. **Access the API**
+2. **Access the API**
    - **API Documentation**: http://localhost:8000/api/docs/
    - **ReDoc Documentation**: http://localhost:8000/api/redoc/
    - **API Base URL**: http://localhost:8000/api/v1/
@@ -282,6 +254,7 @@ For easy API testing and exploration, we've included a comprehensive Postman col
 - 🔄 **Automatic Token Management** - JWT tokens are automatically extracted and stored
 - 📚 **Organized by Resource** - Logical grouping of related endpoints
 - 🛠️ **Environment Variables** - Easy configuration for different environments
+- 🧪 **Automated Testing** - Run full collection tests with `make postman-test`
 
 ### Collection Structure
 
@@ -319,62 +292,24 @@ Classic Models API
 
 ### Using Make Commands (Recommended)
 
-The project includes a comprehensive Makefile with convenient commands:
+The project includes a streamlined Makefile with essential commands:
 
 ```bash
 # Show all available commands
 make help
 
-# Development setup
-make setup              # Complete local development setup
-make install-dev        # Install development dependencies
-make migrate           # Run database migrations
-make load-data         # Load sample data
-make run               # Start development server
+# Docker Development
+make build             # Build Docker containers
+make start             # Start containers (database resets to original data)
+make stop              # Stop containers
 
 # Testing
-make test              # Run all tests
-make test-coverage     # Run tests with coverage report
-make test-unit         # Run unit tests only
-make test-api          # Run API tests only
-make test-fast         # Run fast tests (exclude slow ones)
-
-# Code Quality
-make lint              # Run linting checks
-make format            # Format code with black and isort
-make format-check      # Check code formatting
-
-# Docker Development
-make setup-docker      # Complete Docker setup
-make build             # Build Docker images
-make up                # Start services with Docker Compose
-make down              # Stop services
-make logs              # View service logs
-make restart           # Restart services
-
-# Database Management
-make db-migrate        # Run migrations in Docker
-make db-shell          # Open database shell
-make db-backup         # Backup database
-make db-reset          # Reset database (WARNING: deletes all data)
+make test              # Run test suite
+make postman-test      # Run Postman collection tests
+make health-check      # Check API health
 
 # Utilities
-make clean             # Clean up temporary files
-make health-check      # Check application health
-make version           # Show version information
-```
-
-### Running Locally (without Docker)
-
-```bash
-# Quick setup
-make setup
-
-# Or manual setup
-make install-dev
-make migrate
-make load-data
-make run
+make clean             # Clean up test result files
 ```
 
 ## 🧪 Testing
@@ -385,27 +320,19 @@ The project includes a comprehensive test suite with 100+ test cases:
 # Run all tests
 make test
 
-# Run tests with coverage
-make test-coverage
+# Run Postman collection tests
+make postman-test
 
-# Run specific test categories
-make test-unit         # Model tests only
-make test-api          # API tests only
-make test-fast         # Exclude slow tests
-
-# Run tests in Docker
-make test-docker
-make test-coverage-docker
+# Check API health
+make health-check
 ```
 
 ### Test Structure
 
 - **Model Tests**: Field validation, relationships, constraints
 - **API Tests**: CRUD operations, authentication, validation
-- **Integration Tests**: End-to-end API workflows
-- **Unit Tests**: Individual component testing
-
-For detailed testing information, see [tests/README.md](tests/README.md).
+- **Postman Tests**: End-to-end API workflows and integration testing
+- **Health Checks**: API endpoint availability verification
 
 ## 🐛 Troubleshooting
 
@@ -416,40 +343,27 @@ For detailed testing information, see [tests/README.md](tests/README.md).
    # Check if ports are in use
    lsof -i :8000
    lsof -i :3306
-   
-   # Modify ports in docker-compose.yml if needed
    ```
 
-2. **MySQL Connection Issues**
+2. **Service Issues**
    ```bash
-   # Using Make commands
-   make status          # Check service status
-   make logs-db         # View database logs
-   make restart         # Restart services
-   
-   # Or using Docker Compose directly
+   # Check service status
    docker-compose ps
-   docker-compose logs mysql
-   docker-compose restart
+   
+   # View logs
+   docker-compose logs
+   
+   # Restart services
+   make stop && make start
    ```
 
-3. **Permission Denied**
+3. **Test Failures**
    ```bash
-   # Fix file permissions
-   sudo chown -R $USER:$USER .
-   chmod +x create_demo_user.py
-   ```
-
-4. **Test Failures**
-   ```bash
-   # Run tests with verbose output
-   make test-fast -v
+   # Check API health
+   make health-check
    
-   # Run specific test
-   pytest tests/test_models/test_product.py -v
-   
-   # Check test coverage
-   make test-coverage
+   # Run Postman tests
+   make postman-test
    ```
 
 ## 📚 Learning Resources
@@ -465,14 +379,6 @@ This demo application demonstrates:
 - **Comprehensive testing** strategies
 - **Development workflow** with Make
 
-### Key Learning Areas
-
-1. **API Development**: Complete REST API with authentication
-2. **Database Design**: Complex relationships and constraints
-3. **Testing**: Unit tests, integration tests, and API testing
-4. **DevOps**: Docker, Make, and development automation
-5. **Code Quality**: Linting, formatting, and best practices
-
 ## 🤝 Contributing
 
 This is a demo application for educational purposes. Feel free to fork and modify for your own learning!
@@ -483,8 +389,7 @@ This is a demo application for educational purposes. Feel free to fork and modif
 2. Create a feature branch
 3. Make your changes
 4. Run tests: `make test`
-5. Format code: `make format`
-6. Submit a pull request
+5. Submit a pull request
 
 ## 📄 License
 
