@@ -52,8 +52,9 @@ test: ## Run the test suite
 health-check: ## Run health check against the API endpoints
 	@echo "$(BLUE)Running health check...$(NC)"
 	@echo "Checking API endpoints..."
-	@curl -f -s http://localhost:8000/api/v1/classicmodels/ > /dev/null && echo "$(GREEN)✓ Classic Models API is responding$(NC)" || echo "$(RED)✗ Classic Models API is not responding$(NC)"
-	@curl -f -s http://localhost:8000/api/v1/classicmodels/customers/ > /dev/null && echo "$(GREEN)✓ Customers endpoint is responding$(NC)" || echo "$(RED)✗ Customers endpoint is not responding$(NC)"
-	@curl -f -s http://localhost:8000/api/v1/classicmodels/products/ > /dev/null && echo "$(GREEN)✓ Products endpoint is responding$(NC)" || echo "$(RED)✗ Products endpoint is not responding$(NC)"
 	@curl -f -s http://localhost:8000/api/docs/ > /dev/null && echo "$(GREEN)✓ API documentation is available$(NC)" || echo "$(RED)✗ API documentation is not available$(NC)"
+	@curl -f -s http://localhost:8000/api/schema/ > /dev/null && echo "$(GREEN)✓ API schema is available$(NC)" || echo "$(RED)✗ API schema is not available$(NC)"
+	@curl -f -s -w "%{http_code}" -o /dev/null http://localhost:8000/api/auth/register/ | grep -q "405" && echo "$(GREEN)✓ Authentication endpoints are responding$(NC)" || echo "$(RED)✗ Authentication endpoints are not responding$(NC)"
+	@curl -f -s -w "%{http_code}" -o /dev/null http://localhost:8000/api/v1/classicmodels/customers/ | grep -q "401\|403" && echo "$(GREEN)✓ Customers endpoint is responding (authentication required)$(NC)" || echo "$(RED)✗ Customers endpoint is not responding$(NC)"
+	@curl -f -s -w "%{http_code}" -o /dev/null http://localhost:8000/api/v1/classicmodels/products/ | grep -q "401\|403" && echo "$(GREEN)✓ Products endpoint is responding (authentication required)$(NC)" || echo "$(RED)✗ Products endpoint is not responding$(NC)"
 	@echo "$(GREEN)✓ Health check completed$(NC)"
