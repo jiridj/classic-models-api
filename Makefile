@@ -1,6 +1,6 @@
 # Classic Models API - Simplified Makefile
 
-.PHONY: build start stop health-check test help
+.PHONY: build start stop health-check test postman-test clean help
 
 # Default target
 .DEFAULT_GOAL := help
@@ -19,12 +19,16 @@ help: ## Show this help message
 	@echo "  $(GREEN)start$(NC)        - Start the containers (database resets to original data)"
 	@echo "  $(GREEN)stop$(NC)         - Stop the containers"
 	@echo "  $(GREEN)test$(NC)         - Run the test suite"
+	@echo "  $(GREEN)postman-test$(NC) - Run Postman collection tests"
+	@echo "  $(GREEN)clean$(NC)       - Clean up test result files"
 	@echo "  $(GREEN)health-check$(NC) - Run health check against the API endpoints"
 	@echo ""
 	@echo "$(YELLOW)Examples:$(NC)"
 	@echo "  make build        # Build containers"
 	@echo "  make start        # Start with fresh database"
 	@echo "  make test         # Run all tests"
+	@echo "  make postman-test # Run Postman collection tests"
+	@echo "  make clean        # Clean up test files"
 	@echo "  make health-check # Check if API is working"
 
 build: ## Build the Docker containers
@@ -48,6 +52,34 @@ test: ## Run the test suite
 	@echo "$(BLUE)Running test suite...$(NC)"
 	pytest
 	@echo "$(GREEN)✓ All tests completed$(NC)"
+
+postman-test: ## Run Postman collection tests
+	@echo "$(BLUE)Running Postman collection tests...$(NC)"
+	@echo "Note: Make sure the API is running (make start) before running these tests"
+	@echo ""
+	@if [ -f "Classic_Models_API.postman_collection.json" ]; then \
+		newman run Classic_Models_API.postman_collection.json \
+			--env-var "base_url=http://localhost:8000" \
+			--reporters cli,json \
+			--reporter-json-export postman-test-results.json \
+			--timeout-request 10000 \
+			--timeout-script 10000; \
+		echo "$(GREEN)✓ Postman tests completed$(NC)"; \
+		echo "$(YELLOW)Test results saved to: postman-test-results.json$(NC)"; \
+	else \
+		echo "$(RED)✗ Postman collection file not found$(NC)"; \
+		echo "Expected: Classic_Models_API.postman_collection.json"; \
+		exit 1; \
+	fi
+
+clean: ## Clean up test result files
+	@echo "$(BLUE)Cleaning up test result files...$(NC)"
+	@if [ -f "postman-test-results.json" ]; then \
+		rm postman-test-results.json; \
+		echo "$(GREEN)✓ Removed postman-test-results.json$(NC)"; \
+	else \
+		echo "$(YELLOW)No test result files to clean$(NC)"; \
+	fi
 
 health-check: ## Run health check against the API endpoints
 	@echo "$(BLUE)Running health check...$(NC)"
