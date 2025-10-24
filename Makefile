@@ -41,7 +41,8 @@ start: ## Start the containers (database resets to original data)
 	docker-compose down -v
 	docker-compose up -d
 	@echo "$(GREEN)✓ Containers started with fresh database$(NC)"
-	@echo "$(YELLOW)API available at: http://localhost:8000$(NC)"
+	@echo "$(YELLOW)API available at: http://localhost:8000/classic-models$(NC)"
+	@echo "$(YELLOW)API docs: http://localhost:8000/classic-models/api/docs/$(NC)"
 
 stop: ## Stop the containers
 	@echo "$(BLUE)Stopping containers...$(NC)"
@@ -59,7 +60,7 @@ postman-test: ## Run Postman collection tests
 	@echo ""
 	@if [ -f "Classic_Models_API.postman_collection.json" ]; then \
 		newman run Classic_Models_API.postman_collection.json \
-			--env-var "base_url=http://localhost:8000" \
+			--env-var "base_url=http://localhost:8000/classic-models" \
 			--reporters cli,json \
 			--reporter-json-export postman-test-results.json \
 			--timeout-request 10000 \
@@ -84,9 +85,9 @@ clean: ## Clean up test result files
 health-check: ## Run health check against the API endpoints
 	@echo "$(BLUE)Running health check...$(NC)"
 	@echo "Checking API endpoints..."
-	@curl -f -s http://localhost:8000/api/docs/ > /dev/null && echo "$(GREEN)✓ API documentation is available$(NC)" || echo "$(RED)✗ API documentation is not available$(NC)"
-	@curl -f -s http://localhost:8000/api/schema/ > /dev/null && echo "$(GREEN)✓ API schema is available$(NC)" || echo "$(RED)✗ API schema is not available$(NC)"
-	@curl -f -s -w "%{http_code}" -o /dev/null http://localhost:8000/api/auth/register/ | grep -q "405" && echo "$(GREEN)✓ Authentication endpoints are responding$(NC)" || echo "$(RED)✗ Authentication endpoints are not responding$(NC)"
-	@curl -f -s -w "%{http_code}" -o /dev/null http://localhost:8000/api/v1/classicmodels/customers/ | grep -q "401\|403" && echo "$(GREEN)✓ Customers endpoint is responding (authentication required)$(NC)" || echo "$(RED)✗ Customers endpoint is not responding$(NC)"
-	@curl -f -s -w "%{http_code}" -o /dev/null http://localhost:8000/api/v1/classicmodels/products/ | grep -q "401\|403" && echo "$(GREEN)✓ Products endpoint is responding (authentication required)$(NC)" || echo "$(RED)✗ Products endpoint is not responding$(NC)"
+	@curl -f -s http://localhost:8000/classic-models/api/docs/ > /dev/null && echo "$(GREEN)✓ API documentation is available$(NC)" || echo "$(RED)✗ API documentation is not available$(NC)"
+	@curl -f -s http://localhost:8000/classic-models/api/schema/ > /dev/null && echo "$(GREEN)✓ API schema is available$(NC)" || echo "$(RED)✗ API schema is not available$(NC)"
+	@curl -f -s -w "%{http_code}" -o /dev/null http://localhost:8000/classic-models/api/auth/register/ | grep -q "405" && echo "$(GREEN)✓ Authentication endpoints are responding$(NC)" || echo "$(RED)✗ Authentication endpoints are not responding$(NC)"
+	@curl -f -s -w "%{http_code}" -o /dev/null http://localhost:8000/classic-models/api/v1/classicmodels/customers/ | grep -q "401\|403" && echo "$(GREEN)✓ Customers endpoint is responding (authentication required)$(NC)" || echo "$(RED)✗ Customers endpoint is not responding$(NC)"
+	@curl -f -s -w "%{http_code}" -o /dev/null http://localhost:8000/classic-models/api/v1/classicmodels/products/ | grep -q "401\|403" && echo "$(GREEN)✓ Products endpoint is responding (authentication required)$(NC)" || echo "$(RED)✗ Products endpoint is not responding$(NC)"
 	@echo "$(GREEN)✓ Health check completed$(NC)"
