@@ -39,6 +39,9 @@
         {
           "name": "API Documentation",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -51,6 +54,9 @@
         {
           "name": "API Schema",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -68,6 +74,9 @@
         {
           "name": "Register User",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
             "header": [
               {
@@ -105,6 +114,9 @@
             }
           ],
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
             "header": [
               {
@@ -125,7 +137,24 @@
         },
         {
           "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('access_token', response.access);",
+                  "    console.log('Access token refreshed:', response.access);",
+                  "}"
+                ]
+              }
+            }
+          ],
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
             "header": [
               {
@@ -147,6 +176,9 @@
         {
           "name": "Get Current User",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -159,6 +191,9 @@
         {
           "name": "Logout User",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "POST",
             "header": [
               {
@@ -185,6 +220,9 @@
         {
           "name": "List Product Lines",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -209,6 +247,9 @@
         {
           "name": "Create Product Line",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "POST",
             "header": [
               {
@@ -230,6 +271,9 @@
         {
           "name": "Get Product Line",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -242,6 +286,9 @@
         {
           "name": "Update Product Line",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "PUT",
             "header": [
               {
@@ -263,6 +310,9 @@
         {
           "name": "Partial Update Product Line",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "PATCH",
             "header": [
               {
@@ -284,6 +334,9 @@
         {
           "name": "Delete Product Line",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "DELETE",
             "header": [],
             "url": {
@@ -301,6 +354,9 @@
         {
           "name": "List Products",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -330,6 +386,9 @@
         {
           "name": "Create Product",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "POST",
             "header": [
               {
@@ -351,6 +410,9 @@
         {
           "name": "Get Product",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -363,6 +425,9 @@
         {
           "name": "Update Product",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "PUT",
             "header": [
               {
@@ -384,6 +449,9 @@
         {
           "name": "Partial Update Product",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "PATCH",
             "header": [
               {
@@ -405,6 +473,9 @@
         {
           "name": "Delete Product",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "DELETE",
             "header": [],
             "url": {
@@ -417,6 +488,9 @@
         {
           "name": "Search Products",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -451,6 +525,9 @@
         {
           "name": "List Offices",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -463,6 +540,9 @@
         {
           "name": "Create Office",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "POST",
             "header": [
               {
@@ -484,6 +564,9 @@
         {
           "name": "Get Office",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -496,6 +579,9 @@
         {
           "name": "Update Office",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "PUT",
             "header": [
               {
@@ -517,6 +603,9 @@
         {
           "name": "Partial Update Office",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "PATCH",
             "header": [
               {
@@ -538,6 +627,9 @@
         {
           "name": "Delete Office",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "DELETE",
             "header": [],
             "url": {
@@ -555,6 +647,9 @@
         {
           "name": "List Employees",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -567,6 +662,9 @@
         {
           "name": "Create Employee",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "POST",
             "header": [
               {
@@ -588,6 +686,9 @@
         {
           "name": "Get Employee",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -600,6 +701,9 @@
         {
           "name": "Update Employee",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "PUT",
             "header": [
               {
@@ -621,6 +725,9 @@
         {
           "name": "Partial Update Employee",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "PATCH",
             "header": [
               {
@@ -642,6 +749,9 @@
         {
           "name": "Delete Employee",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "DELETE",
             "header": [],
             "url": {
@@ -659,6 +769,9 @@
         {
           "name": "List Customers",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -688,6 +801,9 @@
         {
           "name": "Create Customer",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "POST",
             "header": [
               {
@@ -709,6 +825,9 @@
         {
           "name": "Get Customer",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -721,6 +840,9 @@
         {
           "name": "Update Customer",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "PUT",
             "header": [
               {
@@ -742,6 +864,9 @@
         {
           "name": "Partial Update Customer",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "PATCH",
             "header": [
               {
@@ -763,6 +888,9 @@
         {
           "name": "Delete Customer",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "DELETE",
             "header": [],
             "url": {
@@ -780,6 +908,9 @@
         {
           "name": "List Orders",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -792,6 +923,9 @@
         {
           "name": "Create Order",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "POST",
             "header": [
               {
@@ -813,6 +947,9 @@
         {
           "name": "Get Order",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -825,6 +962,9 @@
         {
           "name": "Update Order",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "PUT",
             "header": [
               {
@@ -846,6 +986,9 @@
         {
           "name": "Partial Update Order",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "PATCH",
             "header": [
               {
@@ -867,6 +1010,9 @@
         {
           "name": "Delete Order",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "DELETE",
             "header": [],
             "url": {
@@ -884,6 +1030,9 @@
         {
           "name": "List Order Details",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -896,6 +1045,9 @@
         {
           "name": "Create Order Detail",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "POST",
             "header": [
               {
@@ -917,6 +1069,9 @@
         {
           "name": "Get Order Detail",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -929,6 +1084,9 @@
         {
           "name": "Update Order Detail",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "PUT",
             "header": [
               {
@@ -950,6 +1108,9 @@
         {
           "name": "Partial Update Order Detail",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "PATCH",
             "header": [
               {
@@ -971,6 +1132,9 @@
         {
           "name": "Delete Order Detail",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "DELETE",
             "header": [],
             "url": {
@@ -988,6 +1152,9 @@
         {
           "name": "List Payments",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -1000,6 +1167,9 @@
         {
           "name": "Create Payment",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "POST",
             "header": [
               {
@@ -1021,6 +1191,9 @@
         {
           "name": "Get Payment",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -1033,6 +1206,9 @@
         {
           "name": "Update Payment",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "PUT",
             "header": [
               {
@@ -1054,6 +1230,9 @@
         {
           "name": "Partial Update Payment",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "PATCH",
             "header": [
               {
@@ -1075,6 +1254,9 @@
         {
           "name": "Delete Payment",
           "request": {
+            "auth": {
+              "type": "inherit"
+            },
             "method": "DELETE",
             "header": [],
             "url": {
@@ -1092,6 +1274,9 @@
         {
           "name": "ReDoc",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
             "header": [],
             "url": {
