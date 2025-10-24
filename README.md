@@ -253,7 +253,7 @@ For easy API testing and exploration, we've included a comprehensive Postman col
      - For testing with Docker Compose
    
    - **AWS Production**: `Classic_Models_API_AWS.postman_environment.json`
-     - Base URL: `https://classic-models.jiridj.be`
+     - Base URL: `https://router.jiridj.be/classic-models`
      - For testing the deployed AWS environment
    
    Import your chosen environment file into Postman and select it from the environment dropdown.
