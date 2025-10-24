@@ -7,12 +7,9 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key")
 DEBUG = os.environ.get("DEBUG", "0") == "1"
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
 
-# Reverse proxy configuration
-# FORCE_SCRIPT_NAME is intentionally left as None to allow both:
-# - Direct access to AWS endpoint (no prefix)
-# - Access via Traefik proxy (with /classic-models prefix handled by middleware)
-# If you need to force a specific prefix for all requests, set SCRIPT_NAME env var
-FORCE_SCRIPT_NAME = os.environ.get("SCRIPT_NAME", None)
+# Base path configuration
+# All URLs are served under /classic-models base path
+# This simplifies reverse proxy configuration (no need to strip prefix)
 
 # Enable support for X-Forwarded-* headers from trusted proxies
 USE_X_FORWARDED_HOST = True
@@ -85,10 +82,10 @@ SPECTACULAR_SETTINGS = {
     
     This API uses JWT (JSON Web Token) authentication. To access protected endpoints:
     
-    1. **Login**: POST `/api/auth/login/` with username and password
+    1. **Login**: POST `/classic-models/api/auth/login/` with username and password
     2. **Use Token**: Include the access token in the Authorization header: `Bearer <access_token>`
-    3. **Refresh**: Use POST `/api/auth/refresh/` to get a new access token
-    4. **Logout**: POST `/api/auth/logout/` to invalidate the refresh token
+    3. **Refresh**: Use POST `/classic-models/api/auth/refresh/` to get a new access token
+    4. **Logout**: POST `/classic-models/api/auth/logout/` to invalidate the refresh token
     
     ## Demo User
     
@@ -96,20 +93,24 @@ SPECTACULAR_SETTINGS = {
     - **Username**: `demo`
     - **Password**: `demo123`
     
+    ## Base Path
+    
+    All endpoints are served at `/classic-models` base path.
+    
     ## Public Endpoints
     
     - API documentation (this page)
-    - Authentication endpoints (`/api/auth/`)
+    - Authentication endpoints (`/classic-models/api/auth/`)
     
     ## Protected Endpoints
     
-    - All Classic Models data endpoints (`/api/v1/classicmodels/`)
+    - All Classic Models data endpoints (`/classic-models/api/v1/classicmodels/`)
     """,
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
     "COMPONENT_SPLIT_REQUEST": True,
     "SORT_OPERATIONS": False,
-    "SCHEMA_PATH_PREFIX": os.environ.get("SCRIPT_NAME", "") + "/api/",
+    "SCHEMA_PATH_PREFIX": "/classic-models/api/",
     "AUTHENTICATION_WHITELIST": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],

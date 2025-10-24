@@ -42,10 +42,12 @@ This demo application showcases a complete REST API implementation using Django 
    - Start the Django development server
 
 2. **Access the API**
-   - **API Documentation**: http://localhost:8000/api/docs/
-   - **ReDoc Documentation**: http://localhost:8000/api/redoc/
-   - **API Base URL**: http://localhost:8000/api/v1/
+   - **API Documentation**: http://localhost:8000/classic-models/api/docs/
+   - **ReDoc Documentation**: http://localhost:8000/classic-models/api/redoc/
+   - **API Base URL**: http://localhost:8000/classic-models/api/v1/
    - **Postman Collection**: Import `Classic_Models_API.postman_collection.json`
+   
+   Note: The API is served at `/classic-models` base path for all environments.
 
 ### Demo Credentials
 
@@ -160,7 +162,7 @@ The API uses JWT (JSON Web Token) authentication:
 
 ```bash
 # Login
-POST /api/auth/login/
+POST /classic-models/api/auth/login/
 {
   "username": "demo",
   "password": "demo123"
@@ -177,48 +179,48 @@ POST /api/auth/login/
 ### API Endpoints
 
 #### Public Endpoints (No Authentication Required)
-- `GET /api/docs/` - Swagger UI documentation
-- `GET /api/redoc/` - ReDoc documentation
-- `GET /api/schema/` - OpenAPI schema
-- `POST /api/auth/login/` - User login
-- `POST /api/auth/register/` - User registration
-- `POST /api/auth/refresh/` - Token refresh
+- `GET /classic-models/api/docs/` - Swagger UI documentation
+- `GET /classic-models/api/redoc/` - ReDoc documentation
+- `GET /classic-models/api/schema/` - OpenAPI schema
+- `POST /classic-models/api/auth/login/` - User login
+- `POST /classic-models/api/auth/register/` - User registration
+- `POST /classic-models/api/auth/refresh/` - Token refresh
 
 #### Protected Endpoints (JWT Required)
-- `GET /api/auth/me/` - Current user info
-- `POST /api/auth/logout/` - User logout
+- `GET /classic-models/api/auth/me/` - Current user info
+- `POST /classic-models/api/auth/logout/` - User logout
 
 #### Classic Models Data Endpoints
 
 | Resource | Endpoints | Description |
 |----------|-----------|-------------|
-| **Product Lines** | `/api/v1/classicmodels/productlines/` | Product categories |
-| **Products** | `/api/v1/classicmodels/products/` | Product catalog |
-| **Offices** | `/api/v1/classicmodels/offices/` | Company offices |
-| **Employees** | `/api/v1/classicmodels/employees/` | Staff information |
-| **Customers** | `/api/v1/classicmodels/customers/` | Customer data |
-| **Orders** | `/api/v1/classicmodels/orders/` | Customer orders |
-| **Payments** | `/api/v1/classicmodels/payments/` | Payment records |
-| **Order Details** | `/api/v1/classicmodels/orderdetails/` | Order line items |
+| **Product Lines** | `/classic-models/api/v1/classicmodels/productlines/` | Product categories |
+| **Products** | `/classic-models/api/v1/classicmodels/products/` | Product catalog |
+| **Offices** | `/classic-models/api/v1/classicmodels/offices/` | Company offices |
+| **Employees** | `/classic-models/api/v1/classicmodels/employees/` | Staff information |
+| **Customers** | `/classic-models/api/v1/classicmodels/customers/` | Customer data |
+| **Orders** | `/classic-models/api/v1/classicmodels/orders/` | Customer orders |
+| **Payments** | `/classic-models/api/v1/classicmodels/payments/` | Payment records |
+| **Order Details** | `/classic-models/api/v1/classicmodels/orderdetails/` | Order line items |
 
 ### Example API Usage
 
 ```bash
 # 1. Login to get JWT token
-curl -X POST http://localhost:8000/api/auth/login/ \
+curl -X POST http://localhost:8000/classic-models/api/auth/login/ \
   -H "Content-Type: application/json" \
   -d '{"username": "demo", "password": "demo123"}'
 
 # 2. Use token to access protected endpoints
-curl -X GET http://localhost:8000/api/v1/classicmodels/products/ \
+curl -X GET http://localhost:8000/classic-models/api/v1/classicmodels/products/ \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 
 # 3. Get specific product
-curl -X GET http://localhost:8000/api/v1/classicmodels/products/S10_1678/ \
+curl -X GET http://localhost:8000/classic-models/api/v1/classicmodels/products/S10_1678/ \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 
 # 4. Create new product
-curl -X POST http://localhost:8000/api/v1/classicmodels/products/ \
+curl -X POST http://localhost:8000/classic-models/api/v1/classicmodels/products/ \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -249,12 +251,14 @@ For easy API testing and exploration, we've included a comprehensive Postman col
    Choose one of the pre-configured environments:
    
    - **Local Development**: `Classic_Models_API_Local.postman_environment.json`
-     - Base URL: `http://localhost:8000`
+     - Base URL: `http://localhost:8000/classic-models`
      - For testing with Docker Compose
    
    - **AWS Production**: `Classic_Models_API_AWS.postman_environment.json`
      - Base URL: `https://router.jiridj.be/classic-models`
      - For testing the deployed AWS environment
+   
+   Both environments use the `/classic-models` base path.
    
    Import your chosen environment file into Postman and select it from the environment dropdown.
 
