@@ -244,9 +244,19 @@ For easy API testing and exploration, we've included a comprehensive Postman col
    - Download `Classic_Models_API.postman_collection.json` from the project root
    - Import it into Postman
 
-2. **Configure Environment**
-   - Set the `base_url` variable to your API URL (default: `http://localhost:8000`)
-   - No need to manually set tokens - they're automatically managed
+2. **Import an Environment**
+   
+   Choose one of the pre-configured environments:
+   
+   - **Local Development**: `Classic_Models_API_Local.postman_environment.json`
+     - Base URL: `http://localhost:8000`
+     - For testing with Docker Compose
+   
+   - **AWS Production**: `Classic_Models_API_AWS.postman_environment.json`
+     - Base URL: `https://classic-models.jiridj.be`
+     - For testing the deployed AWS environment
+   
+   Import your chosen environment file into Postman and select it from the environment dropdown.
 
 3. **Authentication Flow**
    - Run "Register User" to create a new account (optional)
