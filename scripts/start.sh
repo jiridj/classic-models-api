@@ -3,9 +3,12 @@ set -e
 
 echo "Starting Classic Models API..."
 
+# Use MYSQL_HOST environment variable, default to 'mysql' for local development
+MYSQL_HOST=${MYSQL_HOST:-mysql}
+
 # Wait for MySQL to be ready
-echo "Waiting for MySQL to be ready..."
-until nc -z mysql 3306; do
+echo "Waiting for MySQL to be ready at ${MYSQL_HOST}..."
+until nc -z "${MYSQL_HOST}" 3306; do
   echo "MySQL is unavailable - sleeping"
   sleep 2
 done
