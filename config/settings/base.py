@@ -7,6 +7,18 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key")
 DEBUG = os.environ.get("DEBUG", "0") == "1"
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
 
+# Reverse proxy configuration
+# FORCE_SCRIPT_NAME is intentionally left as None to allow both:
+# - Direct access to AWS endpoint (no prefix)
+# - Access via Traefik proxy (with /classic-models prefix handled by middleware)
+# If you need to force a specific prefix for all requests, set SCRIPT_NAME env var
+FORCE_SCRIPT_NAME = os.environ.get("SCRIPT_NAME", None)
+
+# Enable support for X-Forwarded-* headers from trusted proxies
+USE_X_FORWARDED_HOST = True
+USE_X_FORWARDED_PORT = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -97,7 +109,7 @@ SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": False,
     "COMPONENT_SPLIT_REQUEST": True,
     "SORT_OPERATIONS": False,
-    "SCHEMA_PATH_PREFIX": "/api/",
+    "SCHEMA_PATH_PREFIX": os.environ.get("SCRIPT_NAME", "") + "/api/",
     "AUTHENTICATION_WHITELIST": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],

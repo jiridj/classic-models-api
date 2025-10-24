@@ -305,6 +305,10 @@ Classic Models API
     └── ReDoc
 ```
 
+## 🚀 Deployment
+
+For production deployment instructions, including reverse proxy configuration, see [DEPLOYMENT.md](DEPLOYMENT.md).
+
 ## 🛠️ Development
 
 ### Using Make Commands (Recommended)
