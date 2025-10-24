@@ -119,12 +119,11 @@ To verify the auth configuration is working:
    - Try "List Products" again
    - Expected: 200 OK with product data
 
-## Environment Variables
+## Variables
 
-Both environment files include:
-- `base_url`: API base URL
-- `access_token`: JWT access token (auto-populated on login)
-- `refresh_token`: JWT refresh token (auto-populated on login)
+### Environment Variables
+Both environment files include only:
+- `base_url`: API base URL (environment-specific)
 
 **Local Environment**:
 ```
@@ -135,4 +134,12 @@ base_url: http://localhost:8000/classic-models
 ```
 base_url: https://dynamic-router.onrender.com/classic-models
 ```
+
+### Collection Variables
+The collection includes:
+- `base_url`: Default base URL (can be overridden by environment)
+- `access_token`: JWT access token (auto-populated on login)
+- `refresh_token`: JWT refresh token (auto-populated on login)
+
+**Note**: Authentication tokens are stored at the collection level, not in environments. This ensures tokens persist across environment switches and are managed centrally by the collection.
 
