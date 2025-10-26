@@ -152,7 +152,37 @@ curl http://your-nas-ip:8000/classic-models/api/schema/
 
 ## Updating the Application
 
-### Method 1: Manual Update
+### Method 1: Update to Latest Version
+
+```bash
+cd /share/Container/classic-models-api
+
+# Update to latest version
+echo "API_VERSION=latest" >> .env
+
+# Pull the latest image
+docker-compose -f docker-compose.nas.yml pull
+
+# Restart the services
+docker-compose -f docker-compose.nas.yml up -d
+```
+
+### Method 2: Update to Specific Version
+
+```bash
+cd /share/Container/classic-models-api
+
+# Update to specific version (e.g., v1.0.0)
+echo "API_VERSION=v1.0.0" >> .env
+
+# Pull the specific version
+docker-compose -f docker-compose.nas.yml pull
+
+# Restart the services
+docker-compose -f docker-compose.nas.yml up -d
+```
+
+### Method 3: Manual Update (Legacy)
 
 ```bash
 cd /share/Container/classic-models-api

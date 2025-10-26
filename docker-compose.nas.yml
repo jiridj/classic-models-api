@@ -25,7 +25,7 @@ services:
       start_period: 60s
 
   api:
-    image: ghcr.io/${GITHUB_REPOSITORY:-your-username/classic-models-api}:latest
+    image: ghcr.io/${GITHUB_REPOSITORY:-your-username/classic-models-api}:${API_VERSION:-latest}
     container_name: classic-models-api
     restart: unless-stopped
     ports:

@@ -3,6 +3,7 @@ name: Build and Push Docker Image
 on:
   push:
     branches: [ main ]
+    tags: [ 'v*' ]
   workflow_dispatch:
 
 env:
@@ -19,6 +20,40 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Extract version
+      id: version
+      run: |
+        if [[ $GITHUB_REF == refs/tags/* ]]; then
+          VERSION=${GITHUB_REF#refs/tags/}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "is_release=true" >> $GITHUB_OUTPUT
+        else
+          VERSION="dev-$(git rev-parse --short HEAD)"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "is_release=false" >> $GITHUB_OUTPUT
+        fi
+        echo "Extracted version: $VERSION"
+
+    - name: Update API version in settings
+      if: steps.version.outputs.is_release == 'true'
+      run: |
+        VERSION=${{ steps.version.outputs.version }}
+        # Remove 'v' prefix if present
+        CLEAN_VERSION=${VERSION#v}
+        echo "Updating API version to: $CLEAN_VERSION"
+        
+        # Update the version in settings
+        sed -i "s/\"VERSION\": \"[^\"]*\"/\"VERSION\": \"$CLEAN_VERSION\"/" config/settings/base.py
+        
+        # Commit the version update
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add config/settings/base.py
+        git commit -m "Update API version to $CLEAN_VERSION" || echo "No changes to commit"
+        git tag -f $VERSION || echo "Tag already exists"
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
@@ -40,6 +75,7 @@ jobs:
           type=ref,event=pr
           type=sha,prefix={{branch}}-
           type=raw,value=latest,enable={{is_default_branch}}
+          type=raw,value=${{ steps.version.outputs.version }},enable={{is_release}}
 
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
@@ -51,6 +87,35 @@ jobs:
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
+
+    - name: Create Release
+      if: steps.version.outputs.is_release == 'true'
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.version.outputs.version }}
+        release_name: Release ${{ steps.version.outputs.version }}
+        body: |
+          ## Release ${{ steps.version.outputs.version }}
+          
+          ### Docker Image
+          - **Image**: `${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}`
+          - **Latest**: `${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest`
+          
+          ### API Documentation
+          - **Swagger UI**: `/api/docs/`
+          - **ReDoc**: `/api/redoc/`
+          - **OpenAPI Schema**: `/api/schema/`
+          
+          ### Deployment
+          Update your Docker Compose file to use the new version:
+          ```yaml
+          api:
+            image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}
+          ```
+        draft: false
+        prerelease: false
 
     - name: Image digest
       run: echo ${{ steps.build.outputs.digest }}
