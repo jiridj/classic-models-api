@@ -247,9 +247,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/productlines/?page=1&page_size=10",
+              "raw": "{{base_url}}/api/v1/productlines/?page=1&page_size=10",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "productlines", ""],
+              "path": ["api", "v1", "productlines", ""],
               "query": [
                 {
                   "key": "page",
@@ -290,9 +290,9 @@
               "raw": "{\n  \"productline\": \"Vintage Cars\",\n  \"textdescription\": \"Classic and vintage automobiles from the golden age of motoring\",\n  \"htmldescription\": \"<p>Classic and vintage automobiles from the golden age of motoring</p>\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/productlines/",
+              "raw": "{{base_url}}/api/v1/productlines/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "productlines", ""]
+              "path": ["api", "v1", "productlines", ""]
             }
           }
         },
@@ -312,9 +312,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/productlines/Vintage Cars/",
+              "raw": "{{base_url}}/api/v1/productlines/Vintage Cars/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "productlines", "Vintage Cars", ""]
+              "path": ["api", "v1", "productlines", "Vintage Cars", ""]
             }
           }
         },
@@ -343,9 +343,9 @@
               "raw": "{\n  \"productline\": \"Vintage Cars\",\n  \"textdescription\": \"Updated description for vintage automobiles\",\n  \"htmldescription\": \"<p>Updated HTML description for vintage automobiles</p>\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/productlines/Vintage Cars/",
+              "raw": "{{base_url}}/api/v1/productlines/Vintage Cars/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "productlines", "Vintage Cars", ""]
+              "path": ["api", "v1", "productlines", "Vintage Cars", ""]
             }
           }
         },
@@ -374,9 +374,9 @@
               "raw": "{\n  \"textdescription\": \"Partially updated description\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/productlines/Vintage Cars/",
+              "raw": "{{base_url}}/api/v1/productlines/Vintage Cars/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "productlines", "Vintage Cars", ""]
+              "path": ["api", "v1", "productlines", "Vintage Cars", ""]
             }
           }
         },
@@ -396,9 +396,9 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/productlines/Vintage Cars/",
+              "raw": "{{base_url}}/api/v1/productlines/Vintage Cars/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "productlines", "Vintage Cars", ""]
+              "path": ["api", "v1", "productlines", "Vintage Cars", ""]
             }
           }
         }
@@ -423,9 +423,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/products/?page=1&page_size=20&productline=Motorcycles",
+              "raw": "{{base_url}}/api/v1/products/?page=1&page_size=20&productline=Motorcycles",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "products", ""],
+              "path": ["api", "v1", "products", ""],
               "query": [
                 {
                   "key": "page",
@@ -471,9 +471,9 @@
               "raw": "{\n  \"productcode\": \"S10_1678\",\n  \"productname\": \"1969 Harley Davidson Ultimate Chopper\",\n  \"productline\": \"Motorcycles\",\n  \"productscale\": \"1:10\",\n  \"productvendor\": \"Min Lin Diecast\",\n  \"productdescription\": \"This replica features working kickstand, front suspension, gear-shift lever, footpegs, detachable rear wheel, sprocket and chain.\",\n  \"quantityinstock\": 7933,\n  \"buyprice\": \"48.81\",\n  \"msrp\": \"95.70\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/products/",
+              "raw": "{{base_url}}/api/v1/products/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "products", ""]
+              "path": ["api", "v1", "products", ""]
             }
           }
         },
@@ -493,9 +493,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/products/S10_1678/",
+              "raw": "{{base_url}}/api/v1/products/S10_1678/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "products", "S10_1678", ""]
+              "path": ["api", "v1", "products", "S10_1678", ""]
             }
           }
         },
@@ -524,9 +524,9 @@
               "raw": "{\n  \"productcode\": \"S10_1678\",\n  \"productname\": \"Updated 1969 Harley Davidson Ultimate Chopper\",\n  \"productline\": \"Motorcycles\",\n  \"productscale\": \"1:10\",\n  \"productvendor\": \"Updated Min Lin Diecast\",\n  \"productdescription\": \"Updated description for this motorcycle replica\",\n  \"quantityinstock\": 8000,\n  \"buyprice\": \"50.00\",\n  \"msrp\": \"100.00\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/products/S10_1678/",
+              "raw": "{{base_url}}/api/v1/products/S10_1678/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "products", "S10_1678", ""]
+              "path": ["api", "v1", "products", "S10_1678", ""]
             }
           }
         },
@@ -555,9 +555,9 @@
               "raw": "{\n  \"productname\": \"Partially Updated Product\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/products/S10_1678/",
+              "raw": "{{base_url}}/api/v1/products/S10_1678/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "products", "S10_1678", ""]
+              "path": ["api", "v1", "products", "S10_1678", ""]
             }
           }
         },
@@ -577,9 +577,9 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/products/S10_1678/",
+              "raw": "{{base_url}}/api/v1/products/S10_1678/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "products", "S10_1678", ""]
+              "path": ["api", "v1", "products", "S10_1678", ""]
             }
           }
         },
@@ -599,9 +599,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/products/?search=Harley&page=1&page_size=10",
+              "raw": "{{base_url}}/api/v1/products/?search=Harley&page=1&page_size=10",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "products", ""],
+              "path": ["api", "v1", "products", ""],
               "query": [
                 {
                   "key": "search",
@@ -643,9 +643,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/offices/",
+              "raw": "{{base_url}}/api/v1/offices/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "offices", ""]
+              "path": ["api", "v1", "offices", ""]
             }
           }
         },
@@ -674,9 +674,9 @@
               "raw": "{\n  \"officecode\": \"NYC\",\n  \"city\": \"New York\",\n  \"phone\": \"+1 212 555 0100\",\n  \"addressline1\": \"123 Broadway\",\n  \"addressline2\": \"Suite 100\",\n  \"state\": \"NY\",\n  \"country\": \"USA\",\n  \"postalcode\": \"10001\",\n  \"territory\": \"NA\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/offices/",
+              "raw": "{{base_url}}/api/v1/offices/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "offices", ""]
+              "path": ["api", "v1", "offices", ""]
             }
           }
         },
@@ -696,9 +696,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/offices/NYC/",
+              "raw": "{{base_url}}/api/v1/offices/NYC/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "offices", "NYC", ""]
+              "path": ["api", "v1", "offices", "NYC", ""]
             }
           }
         },
@@ -727,9 +727,9 @@
               "raw": "{\n  \"officecode\": \"NYC\",\n  \"city\": \"New York City\",\n  \"phone\": \"+1 212 555 0101\",\n  \"addressline1\": \"123 Broadway\",\n  \"addressline2\": \"Suite 200\",\n  \"state\": \"NY\",\n  \"country\": \"USA\",\n  \"postalcode\": \"10001\",\n  \"territory\": \"NA\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/offices/NYC/",
+              "raw": "{{base_url}}/api/v1/offices/NYC/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "offices", "NYC", ""]
+              "path": ["api", "v1", "offices", "NYC", ""]
             }
           }
         },
@@ -758,9 +758,9 @@
               "raw": "{\n  \"phone\": \"+1 212 555 0102\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/offices/NYC/",
+              "raw": "{{base_url}}/api/v1/offices/NYC/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "offices", "NYC", ""]
+              "path": ["api", "v1", "offices", "NYC", ""]
             }
           }
         },
@@ -780,9 +780,9 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/offices/NYC/",
+              "raw": "{{base_url}}/api/v1/offices/NYC/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "offices", "NYC", ""]
+              "path": ["api", "v1", "offices", "NYC", ""]
             }
           }
         }
@@ -807,9 +807,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/employees/",
+              "raw": "{{base_url}}/api/v1/employees/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "employees", ""]
+              "path": ["api", "v1", "employees", ""]
             }
           }
         },
@@ -838,9 +838,9 @@
               "raw": "{\n  \"employeenumber\": 1001,\n  \"lastname\": \"Smith\",\n  \"firstname\": \"John\",\n  \"extension\": \"x5800\",\n  \"email\": \"john.smith@classicmodels.com\",\n  \"officecode\": \"NYC\",\n  \"reportsto\": null,\n  \"jobtitle\": \"Sales Manager\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/employees/",
+              "raw": "{{base_url}}/api/v1/employees/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "employees", ""]
+              "path": ["api", "v1", "employees", ""]
             }
           }
         },
@@ -860,9 +860,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/employees/1001/",
+              "raw": "{{base_url}}/api/v1/employees/1001/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "employees", "1001", ""]
+              "path": ["api", "v1", "employees", "1001", ""]
             }
           }
         },
@@ -891,9 +891,9 @@
               "raw": "{\n  \"employeenumber\": 1001,\n  \"lastname\": \"Smith\",\n  \"firstname\": \"John\",\n  \"extension\": \"x5801\",\n  \"email\": \"john.smith@classicmodels.com\",\n  \"officecode\": \"NYC\",\n  \"reportsto\": null,\n  \"jobtitle\": \"Senior Sales Manager\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/employees/1001/",
+              "raw": "{{base_url}}/api/v1/employees/1001/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "employees", "1001", ""]
+              "path": ["api", "v1", "employees", "1001", ""]
             }
           }
         },
@@ -922,9 +922,9 @@
               "raw": "{\n  \"jobtitle\": \"Regional Sales Manager\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/employees/1001/",
+              "raw": "{{base_url}}/api/v1/employees/1001/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "employees", "1001", ""]
+              "path": ["api", "v1", "employees", "1001", ""]
             }
           }
         },
@@ -944,9 +944,9 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/employees/1001/",
+              "raw": "{{base_url}}/api/v1/employees/1001/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "employees", "1001", ""]
+              "path": ["api", "v1", "employees", "1001", ""]
             }
           }
         }
@@ -971,9 +971,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/customers/?page=1&page_size=25&country=USA",
+              "raw": "{{base_url}}/api/v1/customers/?page=1&page_size=25&country=USA",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "customers", ""],
+              "path": ["api", "v1", "customers", ""],
               "query": [
                 {
                   "key": "page",
@@ -1019,9 +1019,9 @@
               "raw": "{\n  \"customernumber\": 1001,\n  \"customername\": \"Atelier graphique\",\n  \"contactlastname\": \"Schmitt\",\n  \"contactfirstname\": \"Carine \",\n  \"phone\": \"40.32.2555\",\n  \"addressline1\": \"54, rue Royale\",\n  \"addressline2\": null,\n  \"city\": \"Nantes\",\n  \"state\": null,\n  \"postalcode\": \"44000\",\n  \"country\": \"France\",\n  \"salesrepemployeenumber\": 1001,\n  \"creditlimit\": \"21000.00\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/customers/",
+              "raw": "{{base_url}}/api/v1/customers/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "customers", ""]
+              "path": ["api", "v1", "customers", ""]
             }
           }
         },
@@ -1041,9 +1041,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/customers/1001/",
+              "raw": "{{base_url}}/api/v1/customers/1001/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "customers", "1001", ""]
+              "path": ["api", "v1", "customers", "1001", ""]
             }
           }
         },
@@ -1072,9 +1072,9 @@
               "raw": "{\n  \"customernumber\": 1001,\n  \"customername\": \"Updated Atelier graphique\",\n  \"contactlastname\": \"Schmitt\",\n  \"contactfirstname\": \"Carine\",\n  \"phone\": \"40.32.2556\",\n  \"addressline1\": \"54, rue Royale\",\n  \"addressline2\": null,\n  \"city\": \"Nantes\",\n  \"state\": null,\n  \"postalcode\": \"44000\",\n  \"country\": \"France\",\n  \"salesrepemployeenumber\": 1001,\n  \"creditlimit\": \"22000.00\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/customers/1001/",
+              "raw": "{{base_url}}/api/v1/customers/1001/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "customers", "1001", ""]
+              "path": ["api", "v1", "customers", "1001", ""]
             }
           }
         },
@@ -1103,9 +1103,9 @@
               "raw": "{\n  \"creditlimit\": \"25000.00\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/customers/1001/",
+              "raw": "{{base_url}}/api/v1/customers/1001/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "customers", "1001", ""]
+              "path": ["api", "v1", "customers", "1001", ""]
             }
           }
         },
@@ -1125,9 +1125,9 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/customers/1001/",
+              "raw": "{{base_url}}/api/v1/customers/1001/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "customers", "1001", ""]
+              "path": ["api", "v1", "customers", "1001", ""]
             }
           }
         }
@@ -1152,9 +1152,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/orders/",
+              "raw": "{{base_url}}/api/v1/orders/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "orders", ""]
+              "path": ["api", "v1", "orders", ""]
             }
           }
         },
@@ -1183,9 +1183,9 @@
               "raw": "{\n  \"ordernumber\": 10100,\n  \"orderdate\": \"2024-01-15\",\n  \"requireddate\": \"2024-01-20\",\n  \"shippeddate\": \"2024-01-18\",\n  \"status\": \"Shipped\",\n  \"comments\": \"Order processed successfully\",\n  \"customernumber\": 1001\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/orders/",
+              "raw": "{{base_url}}/api/v1/orders/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "orders", ""]
+              "path": ["api", "v1", "orders", ""]
             }
           }
         },
@@ -1205,9 +1205,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/orders/10100/",
+              "raw": "{{base_url}}/api/v1/orders/10100/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "orders", "10100", ""]
+              "path": ["api", "v1", "orders", "10100", ""]
             }
           }
         },
@@ -1236,9 +1236,9 @@
               "raw": "{\n  \"ordernumber\": 10100,\n  \"orderdate\": \"2024-01-15\",\n  \"requireddate\": \"2024-01-20\",\n  \"shippeddate\": \"2024-01-19\",\n  \"status\": \"Delivered\",\n  \"comments\": \"Order delivered successfully\",\n  \"customernumber\": 1001\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/orders/10100/",
+              "raw": "{{base_url}}/api/v1/orders/10100/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "orders", "10100", ""]
+              "path": ["api", "v1", "orders", "10100", ""]
             }
           }
         },
@@ -1267,9 +1267,9 @@
               "raw": "{\n  \"status\": \"Cancelled\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/orders/10100/",
+              "raw": "{{base_url}}/api/v1/orders/10100/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "orders", "10100", ""]
+              "path": ["api", "v1", "orders", "10100", ""]
             }
           }
         },
@@ -1289,9 +1289,9 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/orders/10100/",
+              "raw": "{{base_url}}/api/v1/orders/10100/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "orders", "10100", ""]
+              "path": ["api", "v1", "orders", "10100", ""]
             }
           }
         }
@@ -1316,9 +1316,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/orderdetails/",
+              "raw": "{{base_url}}/api/v1/orderdetails/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "orderdetails", ""]
+              "path": ["api", "v1", "orderdetails", ""]
             }
           }
         },
@@ -1347,9 +1347,9 @@
               "raw": "{\n  \"ordernumber\": 10100,\n  \"productcode\": \"S10_1678\",\n  \"quantityordered\": 30,\n  \"priceeach\": \"136.00\",\n  \"orderlinenumber\": 1\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/orderdetails/",
+              "raw": "{{base_url}}/api/v1/orderdetails/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "orderdetails", ""]
+              "path": ["api", "v1", "orderdetails", ""]
             }
           }
         },
@@ -1369,9 +1369,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/orderdetails/10100/S10_1678/",
+              "raw": "{{base_url}}/api/v1/orderdetails/10100/S10_1678/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "orderdetails", "10100", "S10_1678", ""]
+              "path": ["api", "v1", "orderdetails", "10100", "S10_1678", ""]
             }
           }
         },
@@ -1400,9 +1400,9 @@
               "raw": "{\n  \"ordernumber\": 10100,\n  \"productcode\": \"S10_1678\",\n  \"quantityordered\": 35,\n  \"priceeach\": \"140.00\",\n  \"orderlinenumber\": 1\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/orderdetails/10100/S10_1678/",
+              "raw": "{{base_url}}/api/v1/orderdetails/10100/S10_1678/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "orderdetails", "10100", "S10_1678", ""]
+              "path": ["api", "v1", "orderdetails", "10100", "S10_1678", ""]
             }
           }
         },
@@ -1431,9 +1431,9 @@
               "raw": "{\n  \"quantityordered\": 40\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/orderdetails/10100/S10_1678/",
+              "raw": "{{base_url}}/api/v1/orderdetails/10100/S10_1678/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "orderdetails", "10100", "S10_1678", ""]
+              "path": ["api", "v1", "orderdetails", "10100", "S10_1678", ""]
             }
           }
         },
@@ -1453,9 +1453,9 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/orderdetails/10100/S10_1678/",
+              "raw": "{{base_url}}/api/v1/orderdetails/10100/S10_1678/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "orderdetails", "10100", "S10_1678", ""]
+              "path": ["api", "v1", "orderdetails", "10100", "S10_1678", ""]
             }
           }
         }
@@ -1480,9 +1480,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/payments/",
+              "raw": "{{base_url}}/api/v1/payments/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "payments", ""]
+              "path": ["api", "v1", "payments", ""]
             }
           }
         },
@@ -1511,9 +1511,9 @@
               "raw": "{\n  \"customernumber\": 1001,\n  \"checknumber\": \"HQ336336\",\n  \"paymentdate\": \"2024-01-15\",\n  \"amount\": \"6066.78\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/payments/",
+              "raw": "{{base_url}}/api/v1/payments/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "payments", ""]
+              "path": ["api", "v1", "payments", ""]
             }
           }
         },
@@ -1533,9 +1533,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/payments/1001/HQ336336/",
+              "raw": "{{base_url}}/api/v1/payments/1001/HQ336336/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "payments", "1001", "HQ336336", ""]
+              "path": ["api", "v1", "payments", "1001", "HQ336336", ""]
             }
           }
         },
@@ -1564,9 +1564,9 @@
               "raw": "{\n  \"customernumber\": 1001,\n  \"checknumber\": \"HQ336336\",\n  \"paymentdate\": \"2024-01-16\",\n  \"amount\": \"6100.00\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/payments/1001/HQ336336/",
+              "raw": "{{base_url}}/api/v1/payments/1001/HQ336336/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "payments", "1001", "HQ336336", ""]
+              "path": ["api", "v1", "payments", "1001", "HQ336336", ""]
             }
           }
         },
@@ -1595,9 +1595,9 @@
               "raw": "{\n  \"amount\": \"6200.00\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/payments/1001/HQ336336/",
+              "raw": "{{base_url}}/api/v1/payments/1001/HQ336336/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "payments", "1001", "HQ336336", ""]
+              "path": ["api", "v1", "payments", "1001", "HQ336336", ""]
             }
           }
         },
@@ -1617,9 +1617,9 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/classicmodels/payments/1001/HQ336336/",
+              "raw": "{{base_url}}/api/v1/payments/1001/HQ336336/",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "classicmodels", "payments", "1001", "HQ336336", ""]
+              "path": ["api", "v1", "payments", "1001", "HQ336336", ""]
             }
           }
         }

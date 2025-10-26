@@ -93,8 +93,8 @@ health-check: ## Run health check against the API endpoints
 	@curl -f -s http://localhost:8000/classic-models/api/docs/ > /dev/null && echo "$(GREEN)✓ API documentation is available$(NC)" || echo "$(RED)✗ API documentation is not available$(NC)"
 	@curl -f -s http://localhost:8000/classic-models/api/schema/ > /dev/null && echo "$(GREEN)✓ API schema is available$(NC)" || echo "$(RED)✗ API schema is not available$(NC)"
 	@curl -f -s -w "%{http_code}" -o /dev/null http://localhost:8000/classic-models/api/auth/register/ | grep -q "405" && echo "$(GREEN)✓ Authentication endpoints are responding$(NC)" || echo "$(RED)✗ Authentication endpoints are not responding$(NC)"
-	@curl -f -s -w "%{http_code}" -o /dev/null http://localhost:8000/classic-models/api/v1/classicmodels/customers/ | grep -q "401\|403" && echo "$(GREEN)✓ Customers endpoint is responding (authentication required)$(NC)" || echo "$(RED)✗ Customers endpoint is not responding$(NC)"
-	@curl -f -s -w "%{http_code}" -o /dev/null http://localhost:8000/classic-models/api/v1/classicmodels/products/ | grep -q "401\|403" && echo "$(GREEN)✓ Products endpoint is responding (authentication required)$(NC)" || echo "$(RED)✗ Products endpoint is not responding$(NC)"
+	@curl -f -s -w "%{http_code}" -o /dev/null http://localhost:8000/classic-models/api/v1/customers/ | grep -q "401\|403" && echo "$(GREEN)✓ Customers endpoint is responding (authentication required)$(NC)" || echo "$(RED)✗ Customers endpoint is not responding$(NC)"
+	@curl -f -s -w "%{http_code}" -o /dev/null http://localhost:8000/classic-models/api/v1/products/ | grep -q "401\|403" && echo "$(GREEN)✓ Products endpoint is responding (authentication required)$(NC)" || echo "$(RED)✗ Products endpoint is not responding$(NC)"
 	@echo "$(GREEN)✓ Health check completed$(NC)"
 
 patch: ## Bump patch version (0.0.1 -> 0.0.2)

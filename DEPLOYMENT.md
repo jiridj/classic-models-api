@@ -93,7 +93,7 @@ curl -X POST http://localhost:8000/classic-models/api/auth/login/ \
   -d '{"username": "demo", "password": "demo123"}'
 
 # Products
-curl http://localhost:8000/classic-models/api/v1/classicmodels/products/
+curl http://localhost:8000/classic-models/api/v1/products/
 ```
 
 ### AWS Direct Access

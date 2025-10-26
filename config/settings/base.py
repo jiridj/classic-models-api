@@ -108,7 +108,7 @@ SPECTACULAR_SETTINGS = {
     
     ## Protected Endpoints
     
-    - All Classic Models data endpoints (`/classic-models/api/v1/classicmodels/`)
+    - All Classic Models data endpoints (`/classic-models/api/v1/`)
     """,
     "VERSION": get_version(),
     "SERVE_INCLUDE_SCHEMA": False,

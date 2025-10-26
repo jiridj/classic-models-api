@@ -30,14 +30,14 @@ The following endpoints now inherit the Bearer token authentication from the col
 - **Authentication**
   - Get Current User (`/api/auth/me/`)
   - Logout User (`/api/auth/logout/`)
-- **Product Lines** (all 6 CRUD endpoints)
-- **Products** (all 7 endpoints including search)
-- **Offices** (all 6 CRUD endpoints)
-- **Employees** (all 6 CRUD endpoints)
-- **Customers** (all 6 CRUD endpoints)
-- **Orders** (all 6 CRUD endpoints)
-- **Order Details** (all 6 CRUD endpoints)
-- **Payments** (all 6 CRUD endpoints)
+- **Product Lines** (all 6 CRUD endpoints) - `/api/v1/productlines/`
+- **Products** (all 7 endpoints including search) - `/api/v1/products/`
+- **Offices** (all 6 CRUD endpoints) - `/api/v1/offices/`
+- **Employees** (all 6 CRUD endpoints) - `/api/v1/employees/`
+- **Customers** (all 6 CRUD endpoints) - `/api/v1/customers/`
+- **Orders** (all 6 CRUD endpoints) - `/api/v1/orders/`
+- **Order Details** (all 6 CRUD endpoints) - `/api/v1/orderdetails/`
+- **Payments** (all 6 CRUD endpoints) - `/api/v1/payments/`
 
 ### 3. Automatic Token Management
 

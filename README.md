@@ -194,14 +194,14 @@ POST /classic-models/api/auth/login/
 
 | Resource | Endpoints | Description |
 |----------|-----------|-------------|
-| **Product Lines** | `/classic-models/api/v1/classicmodels/productlines/` | Product categories |
-| **Products** | `/classic-models/api/v1/classicmodels/products/` | Product catalog |
-| **Offices** | `/classic-models/api/v1/classicmodels/offices/` | Company offices |
-| **Employees** | `/classic-models/api/v1/classicmodels/employees/` | Staff information |
-| **Customers** | `/classic-models/api/v1/classicmodels/customers/` | Customer data |
-| **Orders** | `/classic-models/api/v1/classicmodels/orders/` | Customer orders |
-| **Payments** | `/classic-models/api/v1/classicmodels/payments/` | Payment records |
-| **Order Details** | `/classic-models/api/v1/classicmodels/orderdetails/` | Order line items |
+| **Product Lines** | `/classic-models/api/v1/productlines/` | Product categories |
+| **Products** | `/classic-models/api/v1/products/` | Product catalog |
+| **Offices** | `/classic-models/api/v1/offices/` | Company offices |
+| **Employees** | `/classic-models/api/v1/employees/` | Staff information |
+| **Customers** | `/classic-models/api/v1/customers/` | Customer data |
+| **Orders** | `/classic-models/api/v1/orders/` | Customer orders |
+| **Payments** | `/classic-models/api/v1/payments/` | Payment records |
+| **Order Details** | `/classic-models/api/v1/orderdetails/` | Order line items |
 
 ### Example API Usage
 
@@ -212,15 +212,15 @@ curl -X POST http://localhost:8000/classic-models/api/auth/login/ \
   -d '{"username": "demo", "password": "demo123"}'
 
 # 2. Use token to access protected endpoints
-curl -X GET http://localhost:8000/classic-models/api/v1/classicmodels/products/ \
+curl -X GET http://localhost:8000/classic-models/api/v1/products/ \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 
 # 3. Get specific product
-curl -X GET http://localhost:8000/classic-models/api/v1/classicmodels/products/S10_1678/ \
+curl -X GET http://localhost:8000/classic-models/api/v1/products/S10_1678/ \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 
 # 4. Create new product
-curl -X POST http://localhost:8000/classic-models/api/v1/classicmodels/products/ \
+curl -X POST http://localhost:8000/classic-models/api/v1/products/ \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
