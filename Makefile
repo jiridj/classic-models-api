@@ -1,6 +1,6 @@
 # Classic Models API - Simplified Makefile
 
-.PHONY: build start stop health-check test postman-test clean help version
+.PHONY: build start stop health-check test postman-test clean help version patch minor major
 
 # Default target
 .DEFAULT_GOAL := help
@@ -22,7 +22,9 @@ help: ## Show this help message
 	@echo "  $(GREEN)postman-test$(NC) - Run Postman collection tests"
 	@echo "  $(GREEN)clean$(NC)       - Clean up test result files"
 	@echo "  $(GREEN)health-check$(NC) - Run health check against the API endpoints"
-	@echo "  $(GREEN)version$(NC)      - Version management (patch, minor, major, or specific version)"
+	@echo "  $(GREEN)patch$(NC)        - Bump patch version (0.0.1 -> 0.0.2)"
+	@echo "  $(GREEN)minor$(NC)        - Bump minor version (0.0.1 -> 0.1.0)"
+	@echo "  $(GREEN)major$(NC)        - Bump major version (0.0.1 -> 1.0.0)"
 	@echo ""
 	@echo "$(YELLOW)Examples:$(NC)"
 	@echo "  make build        # Build containers"
@@ -31,10 +33,9 @@ help: ## Show this help message
 	@echo "  make postman-test # Run Postman collection tests"
 	@echo "  make clean        # Clean up test files"
 	@echo "  make health-check # Check if API is working"
-	@echo "  make version VERSION=patch # Bump patch version (0.0.1 -> 0.0.2)"
-	@echo "  make version VERSION=minor # Bump minor version (0.0.1 -> 0.1.0)"
-	@echo "  make version VERSION=major # Bump major version (0.0.1 -> 1.0.0)"
-	@echo "  make version VERSION=1.2.3 # Set specific version"
+	@echo "  make patch         # Bump patch version (0.0.1 -> 0.0.2)"
+	@echo "  make minor         # Bump minor version (0.0.1 -> 0.1.0)"
+	@echo "  make major         # Bump major version (0.0.1 -> 1.0.0)"
 
 build: ## Build the Docker containers
 	@echo "$(BLUE)Building Docker containers...$(NC)"
@@ -97,20 +98,17 @@ health-check: ## Run health check against the API endpoints
 	@curl -f -s -w "%{http_code}" -o /dev/null http://localhost:8000/classic-models/api/v1/classicmodels/products/ | grep -q "401\|403" && echo "$(GREEN)✓ Products endpoint is responding (authentication required)$(NC)" || echo "$(RED)✗ Products endpoint is not responding$(NC)"
 	@echo "$(GREEN)✓ Health check completed$(NC)"
 
-version: ## Version management (patch, minor, major, or specific version)
-	@echo "$(BLUE)Version Management$(NC)"
-	@echo "Usage: make version VERSION=[patch|minor|major|VERSION]"
-	@echo ""
-	@echo "Examples:"
-	@echo "  make version VERSION=patch    # Bump patch version (0.0.1 -> 0.0.2)"
-	@echo "  make version VERSION=minor    # Bump minor version (0.0.1 -> 0.1.0)"
-	@echo "  make version VERSION=major    # Bump major version (0.0.1 -> 1.0.0)"
-	@echo "  make version VERSION=1.2.3    # Set specific version"
-	@echo ""
-	@if [ -z "$(VERSION)" ]; then \
-		echo "$(YELLOW)Current version:$(NC)"; \
-		python scripts/version_manager.py --help; \
-	else \
-		echo "$(BLUE)Running version management...$(NC)"; \
-		python scripts/version_manager.py $(VERSION); \
-	fi
+patch: ## Bump patch version (0.0.1 -> 0.0.2)
+	@echo "$(BLUE)Bumping patch version...$(NC)"
+	python scripts/version_manager.py patch
+	@echo "$(GREEN)✓ Patch version bumped$(NC)"
+
+minor: ## Bump minor version (0.0.1 -> 0.1.0)
+	@echo "$(BLUE)Bumping minor version...$(NC)"
+	python scripts/version_manager.py minor
+	@echo "$(GREEN)✓ Minor version bumped$(NC)"
+
+major: ## Bump major version (0.0.1 -> 1.0.0)
+	@echo "$(BLUE)Bumping major version...$(NC)"
+	python scripts/version_manager.py major
+	@echo "$(GREEN)✓ Major version bumped$(NC)"
