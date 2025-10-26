@@ -50,8 +50,8 @@ class VersionManager:
         
         content = self.settings_file.read_text()
         
-        # Update SPECTACULAR_SETTINGS version
-        pattern = r'("VERSION":\s*")[^"]*(")'
+        # Update get_version() function default value
+        pattern = r'(return os\.environ\.get\("API_VERSION",\s*")[^"]*("\))'
         replacement = rf'\g<1>{version}\g<2>'
         updated_content = re.sub(pattern, replacement, content)
         
