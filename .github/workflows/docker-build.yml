@@ -12,16 +12,6 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  debug:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
-    steps:
-    - name: Debug tag push
-      run: |
-        echo "Tag pushed: ${{ github.ref_name }}"
-        echo "Repository: ${{ github.repository }}"
-        echo "Event: ${{ github.event_name }}"
-
   build-and-push:
     runs-on: ubuntu-latest
     permissions:
