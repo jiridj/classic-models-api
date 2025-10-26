@@ -19,16 +19,22 @@ class VersionManager:
     def get_current_version(self):
         """Get current version from git tag or settings."""
         try:
-            # Try to get the latest tag
+            # Get all tags and find the latest semver version
             result = subprocess.run(
-                ["git", "describe", "--tags", "--abbrev=0"],
+                ["git", "tag", "-l", "v*"],
                 capture_output=True,
                 text=True,
                 check=True,
                 cwd=self.project_root
             )
-            tag = result.stdout.strip()
-            return tag.lstrip('v')
+            tags = result.stdout.strip().split('\n')
+            if tags and tags[0]:  # Check if we have any tags
+                # Sort tags by semver and get the latest
+                latest_tag = sorted(tags, key=lambda x: [int(v) for v in x.lstrip('v').split('.')])[-1]
+                return latest_tag.lstrip('v')
+            else:
+                # No tags found, fall back to settings
+                return self._get_version_from_settings()
         except subprocess.CalledProcessError:
             # Fall back to reading from settings
             return self._get_version_from_settings()
