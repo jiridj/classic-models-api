@@ -215,9 +215,10 @@ class VersionManager:
         # Update settings
         updated = self._update_settings_version(new_version)
         
-        # Commit changes (if any)
+        # For version increments, always commit (even if settings didn't change)
+        # This ensures we have a commit to tag
         if not options.skip_git:
-            if updated:
+            if updated or version_arg in ['major', 'minor', 'patch']:
                 self._commit_version_change(new_version)
             else:
                 print("No changes to commit")
