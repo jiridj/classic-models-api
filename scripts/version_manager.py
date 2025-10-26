@@ -215,15 +215,14 @@ class VersionManager:
         # Update settings
         updated = self._update_settings_version(new_version)
         
-        if not updated and not options.force:
-            print("No changes to commit")
-            return
-        
-        # Commit changes
+        # Commit changes (if any)
         if not options.skip_git:
-            self._commit_version_change(new_version)
+            if updated:
+                self._commit_version_change(new_version)
+            else:
+                print("No changes to commit")
         
-        # Create tag
+        # Create tag (always create, even if no settings changes)
         if not options.skip_git:
             tag_name = self._create_git_tag(new_version)
         
