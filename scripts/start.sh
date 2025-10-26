@@ -3,6 +3,9 @@ set -e
 
 echo "Starting Classic Models API..."
 
+# Display version information
+echo "API Version: $(python -c "import os; os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.development'); import django; django.setup(); from config.settings.base import get_version; print(get_version())")"
+
 # Use MYSQL_HOST environment variable, default to 'mysql' for local development
 MYSQL_HOST=${MYSQL_HOST:-mysql}
 

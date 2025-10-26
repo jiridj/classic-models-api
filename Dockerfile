@@ -1,8 +1,12 @@
 FROM python:3.11-slim
 
+# Build arguments
+ARG API_VERSION=1.0.0
+
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV API_VERSION=${API_VERSION}
 
 # Set work directory
 WORKDIR /app

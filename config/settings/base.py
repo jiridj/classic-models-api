@@ -3,6 +3,10 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parents[2]
 
+def get_version():
+    """Get version from environment variable or default."""
+    return os.environ.get("API_VERSION", "1.0.0")
+
 SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key")
 DEBUG = os.environ.get("DEBUG", "0") == "1"
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
@@ -106,7 +110,7 @@ SPECTACULAR_SETTINGS = {
     
     - All Classic Models data endpoints (`/classic-models/api/v1/classicmodels/`)
     """,
-    "VERSION": "1.0.0",
+    "VERSION": get_version(),
     "SERVE_INCLUDE_SCHEMA": False,
     "COMPONENT_SPLIT_REQUEST": True,
     "SORT_OPERATIONS": False,
