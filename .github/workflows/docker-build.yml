@@ -2,7 +2,6 @@ name: Build and Push Docker Image
 
 on:
   push:
-    branches: [ main ]
     tags: [ 'v*' ]
   workflow_dispatch:
 
@@ -23,17 +22,34 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Extract version
+    - name: Extract version and check if latest
       id: version
       run: |
         if [[ $GITHUB_REF == refs/tags/* ]]; then
           VERSION=${GITHUB_REF#refs/tags/}
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "is_release=true" >> $GITHUB_OUTPUT
+          
+          # Check if this is the latest semver version
+          CURRENT_VERSION=${VERSION#v}  # Remove 'v' prefix
+          echo "Current version: $CURRENT_VERSION"
+          
+          # Get all git tags and find the highest semver version
+          LATEST_TAG=$(git tag -l 'v*' | sed 's/v//' | sort -V | tail -1)
+          echo "Latest semver tag: v$LATEST_TAG"
+          
+          if [[ "$CURRENT_VERSION" == "$LATEST_TAG" ]]; then
+            echo "is_latest=true" >> $GITHUB_OUTPUT
+            echo "This is the latest version: $VERSION"
+          else
+            echo "is_latest=false" >> $GITHUB_OUTPUT
+            echo "This is not the latest version. Latest is: v$LATEST_TAG"
+          fi
         else
           VERSION="dev-$(git rev-parse --short HEAD)"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "is_release=false" >> $GITHUB_OUTPUT
+          echo "is_latest=false" >> $GITHUB_OUTPUT
         fi
         echo "Extracted version: $VERSION"
 
@@ -71,13 +87,11 @@ jobs:
       with:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         tags: |
-          type=ref,event=branch
-          type=ref,event=pr,prefix=pr-
-          type=sha,prefix={{branch}}-
-          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+          type=raw,value=latest,enable=${{ steps.version.outputs.is_latest == 'true' }}
           type=raw,value=${{ steps.version.outputs.version }},enable=${{ steps.version.outputs.is_release == 'true' }}
 
     - name: Build and push Docker image
+      if: steps.version.outputs.is_release == 'true'
       uses: docker/build-push-action@v5
       with:
         context: .
@@ -103,7 +117,7 @@ jobs:
           
           ### Docker Image
           - **Image**: `${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}`
-          - **Latest**: `${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest`
+          ${{ steps.version.outputs.is_latest == 'true' && '          - **Latest**: `' + env.REGISTRY + '/' + env.IMAGE_NAME + ':latest`' || '' }}
           
           ### API Documentation
           - **Swagger UI**: `/api/docs/`
@@ -116,8 +130,7 @@ jobs:
           api:
             image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}
           ```
+          
+          ${{ steps.version.outputs.is_latest == 'true' && '**Note**: This is the latest version and has been tagged as `latest`.' || '' }}
         draft: false
         prerelease: false
-
-    - name: Image digest
-      run: echo ${{ steps.build.outputs.digest }}
