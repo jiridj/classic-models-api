@@ -34,16 +34,18 @@ jobs:
           CURRENT_VERSION=${VERSION#v}  # Remove 'v' prefix
           echo "Current version: $CURRENT_VERSION"
           
-          # Get all git tags and find the highest semver version
-          LATEST_TAG=$(git tag -l 'v*' | sed 's/v//' | sort -V | tail -1)
-          echo "Latest semver tag: v$LATEST_TAG"
+          # Get all existing tags and find the highest semver version including current
+          ALL_TAGS=$(git tag -l 'v*' | sed 's/v//' | sort -V)
+          HIGHEST_TAG=$(echo "$ALL_TAGS $CURRENT_VERSION" | tr ' ' '\n' | sort -V | tail -1)
+          echo "All existing tags: $ALL_TAGS"
+          echo "Highest version (including current): $HIGHEST_TAG"
           
-          if [[ "$CURRENT_VERSION" == "$LATEST_TAG" ]]; then
+          if [[ "$CURRENT_VERSION" == "$HIGHEST_TAG" ]]; then
             echo "is_latest=true" >> $GITHUB_OUTPUT
             echo "This is the latest version: $VERSION"
           else
             echo "is_latest=false" >> $GITHUB_OUTPUT
-            echo "This is not the latest version. Latest is: v$LATEST_TAG"
+            echo "This is not the latest version. Latest is: v$HIGHEST_TAG"
           fi
         else
           VERSION="dev-$(git rev-parse --short HEAD)"
@@ -104,6 +106,44 @@ jobs:
         build-args: |
           API_VERSION=${{ steps.version.outputs.version }}
 
+    - name: Create release body
+      if: steps.version.outputs.is_release == 'true'
+      id: release_body
+      run: |
+        BODY="## Release ${{ steps.version.outputs.version }}
+        
+        ### Docker Image
+        - **Image**: \`${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}\`"
+        
+        if [[ "${{ steps.version.outputs.is_latest }}" == "true" ]]; then
+          BODY="$BODY
+        - **Latest**: \`${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest\`"
+        fi
+        
+        BODY="$BODY
+        
+        ### API Documentation
+        - **Swagger UI**: \`/api/docs/\`
+        - **ReDoc**: \`/api/redoc/\`
+        - **OpenAPI Schema**: \`/api/schema/\`
+        
+        ### Deployment
+        Update your Docker Compose file to use the new version:
+        \`\`\`yaml
+        api:
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}
+        \`\`\`"
+        
+        if [[ "${{ steps.version.outputs.is_latest }}" == "true" ]]; then
+          BODY="$BODY
+        
+        **Note**: This is the latest version and has been tagged as \`latest\`."
+        fi
+        
+        echo "body<<EOF" >> $GITHUB_OUTPUT
+        echo "$BODY" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+
     - name: Create Release
       if: steps.version.outputs.is_release == 'true'
       uses: actions/create-release@v1
@@ -112,25 +152,6 @@ jobs:
       with:
         tag_name: ${{ steps.version.outputs.version }}
         release_name: Release ${{ steps.version.outputs.version }}
-        body: |
-          ## Release ${{ steps.version.outputs.version }}
-          
-          ### Docker Image
-          - **Image**: `${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}`
-          ${{ steps.version.outputs.is_latest == 'true' && '          - **Latest**: `' + env.REGISTRY + '/' + env.IMAGE_NAME + ':latest`' || '' }}
-          
-          ### API Documentation
-          - **Swagger UI**: `/api/docs/`
-          - **ReDoc**: `/api/redoc/`
-          - **OpenAPI Schema**: `/api/schema/`
-          
-          ### Deployment
-          Update your Docker Compose file to use the new version:
-          ```yaml
-          api:
-            image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}
-          ```
-          
-          ${{ steps.version.outputs.is_latest == 'true' && '**Note**: This is the latest version and has been tagged as `latest`.' || '' }}
+        body: ${{ steps.release_body.outputs.body }}
         draft: false
         prerelease: false
