@@ -39,13 +39,12 @@ help: ## Show this help message
 
 build: ## Build the Docker containers
 	@echo "$(BLUE)Building Docker containers...$(NC)"
-	docker-compose build
+	@source scripts/get_version.sh && docker-compose build --build-arg API_VERSION=$$API_VERSION
 	@echo "$(GREEN)✓ Containers built successfully$(NC)"
 
 start: ## Start the containers (database resets to original data)
 	@echo "$(BLUE)Starting containers with fresh database...$(NC)"
-	docker-compose down -v
-	docker-compose up -d
+	@source scripts/get_version.sh && docker-compose down -v && docker-compose up -d
 	@echo "$(GREEN)✓ Containers started with fresh database$(NC)"
 	@echo "$(YELLOW)API available at: http://localhost:8000/classic-models$(NC)"
 	@echo "$(YELLOW)API docs: http://localhost:8000/classic-models/api/docs/$(NC)"
