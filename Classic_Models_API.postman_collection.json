@@ -18,7 +18,7 @@
   "variable": [
     {
       "key": "base_url",
-      "value": "http://localhost:8000/classic-models",
+      "value": "http://192.168.1.8:9081/classic-models",
       "type": "string"
     },
     {
@@ -177,7 +177,14 @@
           "name": "Get Current User",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -192,7 +199,14 @@
           "name": "Logout User",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "POST",
             "header": [
@@ -221,7 +235,14 @@
           "name": "List Product Lines",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -248,7 +269,14 @@
           "name": "Create Product Line",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "POST",
             "header": [
@@ -272,7 +300,14 @@
           "name": "Get Product Line",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -287,7 +322,14 @@
           "name": "Update Product Line",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "PUT",
             "header": [
@@ -311,7 +353,14 @@
           "name": "Partial Update Product Line",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "PATCH",
             "header": [
@@ -335,7 +384,14 @@
           "name": "Delete Product Line",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "DELETE",
             "header": [],
@@ -355,7 +411,14 @@
           "name": "List Products",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -387,7 +450,14 @@
           "name": "Create Product",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "POST",
             "header": [
@@ -411,7 +481,14 @@
           "name": "Get Product",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -426,7 +503,14 @@
           "name": "Update Product",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "PUT",
             "header": [
@@ -450,7 +534,14 @@
           "name": "Partial Update Product",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "PATCH",
             "header": [
@@ -474,7 +565,14 @@
           "name": "Delete Product",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "DELETE",
             "header": [],
@@ -489,7 +587,14 @@
           "name": "Search Products",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -526,7 +631,14 @@
           "name": "List Offices",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -541,7 +653,14 @@
           "name": "Create Office",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "POST",
             "header": [
@@ -565,7 +684,14 @@
           "name": "Get Office",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -580,7 +706,14 @@
           "name": "Update Office",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "PUT",
             "header": [
@@ -604,7 +737,14 @@
           "name": "Partial Update Office",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "PATCH",
             "header": [
@@ -628,7 +768,14 @@
           "name": "Delete Office",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "DELETE",
             "header": [],
@@ -648,7 +795,14 @@
           "name": "List Employees",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -663,7 +817,14 @@
           "name": "Create Employee",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "POST",
             "header": [
@@ -687,7 +848,14 @@
           "name": "Get Employee",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -702,7 +870,14 @@
           "name": "Update Employee",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "PUT",
             "header": [
@@ -726,7 +901,14 @@
           "name": "Partial Update Employee",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "PATCH",
             "header": [
@@ -750,7 +932,14 @@
           "name": "Delete Employee",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "DELETE",
             "header": [],
@@ -770,7 +959,14 @@
           "name": "List Customers",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -802,7 +998,14 @@
           "name": "Create Customer",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "POST",
             "header": [
@@ -826,7 +1029,14 @@
           "name": "Get Customer",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -841,7 +1051,14 @@
           "name": "Update Customer",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "PUT",
             "header": [
@@ -865,7 +1082,14 @@
           "name": "Partial Update Customer",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "PATCH",
             "header": [
@@ -889,7 +1113,14 @@
           "name": "Delete Customer",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "DELETE",
             "header": [],
@@ -909,7 +1140,14 @@
           "name": "List Orders",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -924,7 +1162,14 @@
           "name": "Create Order",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "POST",
             "header": [
@@ -948,7 +1193,14 @@
           "name": "Get Order",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -963,7 +1215,14 @@
           "name": "Update Order",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "PUT",
             "header": [
@@ -987,7 +1246,14 @@
           "name": "Partial Update Order",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "PATCH",
             "header": [
@@ -1011,7 +1277,14 @@
           "name": "Delete Order",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "DELETE",
             "header": [],
@@ -1031,7 +1304,14 @@
           "name": "List Order Details",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -1046,7 +1326,14 @@
           "name": "Create Order Detail",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "POST",
             "header": [
@@ -1070,7 +1357,14 @@
           "name": "Get Order Detail",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -1085,7 +1379,14 @@
           "name": "Update Order Detail",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "PUT",
             "header": [
@@ -1109,7 +1410,14 @@
           "name": "Partial Update Order Detail",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "PATCH",
             "header": [
@@ -1133,7 +1441,14 @@
           "name": "Delete Order Detail",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "DELETE",
             "header": [],
@@ -1153,7 +1468,14 @@
           "name": "List Payments",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -1168,7 +1490,14 @@
           "name": "Create Payment",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "POST",
             "header": [
@@ -1192,7 +1521,14 @@
           "name": "Get Payment",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -1207,7 +1543,14 @@
           "name": "Update Payment",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "PUT",
             "header": [
@@ -1231,7 +1574,14 @@
           "name": "Partial Update Payment",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "PATCH",
             "header": [
@@ -1255,7 +1605,14 @@
           "name": "Delete Payment",
           "request": {
             "auth": {
-              "type": "inherit"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "DELETE",
             "header": [],

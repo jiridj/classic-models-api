@@ -14,7 +14,7 @@ services:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./db/mysqlsampledatabase.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./db/mysqlsampledatabase.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
     networks:
       - classic-models-network
     healthcheck:
@@ -22,7 +22,7 @@ services:
       timeout: 20s
       retries: 10
       interval: 10s
-      start_period: 40s
+      start_period: 60s
 
   api:
     image: ghcr.io/${GITHUB_REPOSITORY:-your-username/classic-models-api}:latest
