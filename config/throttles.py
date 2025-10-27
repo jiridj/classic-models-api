@@ -109,3 +109,14 @@ class BurstThrottle(throttling.UserRateThrottle):
     scope = "burst"
     rate = "1000/min"
 
+
+class DemoRateLimitThrottle(throttling.AnonRateThrottle):
+    """
+    Throttle demo endpoint to demonstrate rate limiting.
+    
+    Allow 5 requests per minute per IP address.
+    Public endpoint for demonstration purposes.
+    """
+    scope = "demo_rate_limit"
+    rate = "5/min"
+

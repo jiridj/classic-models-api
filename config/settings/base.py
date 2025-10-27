@@ -91,6 +91,7 @@ REST_FRAMEWORK = {
         "read": "1000/min",  # 1000 read requests per minute per user
         "write": "200/min",  # 200 write requests per minute per user
         "burst": "1000/min",  # 1000 burst requests per minute per user
+        "demo_rate_limit": "5/min",  # 5 requests per minute per IP (public demo)
         
         # Default rates
         "anon": "200/hour",  # Anonymous users

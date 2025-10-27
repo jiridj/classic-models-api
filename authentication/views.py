@@ -8,6 +8,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from config.throttles import (
     CurrentUserThrottle,
+    DemoRateLimitThrottle,
     LoginThrottle,
     LogoutThrottle,
     RegisterThrottle,
@@ -192,3 +193,37 @@ def register_view(request):
 def current_user_view(request):
     """Get current user information"""
     return Response(UserSerializer(request.user).data)
+
+
+@extend_schema(
+    operation_id="rate_limit_demo",
+    summary="Rate Limit Demo",
+    description="Public endpoint to demonstrate rate limiting. Limited to 5 requests per minute per IP.",
+    tags=["Authentication"],
+    responses={
+        200: {
+            "description": "Successful response with rate limit info",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "message": "Rate limit demo endpoint",
+                        "rate_limit": "5 requests per minute",
+                        "timestamp": "2024-01-01T00:00:00Z",
+                    }
+                }
+            },
+        },
+    },
+)
+@api_view(["GET"])
+@permission_classes([permissions.AllowAny])
+@throttle_classes([DemoRateLimitThrottle])
+def rate_limit_demo_view(request):
+    """Demo endpoint to demonstrate rate limiting"""
+    from django.utils import timezone
+    return Response({
+        "message": "Rate limit demo endpoint",
+        "rate_limit": "5 requests per minute per IP address",
+        "timestamp": timezone.now().isoformat(),
+        "note": "This endpoint is rate limited to 5 requests per minute. Try making multiple requests quickly to see it in action.",
+    }, status=status.HTTP_200_OK)
