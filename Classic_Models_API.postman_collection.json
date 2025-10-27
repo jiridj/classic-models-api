@@ -1,9 +1,9 @@
 {
   "info": {
     "name": "Classic Models API",
-    "description": "Complete API collection for Classic Models e-commerce system with authentication, CRUD operations, and search capabilities",
+    "description": "Complete API collection for Classic Models e-commerce system with authentication, CRUD operations, search capabilities, and rate limiting demonstrations",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "version": "1.1.0"
+    "version": "1.2.0"
   },
   "auth": {
     "type": "bearer",
@@ -224,6 +224,22 @@
               "host": ["{{base_url}}"],
               "path": ["api", "auth", "logout", ""]
             }
+          }
+        },
+        {
+          "name": "Rate Limit Demo",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/auth/rate-limit-demo/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "rate-limit-demo", ""]
+            },
+            "description": "Public endpoint to demonstrate rate limiting. Limited to 5 requests per minute per IP address."
           }
         }
       ]
