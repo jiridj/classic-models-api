@@ -176,42 +176,44 @@ class DemoRateLimitThrottle(throttling.AnonRateThrottle):
         """
         Override to store request and add headers on success.
         """
-        # Store request reference for use in wait()
-        self.request = request
-        
-        # Call parent to check throttling
-        is_allowed = super().allow_request(request, view)
-        
-        # Add headers
         import time
         from datetime import datetime
+        
+        # Store request reference for use in wait()
+        self.request = request
         
         if not hasattr(request, '_throttle_headers'):
             request._throttle_headers = {}
         
-        # Get the cache key and history to calculate remaining
+        # Calculate remaining BEFORE calling parent (which may modify cache)
         key = self.get_cache_key(request, view)
-        history = []
         reset_time = time.time() + self.duration
+        history = []
         
         if key:
-            # Get history from cache
-            # Note: super().allow_request() was already called, so the current request is in the cache
+            # Get history from cache BEFORE calling parent
             cache_data = self.cache.get(key, [])
             # Filter out old entries (outside the time window)
             now = datetime.now()
             window_start = now.timestamp() - self.duration
             history = [h for h in cache_data if h > window_start]
-        else:
-            history = []
         
-        # Calculate remaining requests
-        # Since allow_request already added the current request to history, we need to count it
-        remaining = max(0, self.num_requests - len(history))
+        # Calculate remaining BEFORE the current request is processed
+        # After allow_request, this will be one less
+        remaining_before = max(0, self.num_requests - len(history))
+        
+        # Call parent to check throttling (this may add current request to cache)
+        is_allowed = super().allow_request(request, view)
+        
+        # Calculate remaining AFTER the current request
+        # If allowed and not throttled, this request was consumed
+        remaining_after = remaining_before
+        if is_allowed and remaining_before > 0:
+            remaining_after = remaining_before - 1
         
         headers = {
             'X-RateLimit-Limit': str(self.num_requests),
-            'X-RateLimit-Remaining': str(remaining),
+            'X-RateLimit-Remaining': str(remaining_after),
             'X-RateLimit-Reset': str(int(reset_time)),
         }
         request._throttle_headers.update(headers)
