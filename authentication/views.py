@@ -20,7 +20,7 @@ from .serializers import LoginSerializer, RegisterSerializer, UserSerializer
 class CustomTokenObtainPairView(TokenObtainPairView):
     """Custom login view with detailed responses"""
 
-    throttle_scope = "login"
+    throttle_classes = [LoginThrottle]
 
     @extend_schema(
         operation_id="login",
@@ -73,7 +73,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 class CustomTokenRefreshView(TokenRefreshView):
     """Custom token refresh view with throttling."""
     
-    throttle_scope = "token_refresh"
+    throttle_classes = [TokenRefreshThrottle]
 
 
 @extend_schema(

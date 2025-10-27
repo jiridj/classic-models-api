@@ -18,6 +18,7 @@ class LoginThrottle(throttling.AnonRateThrottle):
     Allow 5 login attempts per hour per IP address.
     """
     scope = "login"
+    rate = "5/hour"
 
 
 class RegisterThrottle(throttling.AnonRateThrottle):
@@ -27,6 +28,7 @@ class RegisterThrottle(throttling.AnonRateThrottle):
     Allow 5 registration attempts per hour per IP address.
     """
     scope = "register"
+    rate = "5/hour"
 
 
 class TokenRefreshThrottle(throttling.UserRateThrottle):
@@ -68,6 +70,14 @@ class ReadThrottle(throttling.UserRateThrottle):
     """
     scope = "read"
     rate = "100/min"
+    
+    def allow_request(self, request, view):
+        # Only apply this throttle to read operations
+        if hasattr(view, 'action') and view.action:
+            # Skip throttling for write actions, let WriteThrottle handle them
+            if view.action in ['create', 'update', 'partial_update', 'destroy']:
+                return True
+        return super().allow_request(request, view)
 
 
 class WriteThrottle(throttling.UserRateThrottle):
@@ -79,6 +89,14 @@ class WriteThrottle(throttling.UserRateThrottle):
     """
     scope = "write"
     rate = "20/min"
+    
+    def allow_request(self, request, view):
+        # Only apply this throttle to write operations
+        if hasattr(view, 'action') and view.action:
+            # Skip throttling for read actions, let ReadThrottle handle them
+            if view.action in ['list', 'retrieve']:
+                return True
+        return super().allow_request(request, view)
 
 
 class BurstThrottle(throttling.UserRateThrottle):
