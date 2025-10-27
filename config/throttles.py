@@ -196,19 +196,18 @@ class DemoRateLimitThrottle(throttling.AnonRateThrottle):
         
         if key:
             # Get history from cache
+            # Note: super().allow_request() was already called, so the current request is in the cache
             cache_data = self.cache.get(key, [])
             # Filter out old entries (outside the time window)
             now = datetime.now()
             window_start = now.timestamp() - self.duration
             history = [h for h in cache_data if h > window_start]
+        else:
+            history = []
         
         # Calculate remaining requests
+        # Since allow_request already added the current request to history, we need to count it
         remaining = max(0, self.num_requests - len(history))
-        
-        # If this request was allowed, it will be added to history, so remaining should be one less
-        # But since we haven't added it yet, we need to account for that
-        if is_allowed and remaining > 0:
-            remaining -= 1
         
         headers = {
             'X-RateLimit-Limit': str(self.num_requests),
