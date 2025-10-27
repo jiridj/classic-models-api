@@ -1,7 +1,10 @@
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import mixins, permissions, viewsets
+from rest_framework.decorators import action
 from rest_framework.response import Response
+
+from config.throttles import ReadThrottle, WriteThrottle
 
 from classicmodels.models import (Customer, Employee, Office, Order,
                                   Orderdetail, Payment, Product, ProductLine)
@@ -13,7 +16,10 @@ from .serializers import (CustomerSerializer, EmployeeSerializer,
 
 
 class BaseModelViewSet(viewsets.ModelViewSet):
+    """Base viewset with appropriate throttling for read/write operations."""
+    
     permission_classes = [permissions.IsAuthenticated]
+    throttle_classes = [ReadThrottle, WriteThrottle]
 
 
 @extend_schema_view(
@@ -328,6 +334,7 @@ class PaymentViewSet(
     queryset = Payment.objects.select_related("customernumber")
     serializer_class = PaymentSerializer
     permission_classes = [permissions.IsAuthenticated]
+    throttle_classes = [ReadThrottle, WriteThrottle]
 
     def get_object(self):
         customer_number = self.kwargs.get("customerNumber")
@@ -390,6 +397,7 @@ class OrderdetailViewSet(
     queryset = Orderdetail.objects.select_related("ordernumber", "productcode")
     serializer_class = OrderdetailSerializer
     permission_classes = [permissions.IsAuthenticated]
+    throttle_classes = [ReadThrottle, WriteThrottle]
 
     def get_object(self):
         order_number = self.kwargs.get("orderNumber")
