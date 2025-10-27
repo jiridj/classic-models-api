@@ -182,26 +182,40 @@ class DemoRateLimitThrottle(throttling.AnonRateThrottle):
         # Call parent to check throttling
         is_allowed = super().allow_request(request, view)
         
-        # Add headers if request is allowed
-        if is_allowed:
-            import time
-            
-            if not hasattr(request, '_throttle_headers'):
-                request._throttle_headers = {}
-            
-            # Calculate reset time (approximate)
-            reset_time = time.time() + self.duration
-            
-            # We don't have easy access to remaining count, so we'll estimate
-            # In a real implementation, you'd need to query the cache
-            remaining = self.num_requests  # Conservative estimate
-            
-            headers = {
-                'X-RateLimit-Limit': str(self.num_requests),
-                'X-RateLimit-Remaining': str(remaining),
-                'X-RateLimit-Reset': str(int(reset_time)),
-            }
-            request._throttle_headers.update(headers)
+        # Add headers
+        import time
+        from datetime import datetime
+        
+        if not hasattr(request, '_throttle_headers'):
+            request._throttle_headers = {}
+        
+        # Get the cache key and history to calculate remaining
+        key = self.get_cache_key(request, view)
+        history = []
+        reset_time = time.time() + self.duration
+        
+        if key:
+            # Get history from cache
+            cache_data = self.cache.get(key, [])
+            # Filter out old entries (outside the time window)
+            now = datetime.now()
+            window_start = now.timestamp() - self.duration
+            history = [h for h in cache_data if h > window_start]
+        
+        # Calculate remaining requests
+        remaining = max(0, self.num_requests - len(history))
+        
+        # If this request was allowed, it will be added to history, so remaining should be one less
+        # But since we haven't added it yet, we need to account for that
+        if is_allowed and remaining > 0:
+            remaining -= 1
+        
+        headers = {
+            'X-RateLimit-Limit': str(self.num_requests),
+            'X-RateLimit-Remaining': str(remaining),
+            'X-RateLimit-Reset': str(int(reset_time)),
+        }
+        request._throttle_headers.update(headers)
         
         return is_allowed
 
