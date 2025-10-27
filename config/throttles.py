@@ -15,61 +15,61 @@ class LoginThrottle(throttling.AnonRateThrottle):
     """
     Throttle login attempts to prevent brute force attacks.
     
-    Allow 5 login attempts per hour per IP address.
+    Allow 50 login attempts per hour per IP address.
     """
     scope = "login"
-    rate = "5/hour"
+    rate = "50/hour"
 
 
 class RegisterThrottle(throttling.AnonRateThrottle):
     """
     Throttle registration attempts to prevent spam accounts.
     
-    Allow 5 registration attempts per hour per IP address.
+    Allow 50 registration attempts per hour per IP address.
     """
     scope = "register"
-    rate = "5/hour"
+    rate = "50/hour"
 
 
 class TokenRefreshThrottle(throttling.UserRateThrottle):
     """
     Throttle token refresh requests.
     
-    Allow 10 refresh requests per minute per authenticated user.
+    Allow 100 refresh requests per minute per authenticated user.
     """
     scope = "token_refresh"
-    rate = "10/min"
+    rate = "100/min"
 
 
 class LogoutThrottle(throttling.UserRateThrottle):
     """
     Throttle logout requests.
     
-    Allow 20 logout requests per minute per authenticated user.
+    Allow 200 logout requests per minute per authenticated user.
     """
     scope = "logout"
-    rate = "20/min"
+    rate = "200/min"
 
 
 class CurrentUserThrottle(throttling.UserRateThrottle):
     """
     Throttle current user information requests.
     
-    Allow 60 requests per minute per authenticated user.
+    Allow 600 requests per minute per authenticated user.
     """
     scope = "current_user"
-    rate = "60/min"
+    rate = "600/min"
 
 
 class ReadThrottle(throttling.UserRateThrottle):
     """
     Throttle read operations (GET requests).
     
-    Allow 100 read requests per minute per authenticated user.
+    Allow 1000 read requests per minute per authenticated user.
     This is more lenient since reads don't modify data.
     """
     scope = "read"
-    rate = "100/min"
+    rate = "1000/min"
     
     def allow_request(self, request, view):
         # Only apply this throttle to read operations
@@ -84,11 +84,11 @@ class WriteThrottle(throttling.UserRateThrottle):
     """
     Throttle write operations (POST, PUT, PATCH, DELETE).
     
-    Allow 20 write requests per minute per authenticated user.
+    Allow 200 write requests per minute per authenticated user.
     This is more restrictive since writes modify data.
     """
     scope = "write"
-    rate = "20/min"
+    rate = "200/min"
     
     def allow_request(self, request, view):
         # Only apply this throttle to write operations
@@ -103,9 +103,9 @@ class BurstThrottle(throttling.UserRateThrottle):
     """
     Allow short bursts of requests.
     
-    Allow 100 requests per minute per authenticated user.
+    Allow 1000 requests per minute per authenticated user.
     Useful for endpoints that might receive bursts.
     """
     scope = "burst"
-    rate = "100/min"
+    rate = "1000/min"
 

@@ -81,20 +81,20 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_THROTTLE_RATES": {
         # Authentication endpoints
-        "login": "5/hour",  # 5 login attempts per hour per IP
-        "register": "5/hour",  # 5 registration attempts per hour per IP
-        "token_refresh": "10/min",  # 10 token refreshes per minute per user
-        "logout": "20/min",  # 20 logout requests per minute per user
-        "current_user": "60/min",  # 60 /me requests per minute per user
+        "login": "50/hour",  # 50 login attempts per hour per IP
+        "register": "50/hour",  # 50 registration attempts per hour per IP
+        "token_refresh": "100/min",  # 100 token refreshes per minute per user
+        "logout": "200/min",  # 200 logout requests per minute per user
+        "current_user": "600/min",  # 600 /me requests per minute per user
         
         # Data endpoints
-        "read": "100/min",  # 100 read requests per minute per user
-        "write": "20/min",  # 20 write requests per minute per user
-        "burst": "100/min",  # 100 burst requests per minute per user
+        "read": "1000/min",  # 1000 read requests per minute per user
+        "write": "200/min",  # 200 write requests per minute per user
+        "burst": "1000/min",  # 1000 burst requests per minute per user
         
         # Default rates
-        "anon": "20/hour",  # Anonymous users
-        "user": "100/min",  # Authenticated users
+        "anon": "200/hour",  # Anonymous users
+        "user": "1000/min",  # Authenticated users
     },
 }
 
