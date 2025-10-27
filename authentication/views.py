@@ -221,9 +221,20 @@ def current_user_view(request):
 def rate_limit_demo_view(request):
     """Demo endpoint to demonstrate rate limiting"""
     from django.utils import timezone
-    return Response({
+    
+    # Get response
+    response_data = {
         "message": "Rate limit demo endpoint",
         "rate_limit": "5 requests per minute per IP address",
         "timestamp": timezone.now().isoformat(),
         "note": "This endpoint is rate limited to 5 requests per minute. Try making multiple requests quickly to see it in action.",
-    }, status=status.HTTP_200_OK)
+    }
+    
+    response = Response(response_data, status=status.HTTP_200_OK)
+    
+    # Add rate limit headers if they were set
+    if hasattr(request, '_throttle_headers') and request._throttle_headers:
+        for header_name, header_value in request._throttle_headers.items():
+            response[header_name] = str(header_value)
+    
+    return response
