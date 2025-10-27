@@ -75,6 +75,27 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.UserRateThrottle",
+        "rest_framework.throttling.AnonRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        # Authentication endpoints
+        "login": "5/hour",  # 5 login attempts per hour per IP
+        "register": "5/hour",  # 5 registration attempts per hour per IP
+        "token_refresh": "10/min",  # 10 token refreshes per minute per user
+        "logout": "20/min",  # 20 logout requests per minute per user
+        "current_user": "60/min",  # 60 /me requests per minute per user
+        
+        # Data endpoints
+        "read": "100/min",  # 100 read requests per minute per user
+        "write": "20/min",  # 20 write requests per minute per user
+        "burst": "100/min",  # 100 burst requests per minute per user
+        
+        # Default rates
+        "anon": "20/hour",  # Anonymous users
+        "user": "100/min",  # Authenticated users
+    },
 }
 
 SPECTACULAR_SETTINGS = {

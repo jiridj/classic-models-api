@@ -1,16 +1,26 @@
 from drf_spectacular.utils import extend_schema
 from rest_framework import permissions, status
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, throttle_classes
 from rest_framework.response import Response
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
+from config.throttles import (
+    CurrentUserThrottle,
+    LoginThrottle,
+    LogoutThrottle,
+    RegisterThrottle,
+    TokenRefreshThrottle,
+)
 
 from .serializers import LoginSerializer, RegisterSerializer, UserSerializer
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     """Custom login view with detailed responses"""
+
+    throttle_scope = "login"
 
     @extend_schema(
         operation_id="login",
@@ -60,6 +70,12 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class CustomTokenRefreshView(TokenRefreshView):
+    """Custom token refresh view with throttling."""
+    
+    throttle_scope = "token_refresh"
+
+
 @extend_schema(
     operation_id="logout",
     summary="User Logout",
@@ -79,6 +95,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 )
 @api_view(["POST"])
 @permission_classes([permissions.IsAuthenticated])
+@throttle_classes([LogoutThrottle])
 def logout_view(request):
     """Logout view that blacklists the refresh token"""
     try:
@@ -130,6 +147,7 @@ def logout_view(request):
 )
 @api_view(["POST"])
 @permission_classes([permissions.AllowAny])
+@throttle_classes([RegisterThrottle])
 def register_view(request):
     """Register a new user"""
     serializer = RegisterSerializer(data=request.data)
@@ -170,6 +188,7 @@ def register_view(request):
 )
 @api_view(["GET"])
 @permission_classes([permissions.IsAuthenticated])
+@throttle_classes([CurrentUserThrottle])
 def current_user_view(request):
     """Get current user information"""
     return Response(UserSerializer(request.user).data)
