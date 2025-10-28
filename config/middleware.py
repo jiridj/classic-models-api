@@ -1,22 +1,27 @@
 """
-Middleware to add rate limit headers to responses.
+Project middlewares
 """
 
 from django.utils.deprecation import MiddlewareMixin
+import time
 
 
-class RateLimitHeadersMiddleware(MiddlewareMixin):
-    """
-    Middleware that adds rate limit headers to responses.
-    
-    This middleware checks if the request has throttle headers set by
-    our custom throttle classes and adds them to the response.
-    """
-    
-    def process_response(self, request, response):
-        """Add rate limit headers to the response if they exist on the request."""
-        if hasattr(request, '_throttle_headers') and request._throttle_headers:
-            for header_name, header_value in request._throttle_headers.items():
-                response[header_name] = str(header_value)
-        
-        return response
+class SleepDelayMiddleware(MiddlewareMixin):
+    """Sleep for N seconds when 'Sleep' header is provided (applies to all endpoints)."""
+
+    MAX_SLEEP_SECONDS = 30
+
+    def process_request(self, request):
+        sleep_header = request.META.get("HTTP_SLEEP")
+        if not sleep_header:
+            return None
+        try:
+            seconds = int(sleep_header)
+        except (TypeError, ValueError):
+            return None
+        if seconds <= 0:
+            return None
+        # Clamp to safety bounds
+        seconds = min(self.MAX_SLEEP_SECONDS, seconds)
+        time.sleep(seconds)
+        return None
