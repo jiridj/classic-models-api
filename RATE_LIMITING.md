@@ -14,7 +14,7 @@ These endpoints have strict rate limits to prevent brute force attacks and spam:
   - Prevents brute force attacks
   - Resets every hour
   
-- **Register** (`POST /auth/register/`): **5 requests per hour per IP address**
+- **Signup** (`POST /auth/signup/`): **5 requests per hour per IP address**
   - Prevents spam account creation
   - Resets every hour
 

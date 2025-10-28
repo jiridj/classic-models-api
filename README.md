@@ -269,7 +269,7 @@ For easy API testing and exploration, we've included a comprehensive Postman col
 
 ### Collection Features
 
-- 🔐 **Complete Authentication Flow** - Login, register, token refresh, logout
+- 🔐 **Complete Authentication Flow** - Login, signup, token refresh, logout
 - 📦 **Full CRUD Operations** - All entities with Create, Read, Update, Delete
 - 🎯 **Realistic Sample Data** - Proper field values matching model constraints
 - 🔄 **Automatic Token Management** - JWT tokens are automatically extracted and stored

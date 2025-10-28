@@ -72,7 +72,7 @@
       "name": "Authentication",
       "item": [
         {
-          "name": "Register User",
+          "name": "Signup User",
           "request": {
             "auth": {
               "type": "noauth"
@@ -89,9 +89,9 @@
               "raw": "{\n  \"username\": \"testuser\",\n  \"email\": \"test@example.com\",\n  \"first_name\": \"Test\",\n  \"last_name\": \"User\",\n  \"password\": \"testpass123\",\n  \"password_confirm\": \"testpass123\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/auth/register/",
+              "raw": "{{base_url}}/api/auth/signup/",
               "host": ["{{base_url}}"],
-              "path": ["api", "auth", "register", ""]
+              "path": ["api", "auth", "signup", ""]
             }
           }
         },

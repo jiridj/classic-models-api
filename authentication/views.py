@@ -118,9 +118,9 @@ def logout_view(request):
 
 
 @extend_schema(
-    operation_id="register",
-    summary="User Registration",
-    description="Register a new user account",
+    operation_id="signup",
+    summary="User Signup",
+    description="Create a new user account",
     tags=["Authentication"],
     request=RegisterSerializer,
     responses={
@@ -149,8 +149,8 @@ def logout_view(request):
 @api_view(["POST"])
 @permission_classes([permissions.AllowAny])
 @throttle_classes([RegisterThrottle])
-def register_view(request):
-    """Register a new user"""
+def signup_view(request):
+    """Create a new user (signup)"""
     serializer = RegisterSerializer(data=request.data)
     if serializer.is_valid():
         user = serializer.save()

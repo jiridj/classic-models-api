@@ -16,7 +16,7 @@ class TestAuthenticationAPI:
     @pytest.mark.django_db
     def test_register_success(self, api_client):
         """Test successful user registration."""
-        url = reverse("register")
+        url = reverse("signup")
         data = {
             "username": "newuser",
             "email": "newuser@example.com",
@@ -43,7 +43,7 @@ class TestAuthenticationAPI:
     @pytest.mark.django_db
     def test_register_password_mismatch(self, api_client):
         """Test registration with mismatched passwords."""
-        url = reverse("register")
+        url = reverse("signup")
         data = {
             "username": "newuser",
             "email": "newuser@example.com",
@@ -61,7 +61,7 @@ class TestAuthenticationAPI:
     @pytest.mark.django_db
     def test_register_short_password(self, api_client):
         """Test registration with password too short."""
-        url = reverse("register")
+        url = reverse("signup")
         data = {
             "username": "newuser",
             "email": "newuser@example.com",
@@ -79,7 +79,7 @@ class TestAuthenticationAPI:
     @pytest.mark.django_db
     def test_register_duplicate_username(self, api_client, user):
         """Test registration with duplicate username."""
-        url = reverse("register")
+        url = reverse("signup")
         data = {
             "username": user.username,  # Existing username
             "email": "different@example.com",
@@ -97,7 +97,7 @@ class TestAuthenticationAPI:
     @pytest.mark.django_db
     def test_register_missing_fields(self, api_client):
         """Test registration with missing required fields."""
-        url = reverse("register")
+        url = reverse("signup")
         data = {
             "username": "newuser",
             # Missing other required fields
@@ -378,8 +378,8 @@ class TestAuthenticationAPI:
     @pytest.mark.django_db
     def test_authentication_endpoints_allow_anonymous(self, api_client):
         """Test that public endpoints allow anonymous access."""
-        # Test register endpoint
-        register_url = reverse("register")
+        # Test signup endpoint
+        register_url = reverse("signup")
         response = api_client.get(
             register_url
         )  # GET should return 405 Method Not Allowed
