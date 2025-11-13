@@ -121,6 +121,114 @@ class VersionManager:
             if response.lower() != 'y':
                 raise RuntimeError("Aborted due to uncommitted changes")
     
+    def _check_main_branch_up_to_date(self):
+        """Check if main branch is up to date with origin/main before tagging."""
+        print("Checking if main branch is up to date...")
+        
+        # Fetch latest from remote
+        try:
+            subprocess.run(
+                ["git", "fetch", "origin"],
+                capture_output=True,
+                check=True,
+                cwd=self.project_root
+            )
+        except subprocess.CalledProcessError:
+            print("Warning: Could not fetch from origin. Continuing anyway...")
+            return
+        
+        # Check if main branch exists locally
+        try:
+            subprocess.run(
+                ["git", "rev-parse", "--verify", "main"],
+                capture_output=True,
+                check=True,
+                cwd=self.project_root
+            )
+        except subprocess.CalledProcessError:
+            # Try 'master' as fallback
+            try:
+                subprocess.run(
+                    ["git", "rev-parse", "--verify", "master"],
+                    capture_output=True,
+                    check=True,
+                    cwd=self.project_root
+                )
+                main_branch = "master"
+            except subprocess.CalledProcessError:
+                print("Warning: Could not find main or master branch. Skipping check...")
+                return
+        else:
+            main_branch = "main"
+        
+        # Check if origin/main exists
+        try:
+            subprocess.run(
+                ["git", "rev-parse", "--verify", f"origin/{main_branch}"],
+                capture_output=True,
+                check=True,
+                cwd=self.project_root
+            )
+        except subprocess.CalledProcessError:
+            print(f"Warning: origin/{main_branch} does not exist. Skipping check...")
+            return
+        
+        # Compare local main with origin/main
+        try:
+            # Get commit hashes
+            local_result = subprocess.run(
+                ["git", "rev-parse", main_branch],
+                capture_output=True,
+                text=True,
+                check=True,
+                cwd=self.project_root
+            )
+            local_commit = local_result.stdout.strip()
+            
+            remote_result = subprocess.run(
+                ["git", "rev-parse", f"origin/{main_branch}"],
+                capture_output=True,
+                text=True,
+                check=True,
+                cwd=self.project_root
+            )
+            remote_commit = remote_result.stdout.strip()
+            
+            # Check if local is behind remote
+            behind_result = subprocess.run(
+                ["git", "rev-list", "--count", f"{local_commit}..origin/{main_branch}"],
+                capture_output=True,
+                text=True,
+                check=True,
+                cwd=self.project_root
+            )
+            behind_count = int(behind_result.stdout.strip())
+            
+            if behind_count > 0:
+                raise RuntimeError(
+                    f"main branch is {behind_count} commit(s) behind origin/main. "
+                    f"Please pull the latest changes before creating a tag.\n"
+                    f"Run: git checkout {main_branch} && git pull origin {main_branch}"
+                )
+            
+            # Check if local is ahead of remote (optional, but good to know)
+            ahead_result = subprocess.run(
+                ["git", "rev-list", "--count", f"origin/{main_branch}..{local_commit}"],
+                capture_output=True,
+                text=True,
+                check=True,
+                cwd=self.project_root
+            )
+            ahead_count = int(ahead_result.stdout.strip())
+            
+            if ahead_count > 0:
+                print(f"Note: main branch is {ahead_count} commit(s) ahead of origin/main")
+            
+            print(f"✓ main branch is up to date with origin/{main_branch}")
+            
+        except subprocess.CalledProcessError as e:
+            print(f"Warning: Could not compare branches: {e}. Continuing anyway...")
+    
     def _commit_version_change(self, version):
         """Commit version changes."""
         # Add the settings file
@@ -229,6 +337,10 @@ class VersionManager:
             else:
                 print("No changes to commit")
         
+        # Check if main is up to date before tagging
+        if not options.skip_git and not options.force:
+            self._check_main_branch_up_to_date()
+        
         # Create tag (always create, even if no settings changes)
         if not options.skip_git:
             tag_name = self._create_git_tag(new_version)
@@ -292,7 +404,7 @@ Examples:
     parser.add_argument(
         '--force',
         action='store_true',
-        help='Force version update even if no changes'
+        help='Force version update even if no changes, and bypass main branch up-to-date check'
     )
     
     args = parser.parse_args()
