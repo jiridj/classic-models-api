@@ -15,7 +15,7 @@ from config.throttles import (
     TokenRefreshThrottle,
 )
 
-from .serializers import LoginSerializer, RegisterSerializer, UserSerializer
+from .serializers import LoginSerializer, LogoutSerializer, RegisterSerializer, UserSerializer
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
@@ -82,13 +82,7 @@ class CustomTokenRefreshView(TokenRefreshView):
     summary="User Logout",
     description="Logout user by blacklisting the refresh token",
     tags=["Authentication"],
-    request={
-        "type": "object",
-        "properties": {
-            "refresh": {"type": "string", "description": "Refresh token to blacklist"}
-        },
-        "required": ["refresh"],
-    },
+    request=LogoutSerializer,
     responses={
         200: {"description": "Logout successful"},
         400: {"description": "Invalid token"},
