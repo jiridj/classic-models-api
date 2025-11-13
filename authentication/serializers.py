@@ -73,3 +73,9 @@ class RegisterSerializer(serializers.ModelSerializer):
         validated_data.pop("password_confirm")
         user = User.objects.create_user(**validated_data)
         return user
+
+
+class LogoutSerializer(serializers.Serializer):
+    """Serializer for user logout"""
+
+    refresh = serializers.CharField(required=True, help_text="Refresh token to blacklist")
