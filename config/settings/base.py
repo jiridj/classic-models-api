@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-from textwrap import dedent
 
 BASE_DIR = Path(__file__).resolve().parents[2]
 
@@ -103,42 +102,41 @@ REST_FRAMEWORK = {
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "Classic Models API",
-    "DESCRIPTION": dedent("""
-        API for the Classic Models tutorial database with JWT authentication.
-
-        ## Authentication
-
-        This API uses JWT (JSON Web Token) authentication. To access protected endpoints:
-
-        1. **Login**: POST `/classic-models/api/auth/login/` with username and password
-        2. **Use Token**: Include the access token in the Authorization header: `Bearer <access_token>`
-        3. **Refresh**: Use POST `/classic-models/api/auth/refresh/` to get a new access token
-        4. **Logout**: POST `/classic-models/api/auth/logout/` to invalidate the refresh token
-
-        ## Demo User
-
-        For testing purposes, you can use:
-        - **Username**: `demo`
-        - **Password**: `demo123`
-
-        ## Base Path
-
-        All endpoints are served at `/classic-models` base path.
-
-        ## Public Endpoints
-
-        - API documentation (this page)
-        - Authentication endpoints (`/classic-models/api/auth/`)
-
-        ## Protected Endpoints
-
-        - All Classic Models data endpoints (`/classic-models/api/v1/`)
-    """).strip(),
+    "DESCRIPTION": (
+        "API for the Classic Models tutorial database with JWT authentication.\n\n"
+        "## Authentication\n\n"
+        "This API uses JWT (JSON Web Token) authentication. To access protected endpoints:\n\n"
+        "1. **Login**: POST `/classic-models/api/auth/login/` with username and password\n"
+        "2. **Use Token**: Include the access token in the Authorization header: `Bearer <access_token>`\n"
+        "3. **Refresh**: Use POST `/classic-models/api/auth/refresh/` to get a new access token\n"
+        "4. **Logout**: POST `/classic-models/api/auth/logout/` to invalidate the refresh token\n\n"
+        "## Demo User\n\n"
+        "For testing purposes, you can use:\n"
+        "- **Username**: `demo`\n"
+        "- **Password**: `demo123`\n\n"
+        "## Base Path\n\n"
+        "All endpoints are served at `/classic-models` base path.\n\n"
+        "## Public Endpoints\n\n"
+        "- API documentation (this page)\n"
+        "- Authentication endpoints (`/classic-models/api/auth/`)\n\n"
+        "## Protected Endpoints\n\n"
+        "- All Classic Models data endpoints (`/classic-models/api/v1/`)"
+    ),
     "VERSION": get_version(),
     "SERVE_INCLUDE_SCHEMA": False,
     "COMPONENT_SPLIT_REQUEST": True,
     "SORT_OPERATIONS": False,
     "SCHEMA_PATH_PREFIX": "/classic-models/api/",
+    "SWAGGER_UI_SETTINGS": {
+        "deepLinking": True,
+        "displayOperationId": False,
+        "defaultModelsExpandDepth": 1,
+        "defaultModelExpandDepth": 1,
+        "docExpansion": "list",
+        "filter": True,
+        "showExtensions": True,
+        "showCommonExtensions": True,
+    },
     "AUTHENTICATION_WHITELIST": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
