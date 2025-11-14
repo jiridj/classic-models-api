@@ -15,7 +15,15 @@ from config.throttles import (
     TokenRefreshThrottle,
 )
 
-from .serializers import LoginSerializer, LogoutSerializer, RegisterSerializer, UserSerializer
+from .serializers import (
+    LoginResponseSerializer,
+    LoginSerializer,
+    LogoutSerializer,
+    RateLimitDemoResponseSerializer,
+    RegisterSerializer,
+    SignupResponseSerializer,
+    UserSerializer,
+)
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
@@ -30,28 +38,10 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         tags=["Authentication"],
         request=LoginSerializer,
         responses={
-            200: {
-                "description": "Login successful",
-                "content": {
-                    "application/json": {
-                        "example": {
-                            "access": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
-                            "refresh": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
-                            "user": {
-                                "id": 1,
-                                "username": "demo_user",
-                                "email": "demo@example.com",
-                                "first_name": "Demo",
-                                "last_name": "User",
-                                "is_active": True,
-                                "date_joined": "2024-01-01T00:00:00Z",
-                            },
-                        }
-                    }
-                },
-            },
+            200: LoginResponseSerializer,
             400: {"description": "Invalid credentials"},
         },
+        auth=[],
     )
     def post(self, request, *args, **kwargs):
         serializer = LoginSerializer(data=request.data)
@@ -71,6 +61,13 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@extend_schema(
+    operation_id="token_refresh",
+    summary="Refresh Token",
+    description="Refresh JWT access token using a valid refresh token",
+    tags=["Authentication"],
+    auth=[],
+)
 class CustomTokenRefreshView(TokenRefreshView):
     """Custom token refresh view with throttling."""
     
@@ -118,27 +115,10 @@ def logout_view(request):
     tags=["Authentication"],
     request=RegisterSerializer,
     responses={
-        201: {
-            "description": "User created successfully",
-            "content": {
-                "application/json": {
-                    "example": {
-                        "message": "User created successfully",
-                        "user": {
-                            "id": 1,
-                            "username": "new_user",
-                            "email": "new@example.com",
-                            "first_name": "New",
-                            "last_name": "User",
-                            "is_active": True,
-                            "date_joined": "2024-01-01T00:00:00Z",
-                        },
-                    }
-                }
-            },
-        },
+        201: SignupResponseSerializer,
         400: {"description": "Invalid data"},
     },
+    auth=[],
 )
 @api_view(["POST"])
 @permission_classes([permissions.AllowAny])
@@ -162,22 +142,7 @@ def signup_view(request):
     description="Get information about the currently authenticated user",
     tags=["Authentication"],
     responses={
-        200: {
-            "description": "User information",
-            "content": {
-                "application/json": {
-                    "example": {
-                        "id": 1,
-                        "username": "demo_user",
-                        "email": "demo@example.com",
-                        "first_name": "Demo",
-                        "last_name": "User",
-                        "is_active": True,
-                        "date_joined": "2024-01-01T00:00:00Z",
-                    }
-                }
-            },
-        },
+        200: UserSerializer,
         401: {"description": "Authentication required"},
     },
 )
@@ -195,19 +160,9 @@ def current_user_view(request):
     description="Public endpoint to demonstrate rate limiting. Limited to 5 requests per minute per IP.",
     tags=["Authentication"],
     responses={
-        200: {
-            "description": "Successful response with rate limit info",
-            "content": {
-                "application/json": {
-                    "example": {
-                        "message": "Rate limit demo endpoint",
-                        "rate_limit": "5 requests per minute",
-                        "timestamp": "2024-01-01T00:00:00Z",
-                    }
-                }
-            },
-        },
+        200: RateLimitDemoResponseSerializer,
     },
+    auth=[],
 )
 @api_view(["GET"])
 @permission_classes([permissions.AllowAny])
