@@ -140,21 +140,6 @@ SPECTACULAR_SETTINGS = {
     "AUTHENTICATION_WHITELIST": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
-    "EXTENSIONS_INFO": {
-        "x-logo": {
-            "url": "https://via.placeholder.com/200x50/0066CC/FFFFFF?text=Classic+Models+API"
-        }
-    },
-    "COMPONENTS": {
-        "securitySchemes": {
-            "JWTAuth": {
-                "type": "http",
-                "scheme": "bearer",
-                "bearerFormat": "JWT",
-                "description": "JWT token obtained from /api/auth/login/",
-            }
-        }
-    },
     "TAGS": [
         {"name": "Authentication", "description": "User authentication and management"},
         {"name": "Product Lines", "description": "Product line categories"},
