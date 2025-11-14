@@ -79,3 +79,26 @@ class LogoutSerializer(serializers.Serializer):
     """Serializer for user logout"""
 
     refresh = serializers.CharField(required=True, help_text="Refresh token to blacklist")
+
+
+class LoginResponseSerializer(serializers.Serializer):
+    """Serializer for login response"""
+
+    access = serializers.CharField(help_text="JWT access token")
+    refresh = serializers.CharField(help_text="JWT refresh token")
+    user = UserSerializer(help_text="User information")
+
+
+class SignupResponseSerializer(serializers.Serializer):
+    """Serializer for signup response"""
+
+    message = serializers.CharField(help_text="Success message")
+    user = UserSerializer(help_text="Created user information")
+
+
+class RateLimitDemoResponseSerializer(serializers.Serializer):
+    """Serializer for rate limit demo response"""
+
+    message = serializers.CharField(help_text="Demo message")
+    rate_limit = serializers.CharField(help_text="Rate limit description")
+    timestamp = serializers.CharField(help_text="Current timestamp")
