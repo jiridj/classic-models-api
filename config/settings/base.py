@@ -103,7 +103,7 @@ REST_FRAMEWORK = {
 # Get base URL from environment or use default
 def get_base_url():
     """Get base URL from environment variable or default to localhost."""
-    base_url = os.environ.get("API_BASE_URL", "http://localhost:8000/classic-models")
+    base_url = os.environ.get("API_BASE_URL", "http://localhost:8000")
     # Ensure it doesn't end with a slash
     return base_url.rstrip("/")
 
