@@ -100,6 +100,13 @@ REST_FRAMEWORK = {
     },
 }
 
+# Get base URL from environment or use default
+def get_base_url():
+    """Get base URL from environment variable or default to localhost."""
+    base_url = os.environ.get("API_BASE_URL", "http://localhost:8000/classic-models")
+    # Ensure it doesn't end with a slash
+    return base_url.rstrip("/")
+
 SPECTACULAR_SETTINGS = {
     "TITLE": "Classic Models API",
     "DESCRIPTION": (
@@ -127,6 +134,9 @@ SPECTACULAR_SETTINGS = {
     "COMPONENT_SPLIT_REQUEST": True,
     "SORT_OPERATIONS": False,
     "SCHEMA_PATH_PREFIX": "/classic-models/api/",
+    "SERVERS": [
+        {"url": get_base_url(), "description": "API Server"},
+    ],
     "SWAGGER_UI_SETTINGS": {
         "deepLinking": True,
         "displayOperationId": False,
