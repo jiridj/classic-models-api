@@ -34,6 +34,7 @@ services:
       - DEBUG=${DEBUG:-0}
       - SECRET_KEY=${SECRET_KEY:-your-secret-key-here}
       - ALLOWED_HOSTS=${ALLOWED_HOSTS:-*}
+      - API_BASE_URL=${API_BASE_URL:-http://localhost:8000}
       - DATABASE_URL=mysql://${MYSQL_USER:-classicuser}:${MYSQL_PASSWORD:-classicpass}@mysql:3306/${MYSQL_DATABASE:-classicmodels}
       - MYSQL_HOST=mysql
       - MYSQL_PORT=3306
