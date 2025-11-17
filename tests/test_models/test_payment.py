@@ -7,7 +7,7 @@ from decimal import Decimal
 
 import pytest
 from django.core.exceptions import ValidationError
-from django.db import IntegrityError
+from django.db import IntegrityError, models
 
 from classicmodels.models import Customer, Payment
 
@@ -25,6 +25,8 @@ class TestPaymentModel:
             amount=Decimal("229.95"),
         )
 
+        assert payment.id is not None  # id should be auto-generated
+        assert isinstance(payment.id, int)  # id should be an integer
         assert payment.customernumber == customer
         assert payment.checknumber == "TEST001"
         assert payment.paymentdate == date(2024, 1, 20)
@@ -51,6 +53,9 @@ class TestPaymentModel:
         assert Payment._meta.managed is True  # Overridden for testing
         assert Payment._meta.db_table == "payments"
         assert Payment._meta.unique_together == (("customernumber", "checknumber"),)
+        # Verify id field is the primary key
+        assert Payment._meta.pk.name == "id"
+        assert isinstance(Payment._meta.pk, models.AutoField)
 
     @pytest.mark.django_db
     def test_payment_field_attributes(self):

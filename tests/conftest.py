@@ -40,6 +40,81 @@ def django_setup(django_db_setup, django_db_blocker):
                 schema_editor.create_model(model)
 
 
+@pytest.fixture(autouse=True, scope="session")
+def disable_throttling(django_setup):
+    """Disable throttling for all tests by patching throttle classes."""
+    # Replace throttle classes in viewsets with empty list
+    # This affects all viewsets that inherit from BaseModelViewSet
+    # (ProductLineViewSet, ProductViewSet, OfficeViewSet, EmployeeViewSet, 
+    #  CustomerViewSet, OrderViewSet)
+    from api.v1.classicmodels.views import (
+        BaseModelViewSet, PaymentViewSet, OrderdetailViewSet
+    )
+    from authentication.views import CustomTokenObtainPairView, CustomTokenRefreshView
+    
+    # Also patch the throttle classes themselves to always allow requests
+    from config.throttles import (
+        ReadThrottle, WriteThrottle, LoginThrottle, RegisterThrottle,
+        TokenRefreshThrottle, LogoutThrottle, CurrentUserThrottle
+    )
+    from rest_framework import throttling
+    
+    # Store original allow_request methods
+    ReadThrottle._original_allow_request = ReadThrottle.allow_request
+    WriteThrottle._original_allow_request = WriteThrottle.allow_request
+    LoginThrottle._original_allow_request = LoginThrottle.allow_request
+    RegisterThrottle._original_allow_request = RegisterThrottle.allow_request
+    TokenRefreshThrottle._original_allow_request = TokenRefreshThrottle.allow_request
+    LogoutThrottle._original_allow_request = LogoutThrottle.allow_request
+    CurrentUserThrottle._original_allow_request = CurrentUserThrottle.allow_request
+    
+    # Create a no-op allow_request method
+    def allow_request_always_true(self, request, view):
+        return True
+    
+    # Patch all throttle classes to always allow requests
+    ReadThrottle.allow_request = allow_request_always_true
+    WriteThrottle.allow_request = allow_request_always_true
+    LoginThrottle.allow_request = allow_request_always_true
+    RegisterThrottle.allow_request = allow_request_always_true
+    TokenRefreshThrottle.allow_request = allow_request_always_true
+    LogoutThrottle.allow_request = allow_request_always_true
+    CurrentUserThrottle.allow_request = allow_request_always_true
+    
+    # Store original throttle classes for restoration if needed
+    BaseModelViewSet._original_throttle_classes = BaseModelViewSet.throttle_classes
+    PaymentViewSet._original_throttle_classes = PaymentViewSet.throttle_classes
+    OrderdetailViewSet._original_throttle_classes = OrderdetailViewSet.throttle_classes
+    CustomTokenObtainPairView._original_throttle_classes = CustomTokenObtainPairView.throttle_classes
+    CustomTokenRefreshView._original_throttle_classes = getattr(CustomTokenRefreshView, 'throttle_classes', [])
+    
+    # Replace with empty list to disable throttling during tests
+    # This prevents HTTP 429 errors when running many tests in sequence
+    BaseModelViewSet.throttle_classes = []
+    PaymentViewSet.throttle_classes = []
+    OrderdetailViewSet.throttle_classes = []
+    CustomTokenObtainPairView.throttle_classes = []
+    CustomTokenRefreshView.throttle_classes = []
+    
+    yield
+    
+    # Restore original throttle classes and methods (teardown)
+    ReadThrottle.allow_request = ReadThrottle._original_allow_request
+    WriteThrottle.allow_request = WriteThrottle._original_allow_request
+    LoginThrottle.allow_request = LoginThrottle._original_allow_request
+    RegisterThrottle.allow_request = RegisterThrottle._original_allow_request
+    TokenRefreshThrottle.allow_request = TokenRefreshThrottle._original_allow_request
+    LogoutThrottle.allow_request = LogoutThrottle._original_allow_request
+    CurrentUserThrottle.allow_request = CurrentUserThrottle._original_allow_request
+    
+    BaseModelViewSet.throttle_classes = getattr(BaseModelViewSet, '_original_throttle_classes', [])
+    PaymentViewSet.throttle_classes = getattr(PaymentViewSet, '_original_throttle_classes', [])
+    OrderdetailViewSet.throttle_classes = getattr(OrderdetailViewSet, '_original_throttle_classes', [])
+    CustomTokenObtainPairView.throttle_classes = getattr(CustomTokenObtainPairView, '_original_throttle_classes', [])
+    if hasattr(CustomTokenRefreshView, '_original_throttle_classes'):
+        CustomTokenRefreshView.throttle_classes = CustomTokenRefreshView._original_throttle_classes
+
+
 @pytest.fixture
 def api_client():
     """API client for testing endpoints."""

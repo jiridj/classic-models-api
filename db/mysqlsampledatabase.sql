@@ -89,11 +89,13 @@ CREATE TABLE customers (
 );
 
 CREATE TABLE payments (
+  id int NOT NULL AUTO_INCREMENT,
   customerNumber int,
   checkNumber varchar(50) NOT NULL,
   paymentDate date NOT NULL,
   amount decimal(10,2) NOT NULL,
-  PRIMARY KEY (customerNumber,checkNumber),
+  PRIMARY KEY (id),
+  UNIQUE KEY (customerNumber,checkNumber),
   FOREIGN KEY (customerNumber) REFERENCES customers (customerNumber)
 );
 
@@ -110,12 +112,14 @@ CREATE TABLE orders (
 );
 
 CREATE TABLE orderdetails (
+  id int NOT NULL AUTO_INCREMENT,
   orderNumber int,
   productCode varchar(15) NOT NULL,
   quantityOrdered int NOT NULL,
   priceEach decimal(10,2) NOT NULL,
   orderLineNumber smallint(6) NOT NULL,
-  PRIMARY KEY (orderNumber,productCode),
+  PRIMARY KEY (id),
+  UNIQUE KEY (orderNumber,productCode),
   FOREIGN KEY (orderNumber) REFERENCES orders (orderNumber),
   FOREIGN KEY (productCode) REFERENCES products (productCode)
 );

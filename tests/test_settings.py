@@ -125,6 +125,9 @@ REST_FRAMEWORK = {
         "rest_framework.parsers.JSONParser",
     ],
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
+    # Disable throttling for tests to avoid rate limit failures
+    "DEFAULT_THROTTLE_CLASSES": [],
+    "DEFAULT_THROTTLE_RATES": {},
 }
 
 # JWT Configuration
