@@ -24,6 +24,8 @@ class TestOrderdetailModel:
             orderlinenumber=1,
         )
 
+        assert order_detail.id is not None  # id should be auto-generated
+        assert isinstance(order_detail.id, int)  # id should be an integer
         assert order_detail.ordernumber == order
         assert order_detail.productcode == product
         assert order_detail.quantityordered == 5
@@ -51,6 +53,9 @@ class TestOrderdetailModel:
         assert Orderdetail._meta.managed is True  # Overridden for testing
         assert Orderdetail._meta.db_table == "orderdetails"
         assert Orderdetail._meta.unique_together == (("ordernumber", "productcode"),)
+        # Verify id field is the primary key
+        assert Orderdetail._meta.pk.name == "id"
+        assert isinstance(Orderdetail._meta.pk, models.AutoField)
 
     @pytest.mark.django_db
     def test_order_detail_field_attributes(self):

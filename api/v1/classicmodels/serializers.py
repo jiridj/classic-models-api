@@ -1,7 +1,15 @@
 from rest_framework import serializers
 
-from classicmodels.models import (Customer, Employee, Office, Order,
-                                  Orderdetail, Payment, Product, ProductLine)
+from classicmodels.models import (
+    Customer,
+    Employee,
+    Office,
+    Order,
+    Orderdetail,
+    Payment,
+    Product,
+    ProductLine,
+)
 
 
 class ProductLineSerializer(serializers.ModelSerializer):

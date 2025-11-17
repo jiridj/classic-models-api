@@ -78,7 +78,9 @@ class RegisterSerializer(serializers.ModelSerializer):
 class LogoutSerializer(serializers.Serializer):
     """Serializer for user logout"""
 
-    refresh = serializers.CharField(required=True, help_text="Refresh token to blacklist")
+    refresh = serializers.CharField(
+        required=True, help_text="Refresh token to blacklist"
+    )
 
 
 class LoginResponseSerializer(serializers.Serializer):

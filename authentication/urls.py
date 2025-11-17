@@ -1,8 +1,13 @@
 from django.urls import path
 
-from .views import (CustomTokenObtainPairView, CustomTokenRefreshView,
-                    current_user_view, logout_view, rate_limit_demo_view,
-                    signup_view)
+from .views import (
+    CustomTokenObtainPairView,
+    CustomTokenRefreshView,
+    current_user_view,
+    logout_view,
+    rate_limit_demo_view,
+    signup_view,
+)
 
 urlpatterns = [
     path("login/", CustomTokenObtainPairView.as_view(), name="login"),

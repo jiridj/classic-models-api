@@ -131,6 +131,7 @@ class Customer(models.Model):
 
 
 class Payment(models.Model):
+    id = models.AutoField(primary_key=True, db_column="id")
     customernumber = models.ForeignKey(
         Customer,
         models.DO_NOTHING,
@@ -173,6 +174,7 @@ class Order(models.Model):
 
 
 class Orderdetail(models.Model):
+    id = models.AutoField(primary_key=True, db_column="id")
     ordernumber = models.ForeignKey(
         Order, models.DO_NOTHING, db_column="orderNumber", to_field="ordernumber"
     )

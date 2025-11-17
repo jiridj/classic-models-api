@@ -22,6 +22,9 @@ class TestPaymentAPI:
 
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data["results"]) == 1
+        # Verify id field is present in response
+        assert "id" in response.data["results"][0]
+        assert response.data["results"][0]["id"] == payment.id
         assert (
             response.data["results"][0]["customernumber"]
             == payment.customernumber.customernumber
@@ -49,6 +52,9 @@ class TestPaymentAPI:
         response = authenticated_api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
+        # Verify id field is present in response
+        assert "id" in response.data
+        assert response.data["id"] == payment.id
         assert response.data["customernumber"] == payment.customernumber.customernumber
         assert response.data["checknumber"] == payment.checknumber
 
@@ -94,6 +100,9 @@ class TestPaymentAPI:
         response = authenticated_api_client.post(url, data, format="json")
 
         assert response.status_code == status.HTTP_201_CREATED
+        # Verify id field is present and auto-generated in response
+        assert "id" in response.data
+        assert isinstance(response.data["id"], int)
         assert response.data["customernumber"] == customer.customernumber
         assert response.data["checknumber"] == "NEW001"
 

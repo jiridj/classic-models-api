@@ -11,8 +11,16 @@ from django.test import TestCase
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from classicmodels.models import (Customer, Employee, Office, Order,
-                                  Orderdetail, Payment, Product, ProductLine)
+from classicmodels.models import (
+    Customer,
+    Employee,
+    Office,
+    Order,
+    Orderdetail,
+    Payment,
+    Product,
+    ProductLine,
+)
 
 
 class TestDataFactory:
@@ -396,7 +404,7 @@ class DataBuilder:
 # Utility functions for common test operations
 def create_test_hierarchy():
     """Create a complete test hierarchy with all related objects."""
-    builder = TestDataBuilder()
+    builder = DataBuilder()
     return (
         builder.with_user()
         .with_office()

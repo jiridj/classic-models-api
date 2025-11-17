@@ -1,23 +1,37 @@
 from django.shortcuts import get_object_or_404
-from drf_spectacular.utils import extend_schema, extend_schema_view
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import mixins, permissions, viewsets
-from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from config.throttles import ReadThrottle, WriteThrottle
 
-from classicmodels.models import (Customer, Employee, Office, Order,
-                                  Orderdetail, Payment, Product, ProductLine)
+from classicmodels.models import (
+    Customer,
+    Employee,
+    Office,
+    Order,
+    Orderdetail,
+    Payment,
+    Product,
+    ProductLine,
+)
 
-from .serializers import (CustomerSerializer, EmployeeSerializer,
-                          OfficeSerializer, OrderdetailSerializer,
-                          OrderSerializer, PaymentSerializer,
-                          ProductLineSerializer, ProductSerializer)
+from .serializers import (
+    CustomerSerializer,
+    EmployeeSerializer,
+    OfficeSerializer,
+    OrderdetailSerializer,
+    OrderSerializer,
+    PaymentSerializer,
+    ProductLineSerializer,
+    ProductSerializer,
+)
 
 
 class BaseModelViewSet(viewsets.ModelViewSet):
     """Base viewset with appropriate throttling for read/write operations."""
-    
+
     permission_classes = [permissions.IsAuthenticated]
     throttle_classes = [ReadThrottle, WriteThrottle]
 
@@ -304,24 +318,88 @@ class OrderViewSet(BaseModelViewSet):
         tags=["Payments"],
         summary="Get a specific payment",
         description="Retrieve detailed information about a specific payment by customer number and check number.",
+        parameters=[
+            OpenApiParameter(
+                name="customerNumber",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+                description="The customer number",
+                required=True,
+            ),
+            OpenApiParameter(
+                name="checkNumber",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.PATH,
+                description="The check number",
+                required=True,
+            ),
+        ],
     ),
     update=extend_schema(
         operation_id="update_payment",
         tags=["Payments"],
         summary="Update a payment",
         description="Update all fields of an existing payment record.",
+        parameters=[
+            OpenApiParameter(
+                name="customerNumber",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+                description="The customer number",
+                required=True,
+            ),
+            OpenApiParameter(
+                name="checkNumber",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.PATH,
+                description="The check number",
+                required=True,
+            ),
+        ],
     ),
     partial_update=extend_schema(
         operation_id="patch_payment",
         tags=["Payments"],
         summary="Partially update a payment",
         description="Update specific fields of an existing payment record.",
+        parameters=[
+            OpenApiParameter(
+                name="customerNumber",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+                description="The customer number",
+                required=True,
+            ),
+            OpenApiParameter(
+                name="checkNumber",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.PATH,
+                description="The check number",
+                required=True,
+            ),
+        ],
     ),
     destroy=extend_schema(
         operation_id="delete_payment",
         tags=["Payments"],
         summary="Delete a payment",
         description="Remove a payment record from the system.",
+        parameters=[
+            OpenApiParameter(
+                name="customerNumber",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+                description="The customer number",
+                required=True,
+            ),
+            OpenApiParameter(
+                name="checkNumber",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.PATH,
+                description="The check number",
+                required=True,
+            ),
+        ],
     ),
 )
 class PaymentViewSet(
@@ -337,6 +415,7 @@ class PaymentViewSet(
     throttle_classes = [ReadThrottle, WriteThrottle]
 
     def get_object(self):
+        """Get object using composite key (customerNumber, checkNumber)."""
         customer_number = self.kwargs.get("customerNumber")
         check_number = self.kwargs.get("checkNumber")
         return get_object_or_404(
@@ -367,24 +446,88 @@ class PaymentViewSet(
         tags=["Order Details"],
         summary="Get a specific order detail",
         description="Retrieve detailed information about a specific order line item by order number and product code.",
+        parameters=[
+            OpenApiParameter(
+                name="orderNumber",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+                description="The order number",
+                required=True,
+            ),
+            OpenApiParameter(
+                name="productCode",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.PATH,
+                description="The product code",
+                required=True,
+            ),
+        ],
     ),
     update=extend_schema(
         operation_id="update_order_detail",
         tags=["Order Details"],
         summary="Update an order detail",
         description="Update all fields of an existing order line item.",
+        parameters=[
+            OpenApiParameter(
+                name="orderNumber",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+                description="The order number",
+                required=True,
+            ),
+            OpenApiParameter(
+                name="productCode",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.PATH,
+                description="The product code",
+                required=True,
+            ),
+        ],
     ),
     partial_update=extend_schema(
         operation_id="patch_order_detail",
         tags=["Order Details"],
         summary="Partially update an order detail",
         description="Update specific fields of an existing order line item.",
+        parameters=[
+            OpenApiParameter(
+                name="orderNumber",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+                description="The order number",
+                required=True,
+            ),
+            OpenApiParameter(
+                name="productCode",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.PATH,
+                description="The product code",
+                required=True,
+            ),
+        ],
     ),
     destroy=extend_schema(
         operation_id="delete_order_detail",
         tags=["Order Details"],
         summary="Delete an order detail",
         description="Remove a line item from an order.",
+        parameters=[
+            OpenApiParameter(
+                name="orderNumber",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+                description="The order number",
+                required=True,
+            ),
+            OpenApiParameter(
+                name="productCode",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.PATH,
+                description="The product code",
+                required=True,
+            ),
+        ],
     ),
 )
 class OrderdetailViewSet(
@@ -400,6 +543,7 @@ class OrderdetailViewSet(
     throttle_classes = [ReadThrottle, WriteThrottle]
 
     def get_object(self):
+        """Get object using composite key (orderNumber, productCode)."""
         order_number = self.kwargs.get("orderNumber")
         product_code = self.kwargs.get("productCode")
         return get_object_or_404(
