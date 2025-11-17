@@ -7,7 +7,7 @@ BASE_DIR = Path(__file__).resolve().parents[2]
 
 def get_version():
     """Get version from environment variable or default."""
-    return os.environ.get("API_VERSION", "4.0.2")
+    return os.environ.get("API_VERSION", "4.1.0")
 
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key")
