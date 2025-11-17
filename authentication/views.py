@@ -61,17 +61,21 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@extend_schema(
-    operation_id="token_refresh",
-    summary="Refresh Token",
-    description="Refresh JWT access token using a valid refresh token",
-    tags=["Authentication"],
-    auth=[],
-)
 class CustomTokenRefreshView(TokenRefreshView):
     """Custom token refresh view with throttling."""
 
     throttle_classes = [TokenRefreshThrottle]
+
+    @extend_schema(
+        operation_id="token_refresh",
+        summary="Refresh Token",
+        description="Refresh JWT access token using a valid refresh token",
+        tags=["Authentication"],
+        auth=[],
+    )
+    def post(self, request, *args, **kwargs):
+        """Override post to add schema documentation"""
+        return super().post(request, *args, **kwargs)
 
 
 @extend_schema(
