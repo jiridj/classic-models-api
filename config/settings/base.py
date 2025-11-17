@@ -1,11 +1,14 @@
 import os
+from datetime import timedelta
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parents[2]
 
+
 def get_version():
     """Get version from environment variable or default."""
     return os.environ.get("API_VERSION", "4.0.2")
+
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key")
 DEBUG = os.environ.get("DEBUG", "0") == "1"
@@ -18,7 +21,7 @@ ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
 # Enable support for X-Forwarded-* headers from trusted proxies
 USE_X_FORWARDED_HOST = True
 USE_X_FORWARDED_PORT = True
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -87,18 +90,17 @@ REST_FRAMEWORK = {
         "token_refresh": "100/min",  # 100 token refreshes per minute per user
         "logout": "200/min",  # 200 logout requests per minute per user
         "current_user": "600/min",  # 600 /me requests per minute per user
-        
         # Data endpoints
         "read": "1000/min",  # 1000 read requests per minute per user
         "write": "200/min",  # 200 write requests per minute per user
         "burst": "1000/min",  # 1000 burst requests per minute per user
         "demo_rate_limit": "5/min",  # 5 requests per minute per IP (public demo)
-        
         # Default rates
         "anon": "200/hour",  # Anonymous users
         "user": "1000/min",  # Authenticated users
     },
 }
+
 
 # Get base URL from environment or use default
 def get_base_url():
@@ -106,6 +108,7 @@ def get_base_url():
     base_url = os.environ.get("API_BASE_URL", "http://localhost:8000")
     # Ensure it doesn't end with a slash
     return base_url.rstrip("/")
+
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "Classic Models API",
@@ -164,8 +167,6 @@ SPECTACULAR_SETTINGS = {
 }
 
 # JWT Settings
-from datetime import timedelta
-
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),

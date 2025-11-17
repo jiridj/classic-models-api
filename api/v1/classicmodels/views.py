@@ -2,23 +2,36 @@ from django.shortcuts import get_object_or_404
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import mixins, permissions, viewsets
-from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from config.throttles import ReadThrottle, WriteThrottle
 
-from classicmodels.models import (Customer, Employee, Office, Order,
-                                  Orderdetail, Payment, Product, ProductLine)
+from classicmodels.models import (
+    Customer,
+    Employee,
+    Office,
+    Order,
+    Orderdetail,
+    Payment,
+    Product,
+    ProductLine,
+)
 
-from .serializers import (CustomerSerializer, EmployeeSerializer,
-                          OfficeSerializer, OrderdetailSerializer,
-                          OrderSerializer, PaymentSerializer,
-                          ProductLineSerializer, ProductSerializer)
+from .serializers import (
+    CustomerSerializer,
+    EmployeeSerializer,
+    OfficeSerializer,
+    OrderdetailSerializer,
+    OrderSerializer,
+    PaymentSerializer,
+    ProductLineSerializer,
+    ProductSerializer,
+)
 
 
 class BaseModelViewSet(viewsets.ModelViewSet):
     """Base viewset with appropriate throttling for read/write operations."""
-    
+
     permission_classes = [permissions.IsAuthenticated]
     throttle_classes = [ReadThrottle, WriteThrottle]
 

@@ -15,7 +15,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.development")
 django.setup()
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # noqa: E402
 
 
 def create_demo_user():
@@ -30,7 +30,7 @@ def create_demo_user():
         return
 
     # Create user
-    user = User.objects.create_user(
+    User.objects.create_user(
         username=username,
         email=email,
         password=password,

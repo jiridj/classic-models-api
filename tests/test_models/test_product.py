@@ -111,7 +111,7 @@ class TestProductModel:
     def test_product_required_fields(self, product_line):
         """Test that required fields cannot be null."""
         # Test that productcode is required (primary key)
-        product = Product(
+        Product(
             productcode="",  # Empty string instead of None
             productname="Test",
             productline=product_line,

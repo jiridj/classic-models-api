@@ -18,9 +18,17 @@ pytest_plugins = ["pytest_django"]
 def django_setup(django_db_setup, django_db_blocker):
     """Set up Django models for testing."""
     with django_db_blocker.unblock():
-        from classicmodels.models import (Customer, Employee, Office, Order,
-                                          Orderdetail, Payment, Product, ProductLine)
-        
+        from classicmodels.models import (
+            Customer,
+            Employee,
+            Office,
+            Order,
+            Orderdetail,
+            Payment,
+            Product,
+            ProductLine,
+        )
+
         # Override models to be managed for testing
         Office._meta.managed = True
         ProductLine._meta.managed = True
@@ -30,13 +38,22 @@ def django_setup(django_db_setup, django_db_blocker):
         Order._meta.managed = True
         Orderdetail._meta.managed = True
         Payment._meta.managed = True
-        
+
         # Create database tables
         from django.db import connection
-        
+
         # Create tables for all models
         with connection.schema_editor() as schema_editor:
-            for model in [Office, ProductLine, Product, Employee, Customer, Order, Orderdetail, Payment]:
+            for model in [
+                Office,
+                ProductLine,
+                Product,
+                Employee,
+                Customer,
+                Order,
+                Orderdetail,
+                Payment,
+            ]:
                 schema_editor.create_model(model)
 
 
@@ -45,20 +62,26 @@ def disable_throttling(django_setup):
     """Disable throttling for all tests by patching throttle classes."""
     # Replace throttle classes in viewsets with empty list
     # This affects all viewsets that inherit from BaseModelViewSet
-    # (ProductLineViewSet, ProductViewSet, OfficeViewSet, EmployeeViewSet, 
+    # (ProductLineViewSet, ProductViewSet, OfficeViewSet, EmployeeViewSet,
     #  CustomerViewSet, OrderViewSet)
     from api.v1.classicmodels.views import (
-        BaseModelViewSet, PaymentViewSet, OrderdetailViewSet
+        BaseModelViewSet,
+        PaymentViewSet,
+        OrderdetailViewSet,
     )
     from authentication.views import CustomTokenObtainPairView, CustomTokenRefreshView
-    
+
     # Also patch the throttle classes themselves to always allow requests
     from config.throttles import (
-        ReadThrottle, WriteThrottle, LoginThrottle, RegisterThrottle,
-        TokenRefreshThrottle, LogoutThrottle, CurrentUserThrottle
+        ReadThrottle,
+        WriteThrottle,
+        LoginThrottle,
+        RegisterThrottle,
+        TokenRefreshThrottle,
+        LogoutThrottle,
+        CurrentUserThrottle,
     )
-    from rest_framework import throttling
-    
+
     # Store original allow_request methods
     ReadThrottle._original_allow_request = ReadThrottle.allow_request
     WriteThrottle._original_allow_request = WriteThrottle.allow_request
@@ -67,11 +90,11 @@ def disable_throttling(django_setup):
     TokenRefreshThrottle._original_allow_request = TokenRefreshThrottle.allow_request
     LogoutThrottle._original_allow_request = LogoutThrottle.allow_request
     CurrentUserThrottle._original_allow_request = CurrentUserThrottle.allow_request
-    
+
     # Create a no-op allow_request method
     def allow_request_always_true(self, request, view):
         return True
-    
+
     # Patch all throttle classes to always allow requests
     ReadThrottle.allow_request = allow_request_always_true
     WriteThrottle.allow_request = allow_request_always_true
@@ -80,14 +103,18 @@ def disable_throttling(django_setup):
     TokenRefreshThrottle.allow_request = allow_request_always_true
     LogoutThrottle.allow_request = allow_request_always_true
     CurrentUserThrottle.allow_request = allow_request_always_true
-    
+
     # Store original throttle classes for restoration if needed
     BaseModelViewSet._original_throttle_classes = BaseModelViewSet.throttle_classes
     PaymentViewSet._original_throttle_classes = PaymentViewSet.throttle_classes
     OrderdetailViewSet._original_throttle_classes = OrderdetailViewSet.throttle_classes
-    CustomTokenObtainPairView._original_throttle_classes = CustomTokenObtainPairView.throttle_classes
-    CustomTokenRefreshView._original_throttle_classes = getattr(CustomTokenRefreshView, 'throttle_classes', [])
-    
+    CustomTokenObtainPairView._original_throttle_classes = (
+        CustomTokenObtainPairView.throttle_classes
+    )
+    CustomTokenRefreshView._original_throttle_classes = getattr(
+        CustomTokenRefreshView, "throttle_classes", []
+    )
+
     # Replace with empty list to disable throttling during tests
     # This prevents HTTP 429 errors when running many tests in sequence
     BaseModelViewSet.throttle_classes = []
@@ -95,9 +122,9 @@ def disable_throttling(django_setup):
     OrderdetailViewSet.throttle_classes = []
     CustomTokenObtainPairView.throttle_classes = []
     CustomTokenRefreshView.throttle_classes = []
-    
+
     yield
-    
+
     # Restore original throttle classes and methods (teardown)
     ReadThrottle.allow_request = ReadThrottle._original_allow_request
     WriteThrottle.allow_request = WriteThrottle._original_allow_request
@@ -106,19 +133,30 @@ def disable_throttling(django_setup):
     TokenRefreshThrottle.allow_request = TokenRefreshThrottle._original_allow_request
     LogoutThrottle.allow_request = LogoutThrottle._original_allow_request
     CurrentUserThrottle.allow_request = CurrentUserThrottle._original_allow_request
-    
-    BaseModelViewSet.throttle_classes = getattr(BaseModelViewSet, '_original_throttle_classes', [])
-    PaymentViewSet.throttle_classes = getattr(PaymentViewSet, '_original_throttle_classes', [])
-    OrderdetailViewSet.throttle_classes = getattr(OrderdetailViewSet, '_original_throttle_classes', [])
-    CustomTokenObtainPairView.throttle_classes = getattr(CustomTokenObtainPairView, '_original_throttle_classes', [])
-    if hasattr(CustomTokenRefreshView, '_original_throttle_classes'):
-        CustomTokenRefreshView.throttle_classes = CustomTokenRefreshView._original_throttle_classes
+
+    BaseModelViewSet.throttle_classes = getattr(
+        BaseModelViewSet, "_original_throttle_classes", []
+    )
+    PaymentViewSet.throttle_classes = getattr(
+        PaymentViewSet, "_original_throttle_classes", []
+    )
+    OrderdetailViewSet.throttle_classes = getattr(
+        OrderdetailViewSet, "_original_throttle_classes", []
+    )
+    CustomTokenObtainPairView.throttle_classes = getattr(
+        CustomTokenObtainPairView, "_original_throttle_classes", []
+    )
+    if hasattr(CustomTokenRefreshView, "_original_throttle_classes"):
+        CustomTokenRefreshView.throttle_classes = (
+            CustomTokenRefreshView._original_throttle_classes
+        )
 
 
 @pytest.fixture
 def api_client():
     """API client for testing endpoints."""
     from rest_framework.test import APIClient
+
     return APIClient()
 
 
@@ -126,6 +164,7 @@ def api_client():
 def django_client():
     """Django test client for testing views."""
     from django.test import Client
+
     return Client()
 
 
@@ -133,6 +172,7 @@ def django_client():
 def authenticated_api_client(api_client, user):
     """API client with authentication."""
     from rest_framework_simplejwt.tokens import RefreshToken
+
     refresh = RefreshToken.for_user(user)
     api_client.credentials(HTTP_AUTHORIZATION=f"Bearer {refresh.access_token}")
     return api_client
@@ -142,6 +182,7 @@ def authenticated_api_client(api_client, user):
 def user():
     """Create a test user."""
     from django.contrib.auth.models import User
+
     return User.objects.create_user(
         username="testuser",
         email="test@example.com",
@@ -155,6 +196,7 @@ def user():
 def admin_user():
     """Create an admin user."""
     from django.contrib.auth.models import User
+
     return User.objects.create_superuser(
         username="admin", email="admin@example.com", password="adminpass123"
     )
@@ -164,6 +206,7 @@ def admin_user():
 def office():
     """Create a test office."""
     from classicmodels.models import Office
+
     return Office.objects.create(
         officecode="TEST001",
         city="Test City",
@@ -179,6 +222,7 @@ def office():
 def employee(office):
     """Create a test employee."""
     from classicmodels.models import Employee
+
     return Employee.objects.create(
         employeenumber=1001,
         lastname="Doe",
@@ -194,6 +238,7 @@ def employee(office):
 def manager_employee(office):
     """Create a test manager employee."""
     from classicmodels.models import Employee
+
     return Employee.objects.create(
         employeenumber=1000,
         lastname="Smith",
@@ -209,6 +254,7 @@ def manager_employee(office):
 def customer(employee):
     """Create a test customer."""
     from classicmodels.models import Customer
+
     return Customer.objects.create(
         customernumber=1001,
         customername="Test Customer Inc.",
@@ -227,6 +273,7 @@ def customer(employee):
 def product_line():
     """Create a test product line."""
     from classicmodels.models import ProductLine
+
     return ProductLine.objects.create(
         productline="Test Line",
         textdescription="Test product line description",
@@ -238,6 +285,7 @@ def product_line():
 def product(product_line):
     """Create a test product."""
     from classicmodels.models import Product
+
     return Product.objects.create(
         productcode="TEST001",
         productname="Test Product",
@@ -255,6 +303,7 @@ def product(product_line):
 def order(customer):
     """Create a test order."""
     from classicmodels.models import Order
+
     return Order.objects.create(
         ordernumber=10001,
         orderdate="2024-01-15",
@@ -270,6 +319,7 @@ def order(customer):
 def order_detail(order, product):
     """Create a test order detail."""
     from classicmodels.models import Orderdetail
+
     return Orderdetail.objects.create(
         ordernumber=order,
         productcode=product,
@@ -283,6 +333,7 @@ def order_detail(order, product):
 def payment(customer):
     """Create a test payment."""
     from classicmodels.models import Payment
+
     return Payment.objects.create(
         customernumber=customer,
         checknumber="TEST001",
@@ -295,6 +346,7 @@ def payment(customer):
 def multiple_offices():
     """Create multiple test offices."""
     from classicmodels.models import Office
+
     offices = []
     for i in range(3):
         office = Office.objects.create(
@@ -314,6 +366,7 @@ def multiple_offices():
 def multiple_products(product_line):
     """Create multiple test products."""
     from classicmodels.models import Product
+
     products = []
     for i in range(5):
         product = Product.objects.create(

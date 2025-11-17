@@ -3,6 +3,7 @@ Test settings for the Classic Models API tests.
 """
 
 import os
+from datetime import timedelta
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -131,8 +132,6 @@ REST_FRAMEWORK = {
 }
 
 # JWT Configuration
-from datetime import timedelta
-
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
@@ -241,7 +240,7 @@ SESSION_SAVE_EVERY_REQUEST = False
 # CSRF configuration for tests
 CSRF_COOKIE_HTTPONLY = True
 CSRF_COOKIE_SECURE = False  # Set to True in production
-CSRF_TRUSTED_ORIGINS = []
+CSRF_TRUSTED_ORIGINS: list[str] = []
 
 # File upload settings for tests
 FILE_UPLOAD_MAX_MEMORY_SIZE = 2621440  # 2.5 MB
@@ -259,7 +258,7 @@ NUMBER_GROUPING = 3
 USE_TZ = True
 
 # Static files settings for tests
-STATICFILES_DIRS = []
+STATICFILES_DIRS: list[str] = []
 STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
@@ -274,7 +273,7 @@ if "test" in os.environ.get("DJANGO_SETTINGS_MODULE", ""):
     DATABASES["default"] = {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": ":memory:",
-        "OPTIONS": {
+        "OPTIONS": {  # type: ignore[dict-item]
             "timeout": 20,
         },
     }
@@ -288,6 +287,10 @@ if "test" in os.environ.get("DJANGO_SETTINGS_MODULE", ""):
     ]
 
     # Disable logging during tests
-    LOGGING["handlers"]["console"]["level"] = "CRITICAL"
-    for logger in LOGGING["loggers"].values():
-        logger["level"] = "CRITICAL"
+    handlers = LOGGING.get("handlers", {})
+    if handlers and hasattr(handlers, "__contains__") and "console" in handlers:
+        handlers["console"]["level"] = "CRITICAL"  # type: ignore[index]
+    loggers = LOGGING.get("loggers", {})
+    if loggers:
+        for logger in loggers.values():  # type: ignore[attr-defined]
+            logger["level"] = "CRITICAL"

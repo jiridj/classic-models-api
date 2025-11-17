@@ -70,7 +70,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 )
 class CustomTokenRefreshView(TokenRefreshView):
     """Custom token refresh view with throttling."""
-    
+
     throttle_classes = [TokenRefreshThrottle]
 
 
@@ -180,7 +180,7 @@ def rate_limit_demo_view(request):
     response = Response(response_data, status=status.HTTP_200_OK)
 
     # Add rate limit headers if they were set
-    if hasattr(request, '_throttle_headers') and request._throttle_headers:
+    if hasattr(request, "_throttle_headers") and request._throttle_headers:
         for header_name, header_value in request._throttle_headers.items():
             response[header_name] = str(header_value)
 
