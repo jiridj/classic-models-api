@@ -12,6 +12,8 @@ services:
       - "3306:3306"
     volumes:
       - ./db/mysqlsampledatabase.sql:/docker-entrypoint-initdb.d/01-init.sql
+      # Use a named volume that can be easily removed
+      - mysql_data:/var/lib/mysql
     networks:
       - classic-models-network
     healthcheck:
@@ -43,6 +45,11 @@ services:
       - classic-models-network
     volumes:
       - .:/app
+
+volumes:
+  # Named volume for MySQL data - remove this volume to recreate database
+  # Use: docker compose down -v  to remove volumes and recreate on next up
+  mysql_data:
 
 networks:
   classic-models-network:
