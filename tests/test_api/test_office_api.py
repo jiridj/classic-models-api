@@ -505,3 +505,147 @@ class TestOfficeAPI:
         assert response.status_code == status.HTTP_200_OK
         # Note: Employee relationships might not be included in the response
         # depending on the serializer configuration
+
+    @pytest.mark.django_db
+    def test_get_office_employees_authenticated(
+        self, authenticated_api_client, office, employee
+    ):
+        """Test retrieving employees for an office when authenticated."""
+        url = reverse(
+            "classicmodels:office-employees",
+            kwargs={"officecode": office.officecode},
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert "results" in response.data or isinstance(response.data, list)
+        # If paginated, check results; otherwise check list directly
+        if "results" in response.data:
+            assert len(response.data["results"]) >= 1
+            assert response.data["results"][0]["employeenumber"] == employee.employeenumber
+        else:
+            assert len(response.data) >= 1
+            assert response.data[0]["employeenumber"] == employee.employeenumber
+
+    @pytest.mark.django_db
+    def test_get_office_employees_unauthenticated(self, api_client, office):
+        """Test retrieving employees for an office when not authenticated."""
+        url = reverse(
+            "classicmodels:office-employees",
+            kwargs={"officecode": office.officecode},
+        )
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    @pytest.mark.django_db
+    def test_get_office_employees_nonexistent_office(
+        self, authenticated_api_client
+    ):
+        """Test retrieving employees for an office that doesn't exist."""
+        url = reverse(
+            "classicmodels:office-employees", kwargs={"officecode": "NONEXIST"}
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    @pytest.mark.django_db
+    def test_get_office_employees_empty(self, authenticated_api_client):
+        """Test retrieving employees for an office with no employees."""
+        from classicmodels.models import Office
+
+        # Create an office with no employees
+        office_no_employees = Office.objects.create(
+            officecode="EMPTY01",
+            city="Empty City",
+            phone="+1-555-0000",
+            addressline1="123 Empty Street",
+            country="USA",
+            postalcode="12345",
+            territory="NA",
+        )
+
+        url = reverse(
+            "classicmodels:office-employees",
+            kwargs={"officecode": office_no_employees.officecode},
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        # Should return empty list or empty results
+        if "results" in response.data:
+            assert len(response.data["results"]) == 0
+        else:
+            assert len(response.data) == 0
+
+    @pytest.mark.django_db
+    def test_get_office_employees_multiple_employees(
+        self, authenticated_api_client, office
+    ):
+        """Test retrieving employees for an office with multiple employees."""
+        from classicmodels.models import Employee
+
+        # Create multiple employees in this office
+        employees = []
+        for i in range(3):
+            employee = Employee.objects.create(
+                employeenumber=2000 + i,
+                lastname=f"Employee{i+1}",
+                firstname="Test",
+                extension=f"EXT{i+1}",
+                email=f"employee{i+1}@example.com",
+                officecode=office,
+                jobtitle="Sales Rep",
+            )
+            employees.append(employee)
+
+        url = reverse(
+            "classicmodels:office-employees",
+            kwargs={"officecode": office.officecode},
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        # Check that all employees are returned
+        if "results" in response.data:
+            employee_numbers = [
+                e["employeenumber"] for e in response.data["results"]
+            ]
+        else:
+            employee_numbers = [e["employeenumber"] for e in response.data]
+
+        for employee in employees:
+            assert employee.employeenumber in employee_numbers
+
+    @pytest.mark.django_db
+    def test_get_office_employees_pagination(
+        self, authenticated_api_client, office
+    ):
+        """Test pagination for office employees endpoint."""
+        from classicmodels.models import Employee
+
+        # Create more employees than default page size
+        for i in range(15):
+            Employee.objects.create(
+                employeenumber=3000 + i,
+                lastname=f"Pagination{i+1}",
+                firstname="Test",
+                extension=f"PAGE{i+1}",
+                email=f"pagination{i+1}@example.com",
+                officecode=office,
+                jobtitle="Sales Rep",
+            )
+
+        url = reverse(
+            "classicmodels:office-employees",
+            kwargs={"officecode": office.officecode},
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        # Should have pagination metadata
+        assert "count" in response.data
+        assert "next" in response.data or response.data["next"] is None
+        assert "previous" in response.data or response.data["previous"] is None
+        assert "results" in response.data

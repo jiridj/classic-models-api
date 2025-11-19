@@ -789,6 +789,41 @@
           }
         },
         {
+          "name": "Get Employees by Office",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/offices/3/employees/?page=1&page_size=25",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "offices", "3", "employees", ""],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number for pagination"
+                },
+                {
+                  "key": "page_size",
+                  "value": "25",
+                  "description": "Number of items per page"
+                }
+              ]
+            },
+            "description": "Retrieve all employees working in a specific office. This endpoint supports office management and organizational charts."
+          }
+        },
+        {
           "name": "Update Office",
           "request": {
             "auth": {
