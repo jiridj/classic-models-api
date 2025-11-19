@@ -307,6 +307,56 @@ class CustomerViewSet(BaseModelViewSet):
         serializer = OrderSerializer(orders, many=True)
         return Response(serializer.data)
 
+    @extend_schema(
+        operation_id="get_customer_payments",
+        tags=["Customers"],
+        summary="Get customer payment history",
+        description="Retrieve all payments made by a specific customer. This endpoint provides the complete payment history for the customer.",
+        parameters=[
+            OpenApiParameter(
+                name="customernumber",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+                description="The customer number",
+                required=True,
+            ),
+        ],
+        responses={200: PaymentSerializer(many=True)},
+    )
+    @action(
+        detail=True,
+        methods=["get"],
+        url_path="payments",
+        url_name="payments",
+    )
+    def payments(self, request, **kwargs):
+        """
+        Get all payments for a specific customer.
+
+        Returns a paginated list of all payments made by the customer,
+        including payment dates, amounts, and check numbers.
+        """
+        # Get the customer using the lookup_field
+        try:
+            customer = self.get_object()
+        except Customer.DoesNotExist:
+            from rest_framework.exceptions import NotFound
+
+            raise NotFound("Customer not found.")
+
+        payments = Payment.objects.filter(customernumber=customer).select_related(
+            "customernumber"
+        )
+
+        # Apply pagination
+        page = self.paginate_queryset(payments)
+        if page is not None:
+            serializer = PaymentSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = PaymentSerializer(payments, many=True)
+        return Response(serializer.data)
+
 
 @extend_schema_view(
     list=extend_schema(
