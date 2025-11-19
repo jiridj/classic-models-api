@@ -255,6 +255,7 @@ class CustomerViewSet(BaseModelViewSet):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
     lookup_field = "customernumber"
+    lookup_url_kwarg = "customernumber"
 
     @extend_schema(
         operation_id="get_customer_orders",
@@ -285,7 +286,14 @@ class CustomerViewSet(BaseModelViewSet):
         Returns a paginated list of all orders placed by the customer,
         including order status, dates, and other order details.
         """
-        customer = self.get_object()
+        # Get the customer using the lookup_field
+        # This will work whether the URL uses 'pk' or 'customernumber'
+        try:
+            customer = self.get_object()
+        except Customer.DoesNotExist:
+            from rest_framework.exceptions import NotFound
+
+            raise NotFound("Customer not found.")
         orders = Order.objects.filter(customernumber=customer).select_related(
             "customernumber"
         )

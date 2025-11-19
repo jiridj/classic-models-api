@@ -1079,9 +1079,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/customers/1001/orders/?page=1&page_size=25",
+              "raw": "{{base_url}}/api/v1/customers/112/orders/?page=1&page_size=25",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "customers", "1001", "orders", ""],
+              "path": ["api", "v1", "customers", "112", "orders", ""],
               "query": [
                 {
                   "key": "page",
