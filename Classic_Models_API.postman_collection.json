@@ -335,6 +335,41 @@
           }
         },
         {
+          "name": "Get Products by Product Line",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/productlines/Vintage Cars/products/?page=1&page_size=25",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "productlines", "Vintage Cars", "products", ""],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number for pagination"
+                },
+                {
+                  "key": "page_size",
+                  "value": "25",
+                  "description": "Number of items per page"
+                }
+              ]
+            },
+            "description": "Retrieve all products in a specific product line category. This endpoint allows browsing products by category."
+          }
+        },
+        {
           "name": "Update Product Line",
           "request": {
             "auth": {

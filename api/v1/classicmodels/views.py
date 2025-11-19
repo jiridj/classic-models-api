@@ -79,6 +79,57 @@ class ProductLineViewSet(BaseModelViewSet):
     queryset = ProductLine.objects.all()
     serializer_class = ProductLineSerializer
     lookup_field = "productline"
+    lookup_url_kwarg = "productline"
+
+    @extend_schema(
+        operation_id="get_product_line_products",
+        tags=["Product Lines"],
+        summary="Get products by product line",
+        description="Retrieve all products in a specific product line category. This endpoint allows browsing products by category.",
+        parameters=[
+            OpenApiParameter(
+                name="productline",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.PATH,
+                description="The product line identifier",
+                required=True,
+            ),
+        ],
+        responses={200: ProductSerializer(many=True)},
+    )
+    @action(
+        detail=True,
+        methods=["get"],
+        url_path="products",
+        url_name="products",
+    )
+    def products(self, request, **kwargs):
+        """
+        Get all products in a specific product line.
+
+        Returns a paginated list of all products belonging to this product line,
+        including product details, pricing, and inventory information.
+        """
+        # Get the product line using the lookup_field
+        try:
+            product_line = self.get_object()
+        except ProductLine.DoesNotExist:
+            from rest_framework.exceptions import NotFound
+
+            raise NotFound("Product line not found.")
+
+        products = Product.objects.filter(productline=product_line).select_related(
+            "productline"
+        )
+
+        # Apply pagination
+        page = self.paginate_queryset(products)
+        if page is not None:
+            serializer = ProductSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = ProductSerializer(products, many=True)
+        return Response(serializer.data)
 
 
 @extend_schema_view(
