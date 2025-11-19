@@ -296,7 +296,7 @@ class OfficeViewSet(BaseModelViewSet):
     def employees(self, request, **kwargs):
         """
         Get all employees in a specific office.
-        
+
         Returns a paginated list of all employees working in this office,
         including employee details, job titles, and contact information.
         """
@@ -305,18 +305,19 @@ class OfficeViewSet(BaseModelViewSet):
             office = self.get_object()
         except Office.DoesNotExist:
             from rest_framework.exceptions import NotFound
+
             raise NotFound("Office not found.")
-        
+
         employees = Employee.objects.filter(officecode=office).select_related(
             "officecode", "reportsto"
         )
-        
+
         # Apply pagination
         page = self.paginate_queryset(employees)
         if page is not None:
             serializer = EmployeeSerializer(page, many=True)
             return self.get_paginated_response(serializer.data)
-        
+
         serializer = EmployeeSerializer(employees, many=True)
         return Response(serializer.data)
 
@@ -363,6 +364,57 @@ class EmployeeViewSet(BaseModelViewSet):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
     lookup_field = "employeenumber"
+    lookup_url_kwarg = "employeenumber"
+
+    @extend_schema(
+        operation_id="get_employee_reports",
+        tags=["Employees"],
+        summary="Get employees by manager",
+        description="Retrieve all employees reporting to a specific manager. This endpoint supports organizational hierarchy and team management.",
+        parameters=[
+            OpenApiParameter(
+                name="employeenumber",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+                description="The employee number of the manager",
+                required=True,
+            ),
+        ],
+        responses={200: EmployeeSerializer(many=True)},
+    )
+    @action(
+        detail=True,
+        methods=["get"],
+        url_path="reports",
+        url_name="reports",
+    )
+    def reports(self, request, **kwargs):
+        """
+        Get all employees reporting to a specific manager.
+
+        Returns a paginated list of all employees who report to this manager,
+        including employee details, job titles, and contact information.
+        """
+        # Get the manager using the lookup_field
+        try:
+            manager = self.get_object()
+        except Employee.DoesNotExist:
+            from rest_framework.exceptions import NotFound
+
+            raise NotFound("Employee not found.")
+
+        reports = Employee.objects.filter(reportsto=manager).select_related(
+            "officecode", "reportsto"
+        )
+
+        # Apply pagination
+        page = self.paginate_queryset(reports)
+        if page is not None:
+            serializer = EmployeeSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = EmployeeSerializer(reports, many=True)
+        return Response(serializer.data)
 
 
 @extend_schema_view(

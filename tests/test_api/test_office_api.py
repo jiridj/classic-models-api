@@ -522,7 +522,9 @@ class TestOfficeAPI:
         # If paginated, check results; otherwise check list directly
         if "results" in response.data:
             assert len(response.data["results"]) >= 1
-            assert response.data["results"][0]["employeenumber"] == employee.employeenumber
+            assert (
+                response.data["results"][0]["employeenumber"] == employee.employeenumber
+            )
         else:
             assert len(response.data) >= 1
             assert response.data[0]["employeenumber"] == employee.employeenumber
@@ -539,9 +541,7 @@ class TestOfficeAPI:
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     @pytest.mark.django_db
-    def test_get_office_employees_nonexistent_office(
-        self, authenticated_api_client
-    ):
+    def test_get_office_employees_nonexistent_office(self, authenticated_api_client):
         """Test retrieving employees for an office that doesn't exist."""
         url = reverse(
             "classicmodels:office-employees", kwargs={"officecode": "NONEXIST"}
@@ -609,9 +609,7 @@ class TestOfficeAPI:
         assert response.status_code == status.HTTP_200_OK
         # Check that all employees are returned
         if "results" in response.data:
-            employee_numbers = [
-                e["employeenumber"] for e in response.data["results"]
-            ]
+            employee_numbers = [e["employeenumber"] for e in response.data["results"]]
         else:
             employee_numbers = [e["employeenumber"] for e in response.data]
 
@@ -619,9 +617,7 @@ class TestOfficeAPI:
             assert employee.employeenumber in employee_numbers
 
     @pytest.mark.django_db
-    def test_get_office_employees_pagination(
-        self, authenticated_api_client, office
-    ):
+    def test_get_office_employees_pagination(self, authenticated_api_client, office):
         """Test pagination for office employees endpoint."""
         from classicmodels.models import Employee
 
