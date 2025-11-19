@@ -1473,6 +1473,41 @@
           }
         },
         {
+          "name": "Get Order Details by Order",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/orders/10100/order-details/?page=1&page_size=25",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "orders", "10100", "order-details", ""],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number for pagination"
+                },
+                {
+                  "key": "page_size",
+                  "value": "25",
+                  "description": "Number of items per page"
+                }
+              ]
+            },
+            "description": "Retrieve all line items for a specific order. This endpoint supports order fulfillment and invoice generation."
+          }
+        },
+        {
           "name": "Update Order",
           "request": {
             "auth": {

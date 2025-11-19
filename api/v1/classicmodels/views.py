@@ -654,6 +654,56 @@ class OrderViewSet(BaseModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     lookup_field = "ordernumber"
+    lookup_url_kwarg = "ordernumber"
+
+    @extend_schema(
+        operation_id="get_order_order_details",
+        tags=["Orders"],
+        summary="Get order details by order",
+        description="Retrieve all line items for a specific order. This endpoint supports order fulfillment and invoice generation.",
+        parameters=[
+            OpenApiParameter(
+                name="ordernumber",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+                description="The order number",
+                required=True,
+            ),
+        ],
+        responses={200: OrderdetailSerializer(many=True)},
+    )
+    @action(
+        detail=True,
+        methods=["get"],
+        url_path="order-details",
+        url_name="order-details",
+    )
+    def order_details(self, request, **kwargs):
+        """
+        Get all order details for a specific order.
+        
+        Returns a paginated list of all line items in this order,
+        including product codes, quantities, prices, and line numbers.
+        """
+        # Get the order using the lookup_field
+        try:
+            order = self.get_object()
+        except Order.DoesNotExist:
+            from rest_framework.exceptions import NotFound
+            raise NotFound("Order not found.")
+        
+        order_details = Orderdetail.objects.filter(ordernumber=order).select_related(
+            "ordernumber", "productcode"
+        )
+        
+        # Apply pagination
+        page = self.paginate_queryset(order_details)
+        if page is not None:
+            serializer = OrderdetailSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = OrderdetailSerializer(order_details, many=True)
+        return Response(serializer.data)
 
 
 @extend_schema_view(
