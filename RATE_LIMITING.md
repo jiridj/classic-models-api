@@ -4,6 +4,8 @@
 
 This API implements comprehensive rate limiting to protect against abuse, ensure fair usage, and maintain system performance. Rate limits are applied using Django REST Framework's built-in throttling mechanisms.
 
+> **Note**: For general API information, see [README.md](README.md). For deployment configuration, see [DEPLOYMENT.md](DEPLOYMENT.md).
+
 ## Rate Limit Categories
 
 ### Authentication Endpoints

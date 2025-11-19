@@ -243,8 +243,7 @@ For easy API testing and exploration, we've included a comprehensive Postman col
 ### Quick Start with Postman
 
 1. **Import the Collection**
-   - Download `Classic_Models_API.postman_collection.json` from the project root
-   - Import it into Postman
+   - Import `Classic_Models_API.postman_collection.json` from the project root into Postman
 
 2. **Import an Environment**
    
@@ -254,25 +253,44 @@ For easy API testing and exploration, we've included a comprehensive Postman col
      - Base URL: `http://localhost:8000/classic-models`
      - For testing with Docker Compose
    
-   - **AWS Production**: `Classic_Models_API_AWS.postman_environment.json`
-     - Base URL: `https://router.jiridj.be/classic-models`
-     - For testing the deployed AWS environment
+   - **Production**: `Classic_Models_API_AWS.postman_environment.json`
+     - Base URL: Configure with your production URL
+     - For testing deployed environments
    
-   Both environments use the `/classic-models` base path.
-   
-   Import your chosen environment file into Postman and select it from the environment dropdown.
+   Both environments use the `/classic-models` base path. Import your chosen environment file and select it from the environment dropdown.
 
 3. **Authentication Flow**
    - Run "Register User" to create a new account (optional)
    - Run "Login User" to authenticate and get JWT tokens
-   - All subsequent requests will automatically use the stored access token
+   - Tokens are automatically saved to collection variables
+   - All subsequent authenticated requests will automatically use the stored access token
+
+### Authentication Configuration
+
+The collection uses Bearer token authentication configured at the collection level:
+
+- **Collection-level**: Bearer token with variable `{{access_token}}`
+- **Automatic token extraction**: Login endpoint automatically saves `access` and `refresh` tokens
+- **Token refresh**: Refresh endpoint automatically updates the access token
+- **Request-level**: Protected endpoints inherit collection authentication; public endpoints are set to "noauth"
+
+#### Endpoints Without Authentication
+- API Documentation (`/api/docs/`, `/api/schema/`, `/api/redoc/`)
+- Register User (`/api/auth/register/`)
+- Login User (`/api/auth/login/`)
+- Refresh Token (`/api/auth/refresh/`)
+
+#### Endpoints With Authentication (Inherit from Collection)
+- Get Current User (`/api/auth/me/`)
+- Logout User (`/api/auth/logout/`)
+- All CRUD endpoints for Product Lines, Products, Offices, Employees, Customers, Orders, Order Details, and Payments
 
 ### Collection Features
 
-- 🔐 **Complete Authentication Flow** - Login, signup, token refresh, logout
+- 🔐 **Complete Authentication Flow** - Login, signup, token refresh, logout with automatic token management
 - 📦 **Full CRUD Operations** - All entities with Create, Read, Update, Delete
 - 🎯 **Realistic Sample Data** - Proper field values matching model constraints
-- 🔄 **Automatic Token Management** - JWT tokens are automatically extracted and stored
+- 🔄 **Automatic Token Management** - JWT tokens are automatically extracted and stored in collection variables
 - 📚 **Organized by Resource** - Logical grouping of related endpoints
 - 🛠️ **Environment Variables** - Easy configuration for different environments
 - 🧪 **Automated Testing** - Run full collection tests with `make postman-test`
@@ -282,28 +300,28 @@ For easy API testing and exploration, we've included a comprehensive Postman col
 ```
 Classic Models API
 ├── Authentication
-│   ├── Register User
-│   ├── Login User (auto-extracts tokens)
-│   ├── Refresh Token
-│   ├── Get Current User
-│   └── Logout User
-├── Product Lines
+│   ├── Register User (noauth)
+│   ├── Login User (noauth, auto-extracts tokens)
+│   ├── Refresh Token (noauth, auto-updates access token)
+│   ├── Get Current User (inherits auth)
+│   └── Logout User (inherits auth)
+├── Product Lines (inherits auth)
 │   └── [Complete CRUD operations]
-├── Products
+├── Products (inherits auth)
+│   └── [Complete CRUD operations including search]
+├── Offices (inherits auth)
 │   └── [Complete CRUD operations]
-├── Offices
+├── Employees (inherits auth)
 │   └── [Complete CRUD operations]
-├── Employees
+├── Customers (inherits auth)
 │   └── [Complete CRUD operations]
-├── Customers
+├── Orders (inherits auth)
 │   └── [Complete CRUD operations]
-├── Orders
+├── Order Details (inherits auth)
 │   └── [Complete CRUD operations]
-├── Order Details
+├── Payments (inherits auth)
 │   └── [Complete CRUD operations]
-├── Payments
-│   └── [Complete CRUD operations]
-└── API Documentation
+└── API Documentation (noauth)
     ├── OpenAPI Schema
     ├── Swagger UI
     └── ReDoc
@@ -311,7 +329,14 @@ Classic Models API
 
 ## 🚀 Deployment
 
-For production deployment instructions, including reverse proxy configuration, see [DEPLOYMENT.md](DEPLOYMENT.md).
+The API is served at the `/classic-models` base path in all environments for consistency.
+
+### Deployment Options
+
+- **Local Development**: See [Quick Start](#-quick-start) section above
+- **Production Deployment**: See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed instructions
+- **QNAP NAS Deployment**: See [NAS_DEPLOYMENT.md](NAS_DEPLOYMENT.md) for NAS-specific setup
+- **Release Management**: See [RELEASE_MANAGEMENT.md](RELEASE_MANAGEMENT.md) for versioning and releases
 
 ## 🛠️ Development
 
@@ -339,7 +364,9 @@ make clean             # Clean up test result files
 
 ## 🧪 Testing
 
-The project includes a comprehensive test suite with 100+ test cases:
+The project includes a comprehensive test suite with 100+ test cases. For detailed testing documentation, see [tests/README.md](tests/README.md).
+
+### Quick Test Commands
 
 ```bash
 # Run all tests
@@ -391,7 +418,16 @@ make health-check
    make postman-test
    ```
 
-## 📚 Learning Resources
+## 📚 Additional Documentation
+
+- **[DEPLOYMENT.md](DEPLOYMENT.md)** - Production deployment guide with reverse proxy configuration
+- **[NAS_DEPLOYMENT.md](NAS_DEPLOYMENT.md)** - QNAP NAS deployment instructions
+- **[RELEASE_MANAGEMENT.md](RELEASE_MANAGEMENT.md)** - Version management and release process
+- **[RATE_LIMITING.md](RATE_LIMITING.md)** - Rate limiting configuration and best practices
+- **[tests/README.md](tests/README.md)** - Comprehensive testing documentation
+- **[db/migrations/README.md](db/migrations/README.md)** - Database migration guide
+
+## 🎓 Learning Resources
 
 This demo application demonstrates:
 
@@ -403,6 +439,7 @@ This demo application demonstrates:
 - **RESTful API design** principles
 - **Comprehensive testing** strategies
 - **Development workflow** with Make
+- **Rate limiting** and API security
 
 ## 🤝 Contributing
 

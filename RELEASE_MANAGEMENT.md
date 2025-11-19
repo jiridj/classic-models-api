@@ -2,6 +2,8 @@
 
 This guide explains how to manage releases for the Classic Models API using semantic versioning and automated CI/CD.
 
+> **Note**: For general deployment information, see [DEPLOYMENT.md](DEPLOYMENT.md). For QNAP NAS deployment, see [NAS_DEPLOYMENT.md](NAS_DEPLOYMENT.md).
+
 ## Overview
 
 The release management system automatically:
@@ -248,7 +250,9 @@ docker compose down
 docker compose up -d
 
 # Verify deployment
-curl http://your-nas-ip:8000/api/docs/
+curl http://your-nas-ip:8000/classic-models/api/docs/
 ```
+
+> **Note**: The API is always served at the `/classic-models` base path. See [DEPLOYMENT.md](DEPLOYMENT.md) for deployment details.
 
 This release management system ensures consistent, automated releases with proper versioning and documentation updates.

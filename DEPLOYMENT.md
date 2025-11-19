@@ -4,6 +4,8 @@
 
 This application is **always** served at the `/classic-models` base path in all environments. This simplifies reverse proxy configuration and ensures consistent URLs across local development and production.
 
+> **Note**: For local development setup, see the [Quick Start](README.md#-quick-start) section in the main README. For QNAP NAS deployment, see [NAS_DEPLOYMENT.md](NAS_DEPLOYMENT.md).
+
 ## Base Path
 
 **All URLs include `/classic-models` prefix:**
@@ -155,13 +157,13 @@ curl -X POST https://router.jiridj.be/classic-models/api/auth/login/ \
 
 ## Postman Testing
 
-**Local Development Environment:**
-- File: `Classic_Models_API_Local.postman_environment.json`
-- Base URL: `http://localhost:8000/classic-models`
+For detailed Postman collection setup and authentication configuration, see the [Postman Collection](README.md#-postman-collection) section in the main README.
 
-**AWS Production Environment:**
-- File: `Classic_Models_API_AWS.postman_environment.json`
-- Base URL: `https://router.jiridj.be/classic-models`
+**Available Environments:**
+- **Local Development**: `Classic_Models_API_Local.postman_environment.json`
+  - Base URL: `http://localhost:8000/classic-models`
+- **Production**: `Classic_Models_API_AWS.postman_environment.json`
+  - Base URL: Configure with your production URL
 
 Both environments use the same `/classic-models` base path.
 

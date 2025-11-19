@@ -2,6 +2,8 @@
 
 This guide explains how to deploy the Classic Models API on your QNAP NAS using Docker Compose and GitHub Container Registry (GHCR).
 
+> **Note**: For general deployment information, see [DEPLOYMENT.md](DEPLOYMENT.md). For release management, see [RELEASE_MANAGEMENT.md](RELEASE_MANAGEMENT.md).
+
 ## Prerequisites
 
 - QNAP NAS with Container Station installed
@@ -146,9 +148,12 @@ curl http://your-nas-ip:8000/classic-models/api/schema/
 
 ## Step 7: Access Your Application
 
-- **API Documentation**: `http://your-nas-ip:8000/classic-models/api/schema/`
-- **API Base URL**: `http://your-nas-ip:8000/classic-models/api/`
+- **API Documentation**: `http://your-nas-ip:8000/classic-models/api/docs/`
+- **ReDoc Documentation**: `http://your-nas-ip:8000/classic-models/api/redoc/`
+- **API Base URL**: `http://your-nas-ip:8000/classic-models/api/v1/`
 - **Demo User**: username: `demo`, password: `demo123`
+
+> **Note**: The API is always served at the `/classic-models` base path. See [DEPLOYMENT.md](DEPLOYMENT.md) for more details on the base path configuration.
 
 ## Updating the Application
 
@@ -194,7 +199,7 @@ docker-compose -f docker-compose.nas.yml pull
 docker-compose -f docker-compose.nas.yml up -d
 ```
 
-### Method 2: Automated Update (Optional)
+### Method 3: Automated Update (Optional)
 
 You can set up a cron job to automatically pull and restart the application:
 
@@ -205,6 +210,8 @@ crontab -e
 # Add this line to check for updates every day at 2 AM
 0 2 * * * cd /share/Container/classic-models-api && docker-compose -f docker-compose.nas.yml pull && docker-compose -f docker-compose.nas.yml up -d
 ```
+
+> **Note**: For information on version management and releases, see [RELEASE_MANAGEMENT.md](RELEASE_MANAGEMENT.md).
 
 ## Troubleshooting
 

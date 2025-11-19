@@ -2,6 +2,8 @@
 
 This directory contains comprehensive unit tests for the Classic Models API project.
 
+> **Note**: For general project information, see [README.md](../README.md). For running tests, see the [Testing](../README.md#-testing) section in the main README.
+
 ## Test Structure
 
 ```
