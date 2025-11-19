@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import mixins, permissions, viewsets
+from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from config.throttles import ReadThrottle, WriteThrottle
@@ -78,6 +79,57 @@ class ProductLineViewSet(BaseModelViewSet):
     queryset = ProductLine.objects.all()
     serializer_class = ProductLineSerializer
     lookup_field = "productline"
+    lookup_url_kwarg = "productline"
+
+    @extend_schema(
+        operation_id="get_product_line_products",
+        tags=["Product Lines"],
+        summary="Get products by product line",
+        description="Retrieve all products in a specific product line category. This endpoint allows browsing products by category.",
+        parameters=[
+            OpenApiParameter(
+                name="productline",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.PATH,
+                description="The product line identifier",
+                required=True,
+            ),
+        ],
+        responses={200: ProductSerializer(many=True)},
+    )
+    @action(
+        detail=True,
+        methods=["get"],
+        url_path="products",
+        url_name="products",
+    )
+    def products(self, request, **kwargs):
+        """
+        Get all products in a specific product line.
+
+        Returns a paginated list of all products belonging to this product line,
+        including product details, pricing, and inventory information.
+        """
+        # Get the product line using the lookup_field
+        try:
+            product_line = self.get_object()
+        except ProductLine.DoesNotExist:
+            from rest_framework.exceptions import NotFound
+
+            raise NotFound("Product line not found.")
+
+        products = Product.objects.filter(productline=product_line).select_related(
+            "productline"
+        )
+
+        # Apply pagination
+        page = self.paginate_queryset(products)
+        if page is not None:
+            serializer = ProductSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = ProductSerializer(products, many=True)
+        return Response(serializer.data)
 
 
 @extend_schema_view(
@@ -122,6 +174,57 @@ class ProductViewSet(BaseModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     lookup_field = "productcode"
+    lookup_url_kwarg = "productcode"
+
+    @extend_schema(
+        operation_id="get_product_order_details",
+        tags=["Products"],
+        summary="Get product order history",
+        description="Retrieve all order details (sales) for a specific product. This endpoint provides the complete sales history for the product.",
+        parameters=[
+            OpenApiParameter(
+                name="productcode",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.PATH,
+                description="The product code",
+                required=True,
+            ),
+        ],
+        responses={200: OrderdetailSerializer(many=True)},
+    )
+    @action(
+        detail=True,
+        methods=["get"],
+        url_path="order-details",
+        url_name="order-details",
+    )
+    def order_details(self, request, **kwargs):
+        """
+        Get all order details for a specific product.
+
+        Returns a paginated list of all order line items containing this product,
+        including quantities ordered, prices, and order information.
+        """
+        # Get the product using the lookup_field
+        try:
+            product = self.get_object()
+        except Product.DoesNotExist:
+            from rest_framework.exceptions import NotFound
+
+            raise NotFound("Product not found.")
+
+        order_details = Orderdetail.objects.filter(productcode=product).select_related(
+            "productcode", "ordernumber"
+        )
+
+        # Apply pagination
+        page = self.paginate_queryset(order_details)
+        if page is not None:
+            serializer = OrderdetailSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = OrderdetailSerializer(order_details, many=True)
+        return Response(serializer.data)
 
 
 @extend_schema_view(
@@ -166,6 +269,57 @@ class OfficeViewSet(BaseModelViewSet):
     queryset = Office.objects.all()
     serializer_class = OfficeSerializer
     lookup_field = "officecode"
+    lookup_url_kwarg = "officecode"
+
+    @extend_schema(
+        operation_id="get_office_employees",
+        tags=["Offices"],
+        summary="Get employees by office",
+        description="Retrieve all employees working in a specific office. This endpoint supports office management and organizational charts.",
+        parameters=[
+            OpenApiParameter(
+                name="officecode",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.PATH,
+                description="The office code",
+                required=True,
+            ),
+        ],
+        responses={200: EmployeeSerializer(many=True)},
+    )
+    @action(
+        detail=True,
+        methods=["get"],
+        url_path="employees",
+        url_name="employees",
+    )
+    def employees(self, request, **kwargs):
+        """
+        Get all employees in a specific office.
+
+        Returns a paginated list of all employees working in this office,
+        including employee details, job titles, and contact information.
+        """
+        # Get the office using the lookup_field
+        try:
+            office = self.get_object()
+        except Office.DoesNotExist:
+            from rest_framework.exceptions import NotFound
+
+            raise NotFound("Office not found.")
+
+        employees = Employee.objects.filter(officecode=office).select_related(
+            "officecode", "reportsto"
+        )
+
+        # Apply pagination
+        page = self.paginate_queryset(employees)
+        if page is not None:
+            serializer = EmployeeSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = EmployeeSerializer(employees, many=True)
+        return Response(serializer.data)
 
 
 @extend_schema_view(
@@ -210,6 +364,107 @@ class EmployeeViewSet(BaseModelViewSet):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
     lookup_field = "employeenumber"
+    lookup_url_kwarg = "employeenumber"
+
+    @extend_schema(
+        operation_id="get_employee_reports",
+        tags=["Employees"],
+        summary="Get employees by manager",
+        description="Retrieve all employees reporting to a specific manager. This endpoint supports organizational hierarchy and team management.",
+        parameters=[
+            OpenApiParameter(
+                name="employeenumber",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+                description="The employee number of the manager",
+                required=True,
+            ),
+        ],
+        responses={200: EmployeeSerializer(many=True)},
+    )
+    @action(
+        detail=True,
+        methods=["get"],
+        url_path="reports",
+        url_name="reports",
+    )
+    def reports(self, request, **kwargs):
+        """
+        Get all employees reporting to a specific manager.
+
+        Returns a paginated list of all employees who report to this manager,
+        including employee details, job titles, and contact information.
+        """
+        # Get the manager using the lookup_field
+        try:
+            manager = self.get_object()
+        except Employee.DoesNotExist:
+            from rest_framework.exceptions import NotFound
+
+            raise NotFound("Employee not found.")
+
+        reports = Employee.objects.filter(reportsto=manager).select_related(
+            "officecode", "reportsto"
+        )
+
+        # Apply pagination
+        page = self.paginate_queryset(reports)
+        if page is not None:
+            serializer = EmployeeSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = EmployeeSerializer(reports, many=True)
+        return Response(serializer.data)
+
+    @extend_schema(
+        operation_id="get_employee_customers",
+        tags=["Employees"],
+        summary="Get customers by sales rep",
+        description="Retrieve all customers assigned to a specific sales representative. This endpoint supports sales rep performance tracking and customer management.",
+        parameters=[
+            OpenApiParameter(
+                name="employeenumber",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+                description="The employee number of the sales representative",
+                required=True,
+            ),
+        ],
+        responses={200: CustomerSerializer(many=True)},
+    )
+    @action(
+        detail=True,
+        methods=["get"],
+        url_path="customers",
+        url_name="customers",
+    )
+    def customers(self, request, **kwargs):
+        """
+        Get all customers assigned to a specific sales representative.
+
+        Returns a paginated list of all customers assigned to this sales rep,
+        including customer details, contact information, and credit limits.
+        """
+        # Get the sales rep using the lookup_field
+        try:
+            sales_rep = self.get_object()
+        except Employee.DoesNotExist:
+            from rest_framework.exceptions import NotFound
+
+            raise NotFound("Employee not found.")
+
+        customers = Customer.objects.filter(
+            salesrepemployeenumber=sales_rep
+        ).select_related("salesrepemployeenumber")
+
+        # Apply pagination
+        page = self.paginate_queryset(customers)
+        if page is not None:
+            serializer = CustomerSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = CustomerSerializer(customers, many=True)
+        return Response(serializer.data)
 
 
 @extend_schema_view(
@@ -254,6 +509,107 @@ class CustomerViewSet(BaseModelViewSet):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
     lookup_field = "customernumber"
+    lookup_url_kwarg = "customernumber"
+
+    @extend_schema(
+        operation_id="get_customer_orders",
+        tags=["Customers"],
+        summary="Get customer sales history",
+        description="Retrieve all orders for a specific customer. This endpoint provides the complete sales history for the customer.",
+        parameters=[
+            OpenApiParameter(
+                name="customernumber",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+                description="The customer number",
+                required=True,
+            ),
+        ],
+        responses={200: OrderSerializer(many=True)},
+    )
+    @action(
+        detail=True,
+        methods=["get"],
+        url_path="orders",
+        url_name="orders",
+    )
+    def orders(self, request, **kwargs):
+        """
+        Get all orders for a specific customer.
+
+        Returns a paginated list of all orders placed by the customer,
+        including order status, dates, and other order details.
+        """
+        # Get the customer using the lookup_field
+        # This will work whether the URL uses 'pk' or 'customernumber'
+        try:
+            customer = self.get_object()
+        except Customer.DoesNotExist:
+            from rest_framework.exceptions import NotFound
+
+            raise NotFound("Customer not found.")
+        orders = Order.objects.filter(customernumber=customer).select_related(
+            "customernumber"
+        )
+
+        # Apply pagination
+        page = self.paginate_queryset(orders)
+        if page is not None:
+            serializer = OrderSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = OrderSerializer(orders, many=True)
+        return Response(serializer.data)
+
+    @extend_schema(
+        operation_id="get_customer_payments",
+        tags=["Customers"],
+        summary="Get customer payment history",
+        description="Retrieve all payments made by a specific customer. This endpoint provides the complete payment history for the customer.",
+        parameters=[
+            OpenApiParameter(
+                name="customernumber",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+                description="The customer number",
+                required=True,
+            ),
+        ],
+        responses={200: PaymentSerializer(many=True)},
+    )
+    @action(
+        detail=True,
+        methods=["get"],
+        url_path="payments",
+        url_name="payments",
+    )
+    def payments(self, request, **kwargs):
+        """
+        Get all payments for a specific customer.
+
+        Returns a paginated list of all payments made by the customer,
+        including payment dates, amounts, and check numbers.
+        """
+        # Get the customer using the lookup_field
+        try:
+            customer = self.get_object()
+        except Customer.DoesNotExist:
+            from rest_framework.exceptions import NotFound
+
+            raise NotFound("Customer not found.")
+
+        payments = Payment.objects.filter(customernumber=customer).select_related(
+            "customernumber"
+        )
+
+        # Apply pagination
+        page = self.paginate_queryset(payments)
+        if page is not None:
+            serializer = PaymentSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = PaymentSerializer(payments, many=True)
+        return Response(serializer.data)
 
 
 @extend_schema_view(
@@ -298,6 +654,56 @@ class OrderViewSet(BaseModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     lookup_field = "ordernumber"
+    lookup_url_kwarg = "ordernumber"
+
+    @extend_schema(
+        operation_id="get_order_order_details",
+        tags=["Orders"],
+        summary="Get order details by order",
+        description="Retrieve all line items for a specific order. This endpoint supports order fulfillment and invoice generation.",
+        parameters=[
+            OpenApiParameter(
+                name="ordernumber",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+                description="The order number",
+                required=True,
+            ),
+        ],
+        responses={200: OrderdetailSerializer(many=True)},
+    )
+    @action(
+        detail=True,
+        methods=["get"],
+        url_path="order-details",
+        url_name="order-details",
+    )
+    def order_details(self, request, **kwargs):
+        """
+        Get all order details for a specific order.
+        
+        Returns a paginated list of all line items in this order,
+        including product codes, quantities, prices, and line numbers.
+        """
+        # Get the order using the lookup_field
+        try:
+            order = self.get_object()
+        except Order.DoesNotExist:
+            from rest_framework.exceptions import NotFound
+            raise NotFound("Order not found.")
+        
+        order_details = Orderdetail.objects.filter(ordernumber=order).select_related(
+            "ordernumber", "productcode"
+        )
+        
+        # Apply pagination
+        page = self.paginate_queryset(order_details)
+        if page is not None:
+            serializer = OrderdetailSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = OrderdetailSerializer(order_details, many=True)
+        return Response(serializer.data)
 
 
 @extend_schema_view(

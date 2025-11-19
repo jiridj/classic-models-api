@@ -335,6 +335,41 @@
           }
         },
         {
+          "name": "Get Products by Product Line",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/productlines/Vintage Cars/products/?page=1&page_size=25",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "productlines", "Vintage Cars", "products", ""],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number for pagination"
+                },
+                {
+                  "key": "page_size",
+                  "value": "25",
+                  "description": "Number of items per page"
+                }
+              ]
+            },
+            "description": "Retrieve all products in a specific product line category. This endpoint allows browsing products by category."
+          }
+        },
+        {
           "name": "Update Product Line",
           "request": {
             "auth": {
@@ -513,6 +548,41 @@
               "host": ["{{base_url}}"],
               "path": ["api", "v1", "products", "S10_1678", ""]
             }
+          }
+        },
+        {
+          "name": "Get Product Order Details",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/products/S10_1678/order-details/?page=1&page_size=25",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "products", "S10_1678", "order-details", ""],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number for pagination"
+                },
+                {
+                  "key": "page_size",
+                  "value": "25",
+                  "description": "Number of items per page"
+                }
+              ]
+            },
+            "description": "Retrieve all order details (sales) for a specific product. This endpoint provides the complete sales history for the product."
           }
         },
         {
@@ -719,6 +789,41 @@
           }
         },
         {
+          "name": "Get Employees by Office",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/offices/3/employees/?page=1&page_size=25",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "offices", "3", "employees", ""],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number for pagination"
+                },
+                {
+                  "key": "page_size",
+                  "value": "25",
+                  "description": "Number of items per page"
+                }
+              ]
+            },
+            "description": "Retrieve all employees working in a specific office. This endpoint supports office management and organizational charts."
+          }
+        },
+        {
           "name": "Update Office",
           "request": {
             "auth": {
@@ -880,6 +985,76 @@
               "host": ["{{base_url}}"],
               "path": ["api", "v1", "employees", "1001", ""]
             }
+          }
+        },
+        {
+          "name": "Get Employee Reports",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/employees/1056/reports/?page=1&page_size=25",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "employees", "1056", "reports", ""],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number for pagination"
+                },
+                {
+                  "key": "page_size",
+                  "value": "25",
+                  "description": "Number of items per page"
+                }
+              ]
+            },
+            "description": "Retrieve all employees reporting to a specific manager. This endpoint supports organizational hierarchy and team management."
+          }
+        },
+        {
+          "name": "Get Customers by Sales Rep",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/employees/1370/customers/?page=1&page_size=25",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "employees", "1370", "customers", ""],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number for pagination"
+                },
+                {
+                  "key": "page_size",
+                  "value": "25",
+                  "description": "Number of items per page"
+                }
+              ]
+            },
+            "description": "Retrieve all customers assigned to a specific sales representative. This endpoint supports sales rep performance tracking and customer management."
           }
         },
         {
@@ -1064,6 +1239,76 @@
           }
         },
         {
+          "name": "Get Customer Orders",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/customers/112/orders/?page=1&page_size=25",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "customers", "112", "orders", ""],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number for pagination"
+                },
+                {
+                  "key": "page_size",
+                  "value": "25",
+                  "description": "Number of items per page"
+                }
+              ]
+            },
+            "description": "Retrieve all orders for a specific customer. This endpoint provides the complete sales history for the customer."
+          }
+        },
+        {
+          "name": "Get Customer Payments",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/customers/112/payments/?page=1&page_size=25",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "customers", "112", "payments", ""],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number for pagination"
+                },
+                {
+                  "key": "page_size",
+                  "value": "25",
+                  "description": "Number of items per page"
+                }
+              ]
+            },
+            "description": "Retrieve all payments made by a specific customer. This endpoint provides the complete payment history for the customer."
+          }
+        },
+        {
           "name": "Update Customer",
           "request": {
             "auth": {
@@ -1225,6 +1470,41 @@
               "host": ["{{base_url}}"],
               "path": ["api", "v1", "orders", "10100", ""]
             }
+          }
+        },
+        {
+          "name": "Get Order Details by Order",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/orders/10100/order-details/?page=1&page_size=25",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "orders", "10100", "order-details", ""],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number for pagination"
+                },
+                {
+                  "key": "page_size",
+                  "value": "25",
+                  "description": "Number of items per page"
+                }
+              ]
+            },
+            "description": "Retrieve all line items for a specific order. This endpoint supports order fulfillment and invoice generation."
           }
         },
         {

@@ -567,3 +567,172 @@ class TestOrderAPI:
         assert response.status_code == status.HTTP_200_OK
         assert "customernumber" in response.data
         assert response.data["customernumber"] == customer.customernumber
+
+    @pytest.mark.django_db
+    def test_get_order_order_details_authenticated(
+        self, authenticated_api_client, order, order_detail
+    ):
+        """Test retrieving order details for an order when authenticated."""
+        url = reverse(
+            "classicmodels:order-order-details",
+            kwargs={"ordernumber": order.ordernumber},
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert "results" in response.data or isinstance(response.data, list)
+        # If paginated, check results; otherwise check list directly
+        if "results" in response.data:
+            assert len(response.data["results"]) >= 1
+            assert (
+                response.data["results"][0]["ordernumber"] == order.ordernumber
+            )
+        else:
+            assert len(response.data) >= 1
+            assert response.data[0]["ordernumber"] == order.ordernumber
+
+    @pytest.mark.django_db
+    def test_get_order_order_details_unauthenticated(self, api_client, order):
+        """Test retrieving order details for an order when not authenticated."""
+        url = reverse(
+            "classicmodels:order-order-details",
+            kwargs={"ordernumber": order.ordernumber},
+        )
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    @pytest.mark.django_db
+    def test_get_order_order_details_nonexistent_order(
+        self, authenticated_api_client
+    ):
+        """Test retrieving order details for an order that doesn't exist."""
+        url = reverse(
+            "classicmodels:order-order-details", kwargs={"ordernumber": 99999}
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    @pytest.mark.django_db
+    def test_get_order_order_details_empty(
+        self, authenticated_api_client, customer
+    ):
+        """Test retrieving order details for an order with no line items."""
+        from classicmodels.models import Order
+
+        # Create an order with no order details
+        order_no_details = Order.objects.create(
+            ordernumber=60000,
+            orderdate="2024-02-15",
+            requireddate="2024-02-20",
+            status="In Process",
+            customernumber=customer,
+        )
+
+        url = reverse(
+            "classicmodels:order-order-details",
+            kwargs={"ordernumber": order_no_details.ordernumber},
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        # Should return empty list or empty results
+        if "results" in response.data:
+            assert len(response.data["results"]) == 0
+        else:
+            assert len(response.data) == 0
+
+    @pytest.mark.django_db
+    def test_get_order_order_details_multiple_items(
+        self, authenticated_api_client, order, product
+    ):
+        """Test retrieving order details for an order with multiple line items."""
+        from classicmodels.models import Orderdetail
+        from decimal import Decimal
+
+        # Create multiple order details for this order
+        order_details = []
+        for i in range(3):
+            # Create a new product for each line item
+            from classicmodels.models import Product, ProductLine
+            line_product = Product.objects.create(
+                productcode=f"LINE{i+1:03d}",
+                productname=f"Line Product {i+1}",
+                productline=product.productline,
+                productscale="1:10",
+                productvendor="Vendor",
+                productdescription=f"Description for line product {i+1}",
+                quantityinstock=10,
+                buyprice=Decimal("10.00"),
+                msrp=Decimal("20.00"),
+            )
+            order_detail = Orderdetail.objects.create(
+                ordernumber=order,
+                productcode=line_product,
+                quantityordered=5 + i,
+                priceeach=Decimal("45.99") + i * Decimal("5.00"),
+                orderlinenumber=i + 1,
+            )
+            order_details.append(order_detail)
+
+        url = reverse(
+            "classicmodels:order-order-details",
+            kwargs={"ordernumber": order.ordernumber},
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        # Check that all order details are returned
+        if "results" in response.data:
+            product_codes = [
+                od["productcode"] for od in response.data["results"]
+            ]
+        else:
+            product_codes = [od["productcode"] for od in response.data]
+
+        for order_detail in order_details:
+            assert order_detail.productcode.productcode in product_codes
+
+    @pytest.mark.django_db
+    def test_get_order_order_details_pagination(
+        self, authenticated_api_client, order, product
+    ):
+        """Test pagination for order order details endpoint."""
+        from classicmodels.models import Orderdetail, Product
+        from decimal import Decimal
+
+        # Create more order details than default page size
+        for i in range(15):
+            # Create a new product for each line item
+            line_product = Product.objects.create(
+                productcode=f"PAGE{i+1:03d}",
+                productname=f"Pagination Product {i+1}",
+                productline=product.productline,
+                productscale="1:10",
+                productvendor="Vendor",
+                productdescription=f"Description for pagination product {i+1}",
+                quantityinstock=10,
+                buyprice=Decimal("10.00"),
+                msrp=Decimal("20.00"),
+            )
+            Orderdetail.objects.create(
+                ordernumber=order,
+                productcode=line_product,
+                quantityordered=5,
+                priceeach=Decimal("45.99"),
+                orderlinenumber=i + 1,
+            )
+
+        url = reverse(
+            "classicmodels:order-order-details",
+            kwargs={"ordernumber": order.ordernumber},
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        # Should have pagination metadata
+        assert "count" in response.data
+        assert "next" in response.data or response.data["next"] is None
+        assert "previous" in response.data or response.data["previous"] is None
+        assert "results" in response.data

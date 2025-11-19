@@ -359,3 +359,146 @@ class TestProductLineAPI:
         assert response.status_code == status.HTTP_200_OK
         # Basic filtering test - more complex filtering would require custom filters
         assert len(response.data["results"]) >= 2
+
+    @pytest.mark.django_db
+    def test_get_product_line_products_authenticated(
+        self, authenticated_api_client, product_line, product
+    ):
+        """Test retrieving products for a product line when authenticated."""
+        url = reverse(
+            "classicmodels:productline-products",
+            kwargs={"productline": product_line.productline},
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert "results" in response.data or isinstance(response.data, list)
+        # If paginated, check results; otherwise check list directly
+        if "results" in response.data:
+            assert len(response.data["results"]) >= 1
+            assert response.data["results"][0]["productcode"] == product.productcode
+        else:
+            assert len(response.data) >= 1
+            assert response.data[0]["productcode"] == product.productcode
+
+    @pytest.mark.django_db
+    def test_get_product_line_products_unauthenticated(self, api_client, product_line):
+        """Test retrieving products for a product line when not authenticated."""
+        url = reverse(
+            "classicmodels:productline-products",
+            kwargs={"productline": product_line.productline},
+        )
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    @pytest.mark.django_db
+    def test_get_product_line_products_nonexistent_product_line(
+        self, authenticated_api_client
+    ):
+        """Test retrieving products for a product line that doesn't exist."""
+        url = reverse(
+            "classicmodels:productline-products", kwargs={"productline": "NONEXIST"}
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    @pytest.mark.django_db
+    def test_get_product_line_products_empty(self, authenticated_api_client):
+        """Test retrieving products for a product line with no products."""
+        from classicmodels.models import ProductLine
+
+        # Create a product line with no products
+        product_line_no_products = ProductLine.objects.create(
+            productline="Empty Line",
+            textdescription="Product line with no products",
+        )
+
+        url = reverse(
+            "classicmodels:productline-products",
+            kwargs={"productline": product_line_no_products.productline},
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        # Should return empty list or empty results
+        if "results" in response.data:
+            assert len(response.data["results"]) == 0
+        else:
+            assert len(response.data) == 0
+
+    @pytest.mark.django_db
+    def test_get_product_line_products_multiple_products(
+        self, authenticated_api_client, product_line
+    ):
+        """Test retrieving products for a product line with multiple products."""
+        from classicmodels.models import Product
+        from decimal import Decimal
+
+        # Create multiple products in this product line
+        products = []
+        for i in range(3):
+            product = Product.objects.create(
+                productcode=f"MULTI{i+1:03d}",
+                productname=f"Product {i+1}",
+                productline=product_line,
+                productscale="1:10",
+                productvendor="Vendor",
+                productdescription=f"Description for product {i+1}",
+                quantityinstock=10 + i * 10,
+                buyprice=Decimal("10.00") + i * Decimal("5.00"),
+                msrp=Decimal("20.00") + i * Decimal("8.00"),
+            )
+            products.append(product)
+
+        url = reverse(
+            "classicmodels:productline-products",
+            kwargs={"productline": product_line.productline},
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        # Check that all products are returned
+        if "results" in response.data:
+            product_codes = [p["productcode"] for p in response.data["results"]]
+        else:
+            product_codes = [p["productcode"] for p in response.data]
+
+        for product in products:
+            assert product.productcode in product_codes
+
+    @pytest.mark.django_db
+    def test_get_product_line_products_pagination(
+        self, authenticated_api_client, product_line
+    ):
+        """Test pagination for product line products endpoint."""
+        from classicmodels.models import Product
+        from decimal import Decimal
+
+        # Create more products than default page size
+        for i in range(15):
+            Product.objects.create(
+                productcode=f"PAGE{i+1:03d}",
+                productname=f"Pagination Product {i+1}",
+                productline=product_line,
+                productscale="1:10",
+                productvendor="Vendor",
+                productdescription=f"Description for product {i+1}",
+                quantityinstock=10,
+                buyprice=Decimal("10.00"),
+                msrp=Decimal("20.00"),
+            )
+
+        url = reverse(
+            "classicmodels:productline-products",
+            kwargs={"productline": product_line.productline},
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        # Should have pagination metadata
+        assert "count" in response.data
+        assert "next" in response.data or response.data["next"] is None
+        assert "previous" in response.data or response.data["previous"] is None
+        assert "results" in response.data

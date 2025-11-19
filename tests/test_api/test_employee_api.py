@@ -606,3 +606,275 @@ class TestEmployeeAPI:
         assert response.status_code == status.HTTP_200_OK
         assert "officecode" in response.data
         assert response.data["officecode"] == office.officecode
+
+    @pytest.mark.django_db
+    def test_get_employee_reports_authenticated(
+        self, authenticated_api_client, manager_employee, employee
+    ):
+        """Test retrieving reports for a manager when authenticated."""
+        # Set employee to report to manager
+        employee.reportsto = manager_employee
+        employee.save()
+
+        url = reverse(
+            "classicmodels:employee-reports",
+            kwargs={"employeenumber": manager_employee.employeenumber},
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert "results" in response.data or isinstance(response.data, list)
+        # If paginated, check results; otherwise check list directly
+        if "results" in response.data:
+            assert len(response.data["results"]) >= 1
+            assert (
+                response.data["results"][0]["employeenumber"] == employee.employeenumber
+            )
+        else:
+            assert len(response.data) >= 1
+            assert response.data[0]["employeenumber"] == employee.employeenumber
+
+    @pytest.mark.django_db
+    def test_get_employee_reports_unauthenticated(self, api_client, manager_employee):
+        """Test retrieving reports for a manager when not authenticated."""
+        url = reverse(
+            "classicmodels:employee-reports",
+            kwargs={"employeenumber": manager_employee.employeenumber},
+        )
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    @pytest.mark.django_db
+    def test_get_employee_reports_nonexistent_employee(self, authenticated_api_client):
+        """Test retrieving reports for an employee that doesn't exist."""
+        url = reverse(
+            "classicmodels:employee-reports", kwargs={"employeenumber": 99999}
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    @pytest.mark.django_db
+    def test_get_employee_reports_empty(
+        self, authenticated_api_client, manager_employee
+    ):
+        """Test retrieving reports for a manager with no direct reports."""
+        url = reverse(
+            "classicmodels:employee-reports",
+            kwargs={"employeenumber": manager_employee.employeenumber},
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        # Should return empty list or empty results
+        if "results" in response.data:
+            assert len(response.data["results"]) == 0
+        else:
+            assert len(response.data) == 0
+
+    @pytest.mark.django_db
+    def test_get_employee_reports_multiple_reports(
+        self, authenticated_api_client, manager_employee, office
+    ):
+        """Test retrieving reports for a manager with multiple direct reports."""
+        from classicmodels.models import Employee
+
+        # Create multiple employees reporting to the manager
+        reports = []
+        for i in range(3):
+            report = Employee.objects.create(
+                employeenumber=3000 + i,
+                lastname=f"Report{i+1}",
+                firstname="Test",
+                extension=f"RPT{i+1}",
+                email=f"report{i+1}@example.com",
+                officecode=office,
+                reportsto=manager_employee,
+                jobtitle="Sales Rep",
+            )
+            reports.append(report)
+
+        url = reverse(
+            "classicmodels:employee-reports",
+            kwargs={"employeenumber": manager_employee.employeenumber},
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        # Check that all reports are returned
+        if "results" in response.data:
+            employee_numbers = [e["employeenumber"] for e in response.data["results"]]
+        else:
+            employee_numbers = [e["employeenumber"] for e in response.data]
+
+        for report in reports:
+            assert report.employeenumber in employee_numbers
+
+    @pytest.mark.django_db
+    def test_get_employee_reports_pagination(
+        self, authenticated_api_client, manager_employee, office
+    ):
+        """Test pagination for employee reports endpoint."""
+        from classicmodels.models import Employee
+
+        # Create more reports than default page size
+        for i in range(15):
+            Employee.objects.create(
+                employeenumber=4000 + i,
+                lastname=f"Pagination{i+1}",
+                firstname="Test",
+                extension=f"PAGE{i+1}",
+                email=f"pagination{i+1}@example.com",
+                officecode=office,
+                reportsto=manager_employee,
+                jobtitle="Sales Rep",
+            )
+
+        url = reverse(
+            "classicmodels:employee-reports",
+            kwargs={"employeenumber": manager_employee.employeenumber},
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        # Should have pagination metadata
+        assert "count" in response.data
+        assert "next" in response.data or response.data["next"] is None
+        assert "previous" in response.data or response.data["previous"] is None
+        assert "results" in response.data
+
+    @pytest.mark.django_db
+    def test_get_employee_customers_authenticated(
+        self, authenticated_api_client, employee, customer
+    ):
+        """Test retrieving customers for a sales rep when authenticated."""
+        url = reverse(
+            "classicmodels:employee-customers",
+            kwargs={"employeenumber": employee.employeenumber},
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert "results" in response.data or isinstance(response.data, list)
+        # If paginated, check results; otherwise check list directly
+        if "results" in response.data:
+            assert len(response.data["results"]) >= 1
+            assert (
+                response.data["results"][0]["customernumber"] == customer.customernumber
+            )
+        else:
+            assert len(response.data) >= 1
+            assert response.data[0]["customernumber"] == customer.customernumber
+
+    @pytest.mark.django_db
+    def test_get_employee_customers_unauthenticated(self, api_client, employee):
+        """Test retrieving customers for a sales rep when not authenticated."""
+        url = reverse(
+            "classicmodels:employee-customers",
+            kwargs={"employeenumber": employee.employeenumber},
+        )
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    @pytest.mark.django_db
+    def test_get_employee_customers_nonexistent_employee(
+        self, authenticated_api_client
+    ):
+        """Test retrieving customers for an employee that doesn't exist."""
+        url = reverse(
+            "classicmodels:employee-customers", kwargs={"employeenumber": 99999}
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    @pytest.mark.django_db
+    def test_get_employee_customers_empty(self, authenticated_api_client, employee):
+        """Test retrieving customers for a sales rep with no customers."""
+        url = reverse(
+            "classicmodels:employee-customers",
+            kwargs={"employeenumber": employee.employeenumber},
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        # Should return empty list or empty results
+        if "results" in response.data:
+            assert len(response.data["results"]) == 0
+        else:
+            assert len(response.data) == 0
+
+    @pytest.mark.django_db
+    def test_get_employee_customers_multiple_customers(
+        self, authenticated_api_client, employee
+    ):
+        """Test retrieving customers for a sales rep with multiple customers."""
+        from classicmodels.models import Customer
+
+        # Create multiple customers assigned to this sales rep
+        customers = []
+        for i in range(3):
+            customer = Customer.objects.create(
+                customernumber=5000 + i,
+                customername=f"Customer {i+1}",
+                contactlastname=f"Contact{i+1}",
+                contactfirstname="Test",
+                phone=f"+1-555-{1000+i:04d}",
+                addressline1=f"{100+i} Customer Ave",
+                city="Customer City",
+                country="USA",
+                salesrepemployeenumber=employee,
+            )
+            customers.append(customer)
+
+        url = reverse(
+            "classicmodels:employee-customers",
+            kwargs={"employeenumber": employee.employeenumber},
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        # Check that all customers are returned
+        if "results" in response.data:
+            customer_numbers = [c["customernumber"] for c in response.data["results"]]
+        else:
+            customer_numbers = [c["customernumber"] for c in response.data]
+
+        for customer in customers:
+            assert customer.customernumber in customer_numbers
+
+    @pytest.mark.django_db
+    def test_get_employee_customers_pagination(
+        self, authenticated_api_client, employee
+    ):
+        """Test pagination for employee customers endpoint."""
+        from classicmodels.models import Customer
+
+        # Create more customers than default page size
+        for i in range(15):
+            Customer.objects.create(
+                customernumber=6000 + i,
+                customername=f"Pagination Customer {i+1}",
+                contactlastname=f"Pagination{i+1}",
+                contactfirstname="Test",
+                phone=f"+1-555-{2000+i:04d}",
+                addressline1=f"{200+i} Pagination Ave",
+                city="Pagination City",
+                country="USA",
+                salesrepemployeenumber=employee,
+            )
+
+        url = reverse(
+            "classicmodels:employee-customers",
+            kwargs={"employeenumber": employee.employeenumber},
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        # Should have pagination metadata
+        assert "count" in response.data
+        assert "next" in response.data or response.data["next"] is None
+        assert "previous" in response.data or response.data["previous"] is None
+        assert "results" in response.data

@@ -561,3 +561,271 @@ class TestCustomerAPI:
         assert response.status_code == status.HTTP_200_OK
         assert "salesrepemployeenumber" in response.data
         assert response.data["salesrepemployeenumber"] == employee.employeenumber
+
+    @pytest.mark.django_db
+    def test_get_customer_orders_authenticated(
+        self, authenticated_api_client, customer, order
+    ):
+        """Test retrieving customer orders when authenticated."""
+        url = reverse(
+            "classicmodels:customer-orders",
+            kwargs={"customernumber": customer.customernumber},
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert "results" in response.data or isinstance(response.data, list)
+        # If paginated, check results; otherwise check list directly
+        if "results" in response.data:
+            assert len(response.data["results"]) >= 1
+            assert response.data["results"][0]["ordernumber"] == order.ordernumber
+        else:
+            assert len(response.data) >= 1
+            assert response.data[0]["ordernumber"] == order.ordernumber
+
+    @pytest.mark.django_db
+    def test_get_customer_orders_unauthenticated(self, api_client, customer):
+        """Test retrieving customer orders when not authenticated."""
+        url = reverse(
+            "classicmodels:customer-orders",
+            kwargs={"customernumber": customer.customernumber},
+        )
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    @pytest.mark.django_db
+    def test_get_customer_orders_nonexistent_customer(self, authenticated_api_client):
+        """Test retrieving orders for a customer that doesn't exist."""
+        url = reverse("classicmodels:customer-orders", kwargs={"customernumber": 99999})
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    @pytest.mark.django_db
+    def test_get_customer_orders_empty(self, authenticated_api_client, employee):
+        """Test retrieving orders for a customer with no orders."""
+        from classicmodels.models import Customer
+
+        # Create a customer with no orders
+        customer_no_orders = Customer.objects.create(
+            customernumber=2000,
+            customername="No Orders Customer",
+            contactlastname="NoOrders",
+            contactfirstname="Test",
+            phone="+1-555-0000",
+            addressline1="123 No Orders Ave",
+            city="No Orders City",
+            country="USA",
+            salesrepemployeenumber=employee,
+        )
+
+        url = reverse(
+            "classicmodels:customer-orders",
+            kwargs={"customernumber": customer_no_orders.customernumber},
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        # Should return empty list or empty results
+        if "results" in response.data:
+            assert len(response.data["results"]) == 0
+        else:
+            assert len(response.data) == 0
+
+    @pytest.mark.django_db
+    def test_get_customer_orders_multiple_orders(
+        self, authenticated_api_client, customer
+    ):
+        """Test retrieving orders for a customer with multiple orders."""
+        from classicmodels.models import Order
+
+        # Create multiple orders for the customer
+        orders = []
+        for i in range(3):
+            order = Order.objects.create(
+                ordernumber=20000 + i,
+                orderdate="2024-02-15",
+                requireddate="2024-02-20",
+                status="In Process",
+                customernumber=customer,
+            )
+            orders.append(order)
+
+        url = reverse(
+            "classicmodels:customer-orders",
+            kwargs={"customernumber": customer.customernumber},
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        # Check that all orders are returned
+        if "results" in response.data:
+            order_numbers = [o["ordernumber"] for o in response.data["results"]]
+        else:
+            order_numbers = [o["ordernumber"] for o in response.data]
+
+        for order in orders:
+            assert order.ordernumber in order_numbers
+
+    @pytest.mark.django_db
+    def test_get_customer_orders_pagination(self, authenticated_api_client, customer):
+        """Test pagination for customer orders endpoint."""
+        from classicmodels.models import Order
+
+        # Create more orders than default page size
+        for i in range(15):
+            Order.objects.create(
+                ordernumber=30000 + i,
+                orderdate="2024-02-15",
+                requireddate="2024-02-20",
+                status="In Process",
+                customernumber=customer,
+            )
+
+        url = reverse(
+            "classicmodels:customer-orders",
+            kwargs={"customernumber": customer.customernumber},
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        # Should have pagination metadata
+        assert "count" in response.data
+        assert "next" in response.data or response.data["next"] is None
+        assert "previous" in response.data or response.data["previous"] is None
+        assert "results" in response.data
+
+    @pytest.mark.django_db
+    def test_get_customer_payments_authenticated(
+        self, authenticated_api_client, customer, payment
+    ):
+        """Test retrieving customer payments when authenticated."""
+        url = reverse(
+            "classicmodels:customer-payments",
+            kwargs={"customernumber": customer.customernumber},
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert "results" in response.data or isinstance(response.data, list)
+        # If paginated, check results; otherwise check list directly
+        if "results" in response.data:
+            assert len(response.data["results"]) >= 1
+            assert response.data["results"][0]["checknumber"] == payment.checknumber
+        else:
+            assert len(response.data) >= 1
+            assert response.data[0]["checknumber"] == payment.checknumber
+
+    @pytest.mark.django_db
+    def test_get_customer_payments_unauthenticated(self, api_client, customer):
+        """Test retrieving customer payments when not authenticated."""
+        url = reverse(
+            "classicmodels:customer-payments",
+            kwargs={"customernumber": customer.customernumber},
+        )
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    @pytest.mark.django_db
+    def test_get_customer_payments_nonexistent_customer(self, authenticated_api_client):
+        """Test retrieving payments for a customer that doesn't exist."""
+        url = reverse(
+            "classicmodels:customer-payments", kwargs={"customernumber": 99999}
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    @pytest.mark.django_db
+    def test_get_customer_payments_empty(self, authenticated_api_client, employee):
+        """Test retrieving payments for a customer with no payments."""
+        from classicmodels.models import Customer
+
+        # Create a customer with no payments
+        customer_no_payments = Customer.objects.create(
+            customernumber=2001,
+            customername="No Payments Customer",
+            contactlastname="NoPayments",
+            contactfirstname="Test",
+            phone="+1-555-0000",
+            addressline1="123 No Payments Ave",
+            city="No Payments City",
+            country="USA",
+            salesrepemployeenumber=employee,
+        )
+
+        url = reverse(
+            "classicmodels:customer-payments",
+            kwargs={"customernumber": customer_no_payments.customernumber},
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        # Should return empty list or empty results
+        if "results" in response.data:
+            assert len(response.data["results"]) == 0
+        else:
+            assert len(response.data) == 0
+
+    @pytest.mark.django_db
+    def test_get_customer_payments_multiple_payments(
+        self, authenticated_api_client, customer
+    ):
+        """Test retrieving payments for a customer with multiple payments."""
+        from classicmodels.models import Payment
+
+        # Create multiple payments for the customer
+        payments = []
+        for i in range(3):
+            payment = Payment.objects.create(
+                customernumber=customer,
+                checknumber=f"CHECK{i+1:03d}",
+                paymentdate="2024-02-15",
+                amount=100.00 + i * 50.00,
+            )
+            payments.append(payment)
+
+        url = reverse(
+            "classicmodels:customer-payments",
+            kwargs={"customernumber": customer.customernumber},
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        # Check that all payments are returned
+        if "results" in response.data:
+            check_numbers = [p["checknumber"] for p in response.data["results"]]
+        else:
+            check_numbers = [p["checknumber"] for p in response.data]
+
+        for payment in payments:
+            assert payment.checknumber in check_numbers
+
+    @pytest.mark.django_db
+    def test_get_customer_payments_pagination(self, authenticated_api_client, customer):
+        """Test pagination for customer payments endpoint."""
+        from classicmodels.models import Payment
+
+        # Create more payments than default page size
+        for i in range(15):
+            Payment.objects.create(
+                customernumber=customer,
+                checknumber=f"PAGE{i+1:03d}",
+                paymentdate="2024-02-15",
+                amount=100.00 + i * 10.00,
+            )
+
+        url = reverse(
+            "classicmodels:customer-payments",
+            kwargs={"customernumber": customer.customernumber},
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        # Should have pagination metadata
+        assert "count" in response.data
+        assert "next" in response.data or response.data["next"] is None
+        assert "previous" in response.data or response.data["previous"] is None
+        assert "results" in response.data
