@@ -123,6 +123,57 @@ class ProductViewSet(BaseModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     lookup_field = "productcode"
+    lookup_url_kwarg = "productcode"
+
+    @extend_schema(
+        operation_id="get_product_order_details",
+        tags=["Products"],
+        summary="Get product order history",
+        description="Retrieve all order details (sales) for a specific product. This endpoint provides the complete sales history for the product.",
+        parameters=[
+            OpenApiParameter(
+                name="productcode",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.PATH,
+                description="The product code",
+                required=True,
+            ),
+        ],
+        responses={200: OrderdetailSerializer(many=True)},
+    )
+    @action(
+        detail=True,
+        methods=["get"],
+        url_path="order-details",
+        url_name="order-details",
+    )
+    def order_details(self, request, **kwargs):
+        """
+        Get all order details for a specific product.
+
+        Returns a paginated list of all order line items containing this product,
+        including quantities ordered, prices, and order information.
+        """
+        # Get the product using the lookup_field
+        try:
+            product = self.get_object()
+        except Product.DoesNotExist:
+            from rest_framework.exceptions import NotFound
+
+            raise NotFound("Product not found.")
+
+        order_details = Orderdetail.objects.filter(productcode=product).select_related(
+            "productcode", "ordernumber"
+        )
+
+        # Apply pagination
+        page = self.paginate_queryset(order_details)
+        if page is not None:
+            serializer = OrderdetailSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = OrderdetailSerializer(order_details, many=True)
+        return Response(serializer.data)
 
 
 @extend_schema_view(

@@ -499,3 +499,162 @@ class TestProductAPI:
         assert response.status_code == status.HTTP_200_OK
         assert "productline" in response.data
         assert response.data["productline"] == product.productline.productline
+
+    @pytest.mark.django_db
+    def test_get_product_order_details_authenticated(
+        self, authenticated_api_client, product, order_detail
+    ):
+        """Test retrieving product order details when authenticated."""
+        url = reverse(
+            "classicmodels:product-order-details",
+            kwargs={"productcode": product.productcode},
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert "results" in response.data or isinstance(response.data, list)
+        # If paginated, check results; otherwise check list directly
+        if "results" in response.data:
+            assert len(response.data["results"]) >= 1
+            assert response.data["results"][0]["productcode"] == product.productcode
+        else:
+            assert len(response.data) >= 1
+            assert response.data[0]["productcode"] == product.productcode
+
+    @pytest.mark.django_db
+    def test_get_product_order_details_unauthenticated(self, api_client, product):
+        """Test retrieving product order details when not authenticated."""
+        url = reverse(
+            "classicmodels:product-order-details",
+            kwargs={"productcode": product.productcode},
+        )
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    @pytest.mark.django_db
+    def test_get_product_order_details_nonexistent_product(
+        self, authenticated_api_client
+    ):
+        """Test retrieving order details for a product that doesn't exist."""
+        url = reverse(
+            "classicmodels:product-order-details", kwargs={"productcode": "NONEXIST"}
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    @pytest.mark.django_db
+    def test_get_product_order_details_empty(
+        self, authenticated_api_client, product_line
+    ):
+        """Test retrieving order details for a product with no orders."""
+        from classicmodels.models import Product
+        from decimal import Decimal
+
+        # Create a product with no order details
+        product_no_orders = Product.objects.create(
+            productcode="NOORD001",
+            productname="No Orders Product",
+            productline=product_line,
+            productscale="1:10",
+            productvendor="Vendor",
+            productdescription="Product with no orders",
+            quantityinstock=10,
+            buyprice=Decimal("10.00"),
+            msrp=Decimal("20.00"),
+        )
+
+        url = reverse(
+            "classicmodels:product-order-details",
+            kwargs={"productcode": product_no_orders.productcode},
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        # Should return empty list or empty results
+        if "results" in response.data:
+            assert len(response.data["results"]) == 0
+        else:
+            assert len(response.data) == 0
+
+    @pytest.mark.django_db
+    def test_get_product_order_details_multiple_orders(
+        self, authenticated_api_client, product, customer
+    ):
+        """Test retrieving order details for a product with multiple orders."""
+        from classicmodels.models import Order, Orderdetail
+        from decimal import Decimal
+
+        # Create multiple orders with this product
+        orders = []
+        for i in range(3):
+            order = Order.objects.create(
+                ordernumber=40000 + i,
+                orderdate="2024-02-15",
+                requireddate="2024-02-20",
+                status="In Process",
+                customernumber=customer,
+            )
+            orders.append(order)
+            Orderdetail.objects.create(
+                ordernumber=order,
+                productcode=product,
+                quantityordered=5 + i,
+                priceeach=Decimal("45.99"),
+                orderlinenumber=1,
+            )
+
+        url = reverse(
+            "classicmodels:product-order-details",
+            kwargs={"productcode": product.productcode},
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        # Check that all order details are returned
+        if "results" in response.data:
+            order_numbers = [od["ordernumber"] for od in response.data["results"]]
+        else:
+            order_numbers = [od["ordernumber"] for od in response.data]
+
+        for order in orders:
+            assert order.ordernumber in order_numbers
+
+    @pytest.mark.django_db
+    def test_get_product_order_details_pagination(
+        self, authenticated_api_client, product, customer
+    ):
+        """Test pagination for product order details endpoint."""
+        from classicmodels.models import Order, Orderdetail
+        from decimal import Decimal
+
+        # Create more order details than default page size
+        for i in range(15):
+            order = Order.objects.create(
+                ordernumber=50000 + i,
+                orderdate="2024-02-15",
+                requireddate="2024-02-20",
+                status="In Process",
+                customernumber=customer,
+            )
+            Orderdetail.objects.create(
+                ordernumber=order,
+                productcode=product,
+                quantityordered=5,
+                priceeach=Decimal("45.99"),
+                orderlinenumber=1,
+            )
+
+        url = reverse(
+            "classicmodels:product-order-details",
+            kwargs={"productcode": product.productcode},
+        )
+        response = authenticated_api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        # Should have pagination metadata
+        assert "count" in response.data
+        assert "next" in response.data or response.data["next"] is None
+        assert "previous" in response.data or response.data["previous"] is None
+        assert "results" in response.data
