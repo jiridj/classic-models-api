@@ -416,6 +416,56 @@ class EmployeeViewSet(BaseModelViewSet):
         serializer = EmployeeSerializer(reports, many=True)
         return Response(serializer.data)
 
+    @extend_schema(
+        operation_id="get_employee_customers",
+        tags=["Employees"],
+        summary="Get customers by sales rep",
+        description="Retrieve all customers assigned to a specific sales representative. This endpoint supports sales rep performance tracking and customer management.",
+        parameters=[
+            OpenApiParameter(
+                name="employeenumber",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+                description="The employee number of the sales representative",
+                required=True,
+            ),
+        ],
+        responses={200: CustomerSerializer(many=True)},
+    )
+    @action(
+        detail=True,
+        methods=["get"],
+        url_path="customers",
+        url_name="customers",
+    )
+    def customers(self, request, **kwargs):
+        """
+        Get all customers assigned to a specific sales representative.
+
+        Returns a paginated list of all customers assigned to this sales rep,
+        including customer details, contact information, and credit limits.
+        """
+        # Get the sales rep using the lookup_field
+        try:
+            sales_rep = self.get_object()
+        except Employee.DoesNotExist:
+            from rest_framework.exceptions import NotFound
+
+            raise NotFound("Employee not found.")
+
+        customers = Customer.objects.filter(
+            salesrepemployeenumber=sales_rep
+        ).select_related("salesrepemployeenumber")
+
+        # Apply pagination
+        page = self.paginate_queryset(customers)
+        if page is not None:
+            serializer = CustomerSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = CustomerSerializer(customers, many=True)
+        return Response(serializer.data)
+
 
 @extend_schema_view(
     list=extend_schema(

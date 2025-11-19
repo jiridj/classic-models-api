@@ -1023,6 +1023,41 @@
           }
         },
         {
+          "name": "Get Customers by Sales Rep",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/employees/1370/customers/?page=1&page_size=25",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "employees", "1370", "customers", ""],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number for pagination"
+                },
+                {
+                  "key": "page_size",
+                  "value": "25",
+                  "description": "Number of items per page"
+                }
+              ]
+            },
+            "description": "Retrieve all customers assigned to a specific sales representative. This endpoint supports sales rep performance tracking and customer management."
+          }
+        },
+        {
           "name": "Update Employee",
           "request": {
             "auth": {
