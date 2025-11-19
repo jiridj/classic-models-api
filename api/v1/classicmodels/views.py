@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import mixins, permissions, viewsets
+from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from config.throttles import ReadThrottle, WriteThrottle
@@ -254,6 +255,49 @@ class CustomerViewSet(BaseModelViewSet):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
     lookup_field = "customernumber"
+
+    @extend_schema(
+        operation_id="get_customer_orders",
+        tags=["Customers"],
+        summary="Get customer sales history",
+        description="Retrieve all orders for a specific customer. This endpoint provides the complete sales history for the customer.",
+        parameters=[
+            OpenApiParameter(
+                name="customernumber",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+                description="The customer number",
+                required=True,
+            ),
+        ],
+        responses={200: OrderSerializer(many=True)},
+    )
+    @action(
+        detail=True,
+        methods=["get"],
+        url_path="orders",
+        url_name="orders",
+    )
+    def orders(self, request, **kwargs):
+        """
+        Get all orders for a specific customer.
+
+        Returns a paginated list of all orders placed by the customer,
+        including order status, dates, and other order details.
+        """
+        customer = self.get_object()
+        orders = Order.objects.filter(customernumber=customer).select_related(
+            "customernumber"
+        )
+
+        # Apply pagination
+        page = self.paginate_queryset(orders)
+        if page is not None:
+            serializer = OrderSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = OrderSerializer(orders, many=True)
+        return Response(serializer.data)
 
 
 @extend_schema_view(
