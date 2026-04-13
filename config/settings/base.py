@@ -74,6 +74,7 @@ ASGI_APPLICATION = "config.asgi.application"
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_AUTHENTICATION_CLASSES": [
+        "authentication.api_key_auth.ApiKeyAuthentication",
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
@@ -113,15 +114,23 @@ def get_base_url():
 SPECTACULAR_SETTINGS = {
     "TITLE": "Classic Models API",
     "DESCRIPTION": (
-        "API for the Classic Models tutorial database with JWT authentication.\n\n"
-        "## Authentication\n\n"
-        "This API uses JWT (JSON Web Token) authentication. To access protected endpoints:\n\n"
+        "API for the Classic Models tutorial database with multiple authentication options.\n\n"
+        "## Authentication Methods\n\n"
+        "This API supports two authentication methods:\n\n"
+        "### 1. JWT (JSON Web Token) Authentication\n\n"
+        "Standard user authentication for regular access:\n\n"
         "1. **Login**: POST `/classic-models/api/auth/login/` with username and password\n"
         "2. **Use Token**: Include the access token in the Authorization header: `Bearer <access_token>`\n"
         "3. **Refresh**: Use POST `/classic-models/api/auth/refresh/` to get a new access token\n"
         "4. **Logout**: POST `/classic-models/api/auth/logout/` to invalidate the refresh token\n\n"
+        "### 2. API Key Authentication\n\n"
+        "System-level authentication with full admin access (demo purposes):\n\n"
+        "- **Header**: Include `X-API-Key: your-api-key` in your requests\n"
+        "- **Access**: Full read/write/delete permissions\n"
+        "- **Configuration**: Set `API_KEY` environment variable\n"
+        "- **Use Case**: Automated scripts, testing, system integrations\n\n"
         "## Demo User\n\n"
-        "For testing purposes, you can use:\n"
+        "For testing JWT authentication:\n"
         "- **Username**: `demo`\n"
         "- **Password**: `demo123`\n\n"
         "## Base Path\n\n"
@@ -130,7 +139,8 @@ SPECTACULAR_SETTINGS = {
         "- API documentation (this page)\n"
         "- Authentication endpoints (`/classic-models/api/auth/`)\n\n"
         "## Protected Endpoints\n\n"
-        "- All Classic Models data endpoints (`/classic-models/api/v1/`)"
+        "- All Classic Models data endpoints (`/classic-models/api/v1/`)\n"
+        "- Require either JWT token OR API key"
     ),
     "VERSION": get_version(),
     "SERVE_INCLUDE_SCHEMA": False,
@@ -151,6 +161,7 @@ SPECTACULAR_SETTINGS = {
         "showCommonExtensions": True,
     },
     "AUTHENTICATION_WHITELIST": [
+        "authentication.api_key_auth.ApiKeyAuthentication",
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
     "TAGS": [
