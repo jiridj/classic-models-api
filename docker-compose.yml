@@ -32,6 +32,7 @@ services:
     environment:
       - DEBUG=1
       - API_VERSION=${API_VERSION:-1.0.0}
+      - API_KEY=${API_KEY}
       - DATABASE_URL=mysql://classicuser:classicpass@mysql:3306/classicmodels
       - MYSQL_HOST=mysql
       - MYSQL_PORT=3306

@@ -158,7 +158,11 @@ erDiagram
 
 ### Authentication
 
-The API uses JWT (JSON Web Token) authentication:
+The API supports two authentication methods:
+
+#### 1. JWT (JSON Web Token) Authentication
+
+Standard user authentication with JWT tokens:
 
 ```bash
 # Login
@@ -174,6 +178,41 @@ POST /classic-models/api/auth/login/
   "refresh": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
   "user": { ... }
 }
+
+# Use the access token in subsequent requests
+curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  http://localhost:8000/classic-models/api/v1/products/
+```
+
+#### 2. API Key Authentication (System-Level Access)
+
+For demo/testing purposes, you can use an API key for system-level access with full admin privileges:
+
+```bash
+# Set API_KEY in your environment
+export API_KEY="your-secure-api-key"
+
+# Use X-API-Key header in requests
+curl -H "X-API-Key: your-secure-api-key" \
+  http://localhost:8000/classic-models/api/v1/products/
+```
+
+**API Key Features:**
+- ✅ Full admin access (read, write, delete)
+- ✅ No user login required
+- ✅ Works as alternative to JWT authentication
+- ✅ Ideal for automated scripts and testing
+- ⚠️ **Demo purposes only** - use with caution in production
+
+**Generating a Secure API Key:**
+```bash
+python -c "import secrets; print(secrets.token_urlsafe(32))"
+```
+
+**Configuration:**
+Add to your `.env` file:
+```bash
+API_KEY=your-secure-api-key-here
 ```
 
 ### API Endpoints
