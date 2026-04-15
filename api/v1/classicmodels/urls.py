@@ -12,7 +12,8 @@ from .views import (
     ProductViewSet,
 )
 
-router = DefaultRouter()
+# Configure router to work with or without trailing slashes
+router = DefaultRouter(trailing_slash=False)
 router.register(r"productlines", ProductLineViewSet, basename="productline")
 router.register(r"products", ProductViewSet, basename="product")
 router.register(r"offices", OfficeViewSet, basename="office")
