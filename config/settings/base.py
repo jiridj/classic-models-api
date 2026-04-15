@@ -23,6 +23,10 @@ USE_X_FORWARDED_HOST = True
 USE_X_FORWARDED_PORT = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
+# Automatically append trailing slashes to URLs
+# This allows URLs to work with or without trailing slashes
+APPEND_SLASH = True
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",

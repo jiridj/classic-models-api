@@ -10,3 +10,16 @@ class JWTAuthenticationExtension(OpenApiAuthenticationExtension):
         return build_bearer_security_scheme_object(
             header_name="Authorization", token_prefix="Bearer", bearer_format="JWT"
         )
+
+
+class ApiKeyAuthenticationExtension(OpenApiAuthenticationExtension):
+    target_class = "authentication.api_key_auth.ApiKeyAuthentication"
+    name = "ApiKeyAuth"
+
+    def get_security_definition(self, auto_schema):
+        return {
+            "type": "apiKey",
+            "in": "header",
+            "name": "X-API-Key",
+            "description": "API key authentication using X-API-Key header",
+        }
