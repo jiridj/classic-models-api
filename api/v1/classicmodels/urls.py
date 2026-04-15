@@ -1,5 +1,5 @@
 from django.urls import include, path
-from rest_framework.routers import DefaultRouter
+from rest_framework.routers import DefaultRouter, SimpleRouter
 
 from .views import (
     CustomerViewSet,
@@ -12,8 +12,17 @@ from .views import (
     ProductViewSet,
 )
 
+
+class OptionalSlashRouter(DefaultRouter):
+    """Router that accepts URLs with or without trailing slashes."""
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.trailing_slash = '/?'
+
+
 # Configure router to work with or without trailing slashes
-router = DefaultRouter(trailing_slash=False)
+router = OptionalSlashRouter()
 router.register(r"productlines", ProductLineViewSet, basename="productline")
 router.register(r"products", ProductViewSet, basename="product")
 router.register(r"offices", OfficeViewSet, basename="office")
