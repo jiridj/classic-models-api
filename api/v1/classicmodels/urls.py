@@ -34,6 +34,7 @@ router.register(r"orders", OrderViewSet, basename="order")
 urlpatterns = [
     path("", include(router.urls)),
     # Composite-key resources
+    # Payment detail (with trailing slash)
     path(
         "payments/<int:customerNumber>/<str:checkNumber>/",
         PaymentViewSet.as_view(
@@ -46,11 +47,30 @@ urlpatterns = [
         ),
         name="payment-detail",
     ),
+    # Payment detail (without trailing slash)
+    path(
+        "payments/<int:customerNumber>/<str:checkNumber>",
+        PaymentViewSet.as_view(
+            {
+                "get": "retrieve",
+                "put": "update",
+                "patch": "partial_update",
+                "delete": "destroy",
+            }
+        ),
+    ),
+    # Payment list (with trailing slash)
     path(
         "payments/",
         PaymentViewSet.as_view({"get": "list", "post": "create"}),
         name="payment-list",
     ),
+    # Payment list (without trailing slash)
+    path(
+        "payments",
+        PaymentViewSet.as_view({"get": "list", "post": "create"}),
+    ),
+    # Order details by order number (with trailing slash)
     path(
         "orderdetails/<int:orderNumber>/",
         OrderdetailViewSet.as_view(
@@ -60,6 +80,16 @@ urlpatterns = [
         ),
         name="orderdetail-detail",
     ),
+    # Order details by order number (without trailing slash)
+    path(
+        "orderdetails/<int:orderNumber>",
+        OrderdetailViewSet.as_view(
+            {
+                "get": "retrieve",
+            }
+        ),
+    ),
+    # Order detail item operations (with trailing slash)
     path(
         "orderdetails/<int:orderNumber>/<str:productCode>/",
         OrderdetailViewSet.as_view(
@@ -71,9 +101,26 @@ urlpatterns = [
         ),
         name="orderdetail-item-detail",
     ),
+    # Order detail item operations (without trailing slash)
+    path(
+        "orderdetails/<int:orderNumber>/<str:productCode>",
+        OrderdetailViewSet.as_view(
+            {
+                "put": "update",
+                "patch": "partial_update",
+                "delete": "destroy",
+            }
+        ),
+    ),
+    # Order details list (with trailing slash)
     path(
         "orderdetails/",
         OrderdetailViewSet.as_view({"get": "list", "post": "create"}),
         name="orderdetail-list",
+    ),
+    # Order details list (without trailing slash)
+    path(
+        "orderdetails",
+        OrderdetailViewSet.as_view({"get": "list", "post": "create"}),
     ),
 ]
