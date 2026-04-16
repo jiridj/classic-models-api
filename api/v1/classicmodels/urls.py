@@ -52,16 +52,24 @@ urlpatterns = [
         name="payment-list",
     ),
     path(
-        "orderdetails/<int:orderNumber>/<str:productCode>/",
+        "orderdetails/<int:orderNumber>/",
         OrderdetailViewSet.as_view(
             {
                 "get": "retrieve",
+            }
+        ),
+        name="orderdetail-detail",
+    ),
+    path(
+        "orderdetails/<int:orderNumber>/<str:productCode>/",
+        OrderdetailViewSet.as_view(
+            {
                 "put": "update",
                 "patch": "partial_update",
                 "delete": "destroy",
             }
         ),
-        name="orderdetail-detail",
+        name="orderdetail-item-detail",
     ),
     path(
         "orderdetails/",

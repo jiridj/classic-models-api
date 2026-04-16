@@ -48,31 +48,33 @@ class TestOrderDetailAPI:
     def test_retrieve_order_detail_authenticated(
         self, authenticated_api_client, order_detail
     ):
-        """Test retrieving a specific order detail when authenticated."""
+        """Test retrieving order details by order number when authenticated."""
         url = reverse(
             "classicmodels:orderdetail-detail",
             kwargs={
                 "orderNumber": order_detail.ordernumber.ordernumber,
-                "productCode": order_detail.productcode.productcode,
             },
         )
         response = authenticated_api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
-        # Verify id field is present in response
-        assert "id" in response.data
-        assert response.data["id"] == order_detail.id
-        assert response.data["ordernumber"] == order_detail.ordernumber.ordernumber
-        assert response.data["productcode"] == order_detail.productcode.productcode
+        # Should return a paginated list of order details
+        assert "results" in response.data
+        assert len(response.data["results"]) >= 1
+        # Verify the order detail is in the results
+        order_detail_data = response.data["results"][0]
+        assert "id" in order_detail_data
+        assert order_detail_data["id"] == order_detail.id
+        assert order_detail_data["ordernumber"] == order_detail.ordernumber.ordernumber
+        assert order_detail_data["productcode"] == order_detail.productcode.productcode
 
     @pytest.mark.django_db
     def test_retrieve_order_detail_unauthenticated(self, api_client, order_detail):
-        """Test retrieving an order detail when not authenticated."""
+        """Test retrieving order details when not authenticated."""
         url = reverse(
             "classicmodels:orderdetail-detail",
             kwargs={
                 "orderNumber": order_detail.ordernumber.ordernumber,
-                "productCode": order_detail.productcode.productcode,
             },
         )
         response = api_client.get(url)
@@ -80,11 +82,11 @@ class TestOrderDetailAPI:
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     @pytest.mark.django_db
-    def test_retrieve_nonexistent_order_detail(self, authenticated_api_client, order):
-        """Test retrieving an order detail that doesn't exist."""
+    def test_retrieve_nonexistent_order_detail(self, authenticated_api_client):
+        """Test retrieving order details for a non-existent order."""
         url = reverse(
             "classicmodels:orderdetail-detail",
-            kwargs={"orderNumber": order.ordernumber, "productCode": "NONEXISTENT"},
+            kwargs={"orderNumber": 99999},
         )
         response = authenticated_api_client.get(url)
 
@@ -227,7 +229,7 @@ class TestOrderDetailAPI:
     ):
         """Test updating an order detail when authenticated."""
         url = reverse(
-            "classicmodels:orderdetail-detail",
+            "classicmodels:orderdetail-item-detail",
             kwargs={
                 "orderNumber": order_detail.ordernumber.ordernumber,
                 "productCode": order_detail.productcode.productcode,
@@ -251,7 +253,7 @@ class TestOrderDetailAPI:
     def test_update_order_detail_unauthenticated(self, api_client, order_detail):
         """Test updating an order detail when not authenticated."""
         url = reverse(
-            "classicmodels:orderdetail-detail",
+            "classicmodels:orderdetail-item-detail",
             kwargs={
                 "orderNumber": order_detail.ordernumber.ordernumber,
                 "productCode": order_detail.productcode.productcode,
@@ -275,7 +277,7 @@ class TestOrderDetailAPI:
     ):
         """Test partially updating an order detail when authenticated."""
         url = reverse(
-            "classicmodels:orderdetail-detail",
+            "classicmodels:orderdetail-item-detail",
             kwargs={
                 "orderNumber": order_detail.ordernumber.ordernumber,
                 "productCode": order_detail.productcode.productcode,
@@ -298,7 +300,7 @@ class TestOrderDetailAPI:
     ):
         """Test partially updating an order detail when not authenticated."""
         url = reverse(
-            "classicmodels:orderdetail-detail",
+            "classicmodels:orderdetail-item-detail",
             kwargs={
                 "orderNumber": order_detail.ordernumber.ordernumber,
                 "productCode": order_detail.productcode.productcode,
@@ -316,7 +318,7 @@ class TestOrderDetailAPI:
     ):
         """Test deleting an order detail when authenticated."""
         url = reverse(
-            "classicmodels:orderdetail-detail",
+            "classicmodels:orderdetail-item-detail",
             kwargs={
                 "orderNumber": order_detail.ordernumber.ordernumber,
                 "productCode": order_detail.productcode.productcode,
@@ -333,7 +335,7 @@ class TestOrderDetailAPI:
     def test_delete_order_detail_unauthenticated(self, api_client, order_detail):
         """Test deleting an order detail when not authenticated."""
         url = reverse(
-            "classicmodels:orderdetail-detail",
+            "classicmodels:orderdetail-item-detail",
             kwargs={
                 "orderNumber": order_detail.ordernumber.ordernumber,
                 "productCode": order_detail.productcode.productcode,
@@ -347,7 +349,7 @@ class TestOrderDetailAPI:
     def test_delete_nonexistent_order_detail(self, authenticated_api_client, order):
         """Test deleting an order detail that doesn't exist."""
         url = reverse(
-            "classicmodels:orderdetail-detail",
+            "classicmodels:orderdetail-item-detail",
             kwargs={"orderNumber": order.ordernumber, "productCode": "NONEXISTENT"},
         )
         response = authenticated_api_client.delete(url)
@@ -835,13 +837,15 @@ class TestOrderDetailAPI:
             "classicmodels:orderdetail-detail",
             kwargs={
                 "orderNumber": order_detail.ordernumber.ordernumber,
-                "productCode": order_detail.productcode.productcode,
             },
         )
         response = authenticated_api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
-        assert "ordernumber" in response.data
-        assert "productcode" in response.data
-        assert response.data["ordernumber"] == order.ordernumber
-        assert response.data["productcode"] == product.productcode
+        assert "results" in response.data
+        assert len(response.data["results"]) >= 1
+        order_detail_data = response.data["results"][0]
+        assert "ordernumber" in order_detail_data
+        assert "productcode" in order_detail_data
+        assert order_detail_data["ordernumber"] == order.ordernumber
+        assert order_detail_data["productcode"] == product.productcode
