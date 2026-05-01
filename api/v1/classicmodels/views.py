@@ -850,14 +850,21 @@ class PaymentViewSet(
     retrieve=extend_schema(
         operation_id="get_order_detail",
         tags=["Order Details"],
-        summary="Get order details by order number",
-        description="Retrieve all line items for a specific order. Returns a paginated list of all products in the order with quantities and prices.",
+        summary="Get a specific order detail",
+        description="Retrieve a specific line item from an order using the composite key (orderNumber, productCode).",
         parameters=[
             OpenApiParameter(
                 name="orderNumber",
                 type=OpenApiTypes.INT,
                 location=OpenApiParameter.PATH,
                 description="The order number",
+                required=True,
+            ),
+            OpenApiParameter(
+                name="productCode",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.PATH,
+                description="The product code",
                 required=True,
             ),
         ],
@@ -932,6 +939,7 @@ class PaymentViewSet(
 class OrderdetailViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
     mixins.UpdateModelMixin,
     mixins.DestroyModelMixin,
     viewsets.GenericViewSet,
@@ -948,28 +956,3 @@ class OrderdetailViewSet(
         return get_object_or_404(
             Orderdetail, ordernumber_id=order_number, productcode_id=product_code
         )
-
-    def retrieve(self, request, *args, **kwargs):
-        """
-        Retrieve order details by order number.
-        Returns all line items for the specified order.
-        """
-        order_number = self.kwargs.get("orderNumber")
-        
-        # Get all order details for this order
-        order_details = Orderdetail.objects.filter(
-            ordernumber_id=order_number
-        ).select_related("ordernumber", "productcode")
-        
-        if not order_details.exists():
-            from rest_framework.exceptions import NotFound
-            raise NotFound("No order details found for this order number.")
-        
-        # Apply pagination
-        page = self.paginate_queryset(order_details)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        
-        serializer = self.get_serializer(order_details, many=True)
-        return Response(serializer.data)

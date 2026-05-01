@@ -1,5 +1,5 @@
 from django.urls import include, path
-from rest_framework.routers import DefaultRouter, SimpleRouter
+from rest_framework.routers import DefaultRouter
 
 from .views import (
     CustomerViewSet,
@@ -13,16 +13,9 @@ from .views import (
 )
 
 
-class OptionalSlashRouter(DefaultRouter):
-    """Router that accepts URLs with or without trailing slashes."""
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.trailing_slash = '/?'
-
-
-# Configure router to work with or without trailing slashes
-router = OptionalSlashRouter()
+# Use standard DRF router with trailing slashes
+# Django's APPEND_SLASH setting handles requests without trailing slashes
+router = DefaultRouter()
 router.register(r"productlines", ProductLineViewSet, basename="productline")
 router.register(r"products", ProductViewSet, basename="product")
 router.register(r"offices", OfficeViewSet, basename="office")
@@ -34,7 +27,7 @@ router.register(r"orders", OrderViewSet, basename="order")
 urlpatterns = [
     path("", include(router.urls)),
     # Composite-key resources
-    # Payment endpoints - trailing slash in spec, accepts with or without via APPEND_SLASH
+    # Payment endpoints - composite key: (customerNumber, checkNumber)
     path(
         "payments/<int:customerNumber>/<str:checkNumber>/",
         PaymentViewSet.as_view(
@@ -52,26 +45,19 @@ urlpatterns = [
         PaymentViewSet.as_view({"get": "list", "post": "create"}),
         name="payment-list",
     ),
-    # Order details endpoints - trailing slash in spec, accepts with or without via APPEND_SLASH
-    path(
-        "orderdetails/<int:orderNumber>/",
-        OrderdetailViewSet.as_view(
-            {
-                "get": "retrieve",
-            }
-        ),
-        name="orderdetail-detail",
-    ),
+    # Order details endpoints - composite key: (orderNumber, productCode)
+    # Note: To get all items for an order, use GET /orders/{ordernumber}/order-details/
     path(
         "orderdetails/<int:orderNumber>/<str:productCode>/",
         OrderdetailViewSet.as_view(
             {
+                "get": "retrieve",
                 "put": "update",
                 "patch": "partial_update",
                 "delete": "destroy",
             }
         ),
-        name="orderdetail-item-detail",
+        name="orderdetail-detail",
     ),
     path(
         "orderdetails/",
