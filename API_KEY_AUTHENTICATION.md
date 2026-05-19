@@ -51,6 +51,28 @@ make stop
 make start
 ```
 
+## Demo API Key
+
+For quick testing and demonstration purposes, a demo API key is pre-configured:
+
+**Demo API Key**: `GzIGzQD0pdtAi2LvYZCvJDhZZH2w87AaPZI_hFlF5BY`
+
+This demo key provides:
+- ✅ Full admin access to all API endpoints
+- ✅ No setup required - works immediately
+- ✅ Ideal for testing, demos, and learning
+- ⚠️ **Demo purposes only** - not for production use
+
+### Quick Test
+
+```bash
+# Test the demo API key
+curl -H "X-API-Key: GzIGzQD0pdtAi2LvYZCvJDhZZH2w87AaPZI_hFlF5BY" \
+  http://localhost:8000/classic-models/api/v1/products/
+```
+
+**Note**: The demo API key is configured in the `.env` file and is automatically available when you start the application with `make start`.
+
 ## Usage
 
 ### Basic Request

@@ -51,9 +51,20 @@ This demo application showcases a complete REST API implementation using Django 
 
 ### Demo Credentials
 
+#### JWT Authentication
 - **Username**: `demo`
 - **Password**: `demo123`
 - **Email**: `demo@classicmodels.com`
+
+#### API Key Authentication
+- **Demo API Key**: `GzIGzQD0pdtAi2LvYZCvJDhZZH2w87AaPZI_hFlF5BY`
+
+The demo API key provides full admin access and is pre-configured for immediate testing. Use it with the `X-API-Key` header:
+
+```bash
+curl -H "X-API-Key: GzIGzQD0pdtAi2LvYZCvJDhZZH2w87AaPZI_hFlF5BY" \
+  http://localhost:8000/classic-models/api/v1/products/
+```
 
 ## 🗄️ Database Structure
 
