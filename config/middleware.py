@@ -2,8 +2,9 @@
 Project middlewares
 """
 
-from django.utils.deprecation import MiddlewareMixin
 import time
+
+from django.utils.deprecation import MiddlewareMixin
 
 
 class SleepDelayMiddleware(MiddlewareMixin):

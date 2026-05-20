@@ -1,4 +1,4 @@
-from django.urls import include, path
+from django.urls import include, path, re_path
 from rest_framework.routers import DefaultRouter
 
 from .views import (
@@ -13,9 +13,15 @@ from .views import (
 )
 
 
-# Use standard DRF router with trailing slashes
-# Django's APPEND_SLASH setting handles requests without trailing slashes
-router = DefaultRouter()
+class OptionalSlashRouter(DefaultRouter):
+    """DRF router that accepts URLs with or without a trailing slash."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.trailing_slash = "/?"
+
+
+router = OptionalSlashRouter()
 router.register(r"productlines", ProductLineViewSet, basename="productline")
 router.register(r"products", ProductViewSet, basename="product")
 router.register(r"offices", OfficeViewSet, basename="office")
@@ -28,8 +34,8 @@ urlpatterns = [
     path("", include(router.urls)),
     # Composite-key resources
     # Payment endpoints - composite key: (customerNumber, checkNumber)
-    path(
-        "payments/<int:customerNumber>/<str:checkNumber>/",
+    re_path(
+        r"^payments/(?P<customerNumber>\d+)/(?P<checkNumber>[^/]+)/?$",
         PaymentViewSet.as_view(
             {
                 "get": "retrieve",
@@ -40,15 +46,15 @@ urlpatterns = [
         ),
         name="payment-detail",
     ),
-    path(
-        "payments/",
+    re_path(
+        r"^payments/?$",
         PaymentViewSet.as_view({"get": "list", "post": "create"}),
         name="payment-list",
     ),
     # Order details endpoints - composite key: (orderNumber, productCode)
     # Note: To get all items for an order, use GET /orders/{ordernumber}/order-details/
-    path(
-        "orderdetails/<int:orderNumber>/<str:productCode>/",
+    re_path(
+        r"^orderdetails/(?P<orderNumber>\d+)/(?P<productCode>[^/]+)/?$",
         OrderdetailViewSet.as_view(
             {
                 "get": "retrieve",
@@ -59,8 +65,8 @@ urlpatterns = [
         ),
         name="orderdetail-detail",
     ),
-    path(
-        "orderdetails/",
+    re_path(
+        r"^orderdetails/?$",
         OrderdetailViewSet.as_view({"get": "list", "post": "create"}),
         name="orderdetail-list",
     ),
