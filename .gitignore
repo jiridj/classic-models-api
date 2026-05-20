@@ -258,3 +258,6 @@ dmypy.json
 
 # Postman
 postman-test-results.json
+
+# Bob
+.bob/
