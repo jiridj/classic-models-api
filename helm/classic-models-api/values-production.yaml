@@ -1,0 +1,161 @@
+# Production values for classic-models-api
+# This file contains production-ready configuration overrides
+
+# Note: Liveness and readiness probes use /classic-models/api/schema/
+# which has AllowAny permission to avoid authentication issues
+
+# Global settings
+global:
+  openshift: true
+  security:
+    # Allow bitnamilegacy images (Bitnami moved images to legacy registry)
+    allowInsecureImages: true
+
+# API Application Configuration
+replicaCount: 3
+
+image:
+  # Set your production image repository
+  # Examples:
+  #   - Docker Hub: "myorg/classic-models-api"
+  #   - Private registry: "registry.example.com/myorg/classic-models-api"
+  #   - OpenShift internal: "image-registry.openshift-image-registry.svc:5000/production/classic-models-api"
+  repository: classic-models-api
+  tag: "1.0.0"
+
+app:
+  debug: false
+  apiVersion: "1.0.0"
+  # IMPORTANT: Generate a secure secret key for production
+  # python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+  secretKey: "CHANGE-ME-IN-PRODUCTION"
+  # Optional API key - generate with: python -c "import secrets; print(secrets.token_urlsafe(32))"
+  apiKey: ""
+  # Set your actual domain(s)
+  allowedHosts: "api.example.com,*.example.com"
+
+# Resource limits for production
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 200m
+    memory: 512Mi
+
+# Enable autoscaling
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# Route configuration (OpenShift)
+route:
+  enabled: true
+  # Set your actual hostname
+  host: "classic-models-api.apps.example.com"
+  path: /
+  tls:
+    enabled: true
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+
+# MySQL Configuration
+# Two options:
+# 1. Chart-managed MySQL (mysql.enabled: true) - deploys MySQL using Bitnami chart
+# 2. External MySQL (mysql.enabled: false) - connects to existing MySQL database
+mysql:
+  # Set to false to use an external MySQL database
+  enabled: true
+  
+  # External MySQL configuration (used when mysql.enabled is false)
+  # IMPORTANT: Set these when using external MySQL
+  externalHost: ""  # e.g., "mysql.production.example.com"
+  externalPort: 3306
+  
+  # Chart-managed MySQL configuration (only used when mysql.enabled is true)
+  # Use Bitnami MySQL image from legacy registry
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/mysql
+    tag: 8.4.5-debian-12-r0
+  
+  # Database authentication (used for both chart-managed and external MySQL)
+  auth:
+    # IMPORTANT: Use strong passwords in production
+    # Generate with: openssl rand -base64 32
+    rootPassword: "CHANGE-ME-IN-PRODUCTION"
+    database: "classicmodels"
+    username: "classicuser"
+    password: "CHANGE-ME-IN-PRODUCTION"
+  
+  primary:
+    persistence:
+      enabled: true
+      size: 50Gi
+      # Specify storage class if needed
+      # storageClass: "fast-ssd"
+    
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+      requests:
+        cpu: 500m
+        memory: 1Gi
+    
+    # OpenShift-specific: Disable security contexts to use OpenShift's assigned UIDs
+    # OpenShift automatically assigns UIDs from the project's range
+    podSecurityContext:
+      enabled: false
+    containerSecurityContext:
+      enabled: false
+  
+  # Initialize with Classic Models data
+  # RECOMMENDED: Use --set-file to pass the SQL file:
+  #   helm install classic-models-api ./helm/classic-models-api \
+  #     -f values-production.yaml \
+  #     --set-file mysql.initdbScripts.01-init\.sql=db/mysqlsampledatabase.sql
+  #
+  # ALTERNATIVE: Use existing ConfigMap:
+  #   kubectl create configmap mysql-init-script --from-file=01-init.sql=db/mysqlsampledatabase.sql
+  #   helm install classic-models-api ./helm/classic-models-api \
+  #     -f values-production.yaml \
+  #     --set mysql.initdbScriptsConfigMap=mysql-init-script
+  initdbScripts: {}
+  
+  # Use existing ConfigMap for init scripts (alternative to initdbScripts)
+  initdbScriptsConfigMap: ""
+  # initdbScriptsConfigMap: "mysql-init-script"
+
+# Security context
+podSecurityContext:
+  runAsNonRoot: true
+  fsGroup: 1000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  runAsUser: 1000
+
+# Pod disruption budget (optional)
+# Uncomment to enable
+# podDisruptionBudget:
+#   enabled: true
+#   minAvailable: 1
+
+# Network policies (optional)
+# Uncomment to enable
+# networkPolicy:
+#   enabled: true
+#   policyTypes:
+#   - Ingress
+#   - Egress
+
+# Made with Bob

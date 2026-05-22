@@ -1,0 +1,234 @@
+# Default values for classic-models-api
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Global settings
+global:
+  # Set to true if deploying on OpenShift
+  openshift: "false"
+  security:
+    # Allow bitnamilegacy images (Bitnami moved images to legacy registry)
+    allowInsecureImages: true
+
+# API Application Configuration
+replicaCount: 2
+
+image:
+  # Full image repository path
+  # Examples:
+  #   - Docker Hub: "myorg/classic-models-api"
+  #   - Private registry: "registry.example.com/myorg/classic-models-api"
+  #   - OpenShift internal: "image-registry.openshift-image-registry.svc:5000/myproject/classic-models-api"
+  repository: classic-models-api
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# Application configuration
+app:
+  debug: false
+  apiVersion: "1.0.0"
+  # Django secret key - generate with: python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+  secretKey: "change-me-in-production"
+  # Optional API key for system-level access
+  apiKey: ""
+  # Allowed hosts (comma-separated)
+  allowedHosts: "*"
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 8000
+  targetPort: 8000
+  annotations: {}
+
+# Route configuration (OpenShift)
+route:
+  enabled: true
+  host: ""  # Leave empty to auto-generate
+  path: /
+  tls:
+    enabled: true
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  annotations: {}
+
+# Ingress configuration (Kubernetes)
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: classic-models-api.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: classic-models-api-tls
+  #    hosts:
+  #      - classic-models-api.local
+
+# Resource limits and requests
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 256Mi
+
+# Autoscaling configuration
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+# Liveness and readiness probes
+# Using /classic-models/api/schema/ endpoint which has AllowAny permission
+# This avoids authentication issues with health checks
+livenessProbe:
+  httpGet:
+    path: /classic-models/api/schema/
+    port: http
+  initialDelaySeconds: 60
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /classic-models/api/schema/
+    port: http
+  initialDelaySeconds: 30
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+# Init container to wait for MySQL
+initContainers:
+  waitForMysql:
+    enabled: true
+    image: busybox:1.35
+    command:
+      - sh
+      - -c
+      - |
+        until nc -z {{ include "classic-models-api.mysql.fullname" . }} 3306; do
+          echo "Waiting for MySQL to be ready..."
+          sleep 2
+        done
+        echo "MySQL is ready!"
+
+# Pod annotations
+podAnnotations: {}
+
+# Pod security context
+podSecurityContext: {}
+  # fsGroup: 2000
+
+# Container security context
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+# Node selector
+nodeSelector: {}
+
+# Tolerations
+tolerations: []
+
+# Affinity rules
+affinity: {}
+
+# Service account
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+# MySQL Configuration
+# Two options:
+# 1. Chart-managed MySQL (mysql.enabled: true) - deploys MySQL using Bitnami chart
+# 2. External MySQL (mysql.enabled: false) - connects to existing MySQL database
+mysql:
+  # Set to false to use an external MySQL database
+  enabled: true
+  
+  # External MySQL configuration (used when mysql.enabled is false)
+  # Required when mysql.enabled is false
+  externalHost: ""  # e.g., "mysql.example.com" or "10.0.0.5"
+  externalPort: 3306
+  
+  # Chart-managed MySQL configuration (Bitnami MySQL Chart)
+  # See: https://github.com/bitnami/charts/tree/main/bitnami/mysql
+  # Only used when mysql.enabled is true
+  
+  # Use Bitnami MySQL image from legacy registry
+  # Bitnami images are now in docker.io/bitnamilegacy
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/mysql
+    tag: 8.4.5-debian-12-r0
+  
+  # Database authentication (used for both chart-managed and external MySQL)
+  auth:
+    rootPassword: "rootpassword"
+    database: "classicmodels"
+    username: "classicuser"
+    password: "classicpass"
+  
+  primary:
+    persistence:
+      enabled: true
+      size: 10Gi
+      # storageClass: ""
+    
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1Gi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+    
+    # OpenShift-specific: Disable security contexts to use OpenShift's assigned UIDs
+    # OpenShift automatically assigns UIDs from the project's range
+    podSecurityContext:
+      enabled: false
+    containerSecurityContext:
+      enabled: false
+    
+  # Initialize database with Classic Models schema
+  # RECOMMENDED: Use --set-file to pass the SQL file:
+  #   helm install classic-models-api ./helm/classic-models-api \
+  #     --set-file mysql.initdbScripts.01-init\.sql=db/mysqlsampledatabase.sql
+  #
+  # ALTERNATIVE: Use existing ConfigMap:
+  #   kubectl create configmap mysql-init-script --from-file=01-init.sql=db/mysqlsampledatabase.sql
+  #   helm install classic-models-api ./helm/classic-models-api \
+  #     --set mysql.initdbScriptsConfigMap=mysql-init-script
+  initdbScripts: {}
+    # 01-init.sql: |
+    #   # SQL content here (not recommended for large files)
+  
+  # Use existing ConfigMap for init scripts (alternative to initdbScripts)
+  initdbScriptsConfigMap: ""
+  # initdbScriptsConfigMap: "mysql-init-script"
+
+# Made with Bob

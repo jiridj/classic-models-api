@@ -1,0 +1,73 @@
+Thank you for installing {{ .Chart.Name }}!
+
+Your release is named {{ .Release.Name }}.
+
+To learn more about the release, try:
+
+  $ helm status {{ .Release.Name }}
+  $ helm get all {{ .Release.Name }}
+
+{{- if .Values.global.openshift }}
+{{- if .Values.route.enabled }}
+
+The Classic Models API is accessible via OpenShift Route:
+
+  Route URL: https://{{ include "classic-models-api.fullname" . }}-{{ .Release.Namespace }}.apps.<your-cluster-domain>
+
+{{- end }}
+{{- else }}
+{{- if .Values.ingress.enabled }}
+
+The Classic Models API is accessible via Ingress:
+
+{{- range .Values.ingress.hosts }}
+  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ .host }}{{ range .paths }}{{ .path }}{{ end }}
+{{- end }}
+{{- else }}
+
+Get the application URL by running these commands:
+
+{{- if contains "NodePort" .Values.service.type }}
+  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "classic-models-api.fullname" . }})
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT
+{{- else if contains "LoadBalancer" .Values.service.type }}
+     NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+           You can watch the status of by running 'kubectl get --namespace {{ .Release.Namespace }} svc -w {{ include "classic-models-api.fullname" . }}'
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "classic-models-api.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+  echo http://$SERVICE_IP:{{ .Values.service.port }}
+{{- else if contains "ClusterIP" .Values.service.type }}
+  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "classic-models-api.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
+  export CONTAINER_PORT=$(kubectl get pod --namespace {{ .Release.Namespace }} $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
+  echo "Visit http://127.0.0.1:8000 to use your application"
+  kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8000:$CONTAINER_PORT
+{{- end }}
+{{- end }}
+{{- end }}
+
+API Endpoints:
+  - API Base: /classic-models/api/v1/
+  - API Docs: /classic-models/api/docs/
+  - ReDoc: /classic-models/api/redoc/
+
+{{- if .Values.mysql.enabled }}
+
+MySQL Database:
+  - Host: {{ include "classic-models-api.mysql.servicename" . }}
+  - Port: {{ include "classic-models-api.mysql.port" . }}
+  - Database: {{ include "classic-models-api.mysql.database" . }}
+  - Username: {{ include "classic-models-api.mysql.username" . }}
+{{- end }}
+
+To check the status of your deployment:
+  kubectl get pods -n {{ .Release.Namespace }} -l app.kubernetes.io/instance={{ .Release.Name }}
+
+To view logs:
+  kubectl logs -n {{ .Release.Namespace }} -l app.kubernetes.io/name={{ include "classic-models-api.name" . }} -f
+
+{{- if .Values.autoscaling.enabled }}
+
+Autoscaling is enabled:
+  - Min replicas: {{ .Values.autoscaling.minReplicas }}
+  - Max replicas: {{ .Values.autoscaling.maxReplicas }}
+{{- end }}
