@@ -104,8 +104,6 @@ spec:
             secretKeyRef:
               name: {{ include "classic-models-api.fullname" . }}
               key: mysql-password
-        - name: DATABASE_URL
-          value: "mysql://$(MYSQL_USER):$(MYSQL_PASSWORD)@$(MYSQL_HOST):$(MYSQL_PORT)/$(MYSQL_DATABASE)"
         {{- if .Values.livenessProbe }}
         livenessProbe:
           {{- toYaml .Values.livenessProbe | nindent 12 }}

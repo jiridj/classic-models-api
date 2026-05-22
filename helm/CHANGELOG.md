@@ -16,6 +16,12 @@
   - Probes now work correctly without authentication credentials
 
 ### Fixed
+- **Security - Password Leakage**: Removed DATABASE_URL environment variable to prevent password exposure
+  - DATABASE_URL contained password in plain text: `mysql://user:password@host:port/db`
+  - Django error traces would expose this URL including the password
+  - Django uses individual environment variables (MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, etc.)
+  - Removed unnecessary DATABASE_URL to eliminate security risk
+
 - **Init Container**: Fixed shell variable expansion issue in wait-for-mysql init container
   - Changed from inline template substitution to environment variables
   - Prevents "bad address" errors with hostnames containing special characters

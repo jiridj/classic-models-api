@@ -14,6 +14,18 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key")
 DEBUG = os.environ.get("DEBUG", "0") == "1"
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
 
+# Security: Hide sensitive settings in error reports
+# These settings will be masked in error traces and debug pages
+SECURE_SETTINGS_HIDDEN_VARS = [
+    'SECRET_KEY',
+    'MYSQL_PASSWORD',
+    'DATABASE_URL',
+    'API_KEY',
+    'PASSWORD',
+    'TOKEN',
+    'SECRET',
+]
+
 # Base path configuration
 # All URLs are served under /classic-models base path
 # This simplifies reverse proxy configuration (no need to strip prefix)
