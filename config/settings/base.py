@@ -186,25 +186,31 @@ SPECTACULAR_SETTINGS = {
 }
 
 # JWT Settings
+JWT_ISSUER = os.environ.get("JWT_ISSUER")
+JWT_AUDIENCE = os.environ.get("JWT_AUDIENCE")
+JWT_PRIVATE_KEY_PEM = os.environ.get("JWT_PRIVATE_KEY_PEM")
+JWT_PUBLIC_KEY_PEM = os.environ.get("JWT_PUBLIC_KEY_PEM")
+JWT_KEY_ID = os.environ.get("JWT_KEY_ID")
+
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
     "UPDATE_LAST_LOGIN": True,
-    "ALGORITHM": "HS256",
-    "SIGNING_KEY": SECRET_KEY,
-    "VERIFYING_KEY": None,
-    "AUDIENCE": None,
-    "ISSUER": None,
+    "ALGORITHM": "RS256" if (JWT_PRIVATE_KEY_PEM and JWT_PUBLIC_KEY_PEM) else "HS256",
+    "SIGNING_KEY": JWT_PRIVATE_KEY_PEM or SECRET_KEY,
+    "VERIFYING_KEY": JWT_PUBLIC_KEY_PEM,
+    "AUDIENCE": JWT_AUDIENCE,
+    "ISSUER": JWT_ISSUER,
     "JWK_URL": None,
-    "LEEWAY": 0,
+    "LEEWAY": int(os.environ.get("JWT_LEEWAY_SECONDS", "0")),
     "AUTH_HEADER_TYPES": ("Bearer",),
     "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
     "USER_ID_FIELD": "id",
     "USER_ID_CLAIM": "user_id",
     "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
-    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+    "AUTH_TOKEN_CLASSES": ("authentication.jwt_tokens.CustomAccessToken",),
     "TOKEN_TYPE_CLAIM": "token_type",
     "TOKEN_USER_CLASS": "rest_framework_simplejwt.models.TokenUser",
     "JTI_CLAIM": "jti",

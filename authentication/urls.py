@@ -8,6 +8,7 @@ from .views import (
     rate_limit_demo_view,
     signup_view,
 )
+from .well_known import jwks_view, openid_configuration_view
 
 urlpatterns = [
     path("login/", CustomTokenObtainPairView.as_view(), name="login"),
@@ -16,4 +17,10 @@ urlpatterns = [
     path("refresh/", CustomTokenRefreshView.as_view(), name="token_refresh"),
     path("me/", current_user_view, name="current_user"),
     path("rate-limit-demo/", rate_limit_demo_view, name="rate_limit_demo"),
+    path(".well-known/jwks.json", jwks_view, name="jwks"),
+    path(
+        ".well-known/openid-configuration",
+        openid_configuration_view,
+        name="openid_configuration",
+    ),
 ]

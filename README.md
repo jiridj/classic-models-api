@@ -185,8 +185,8 @@ POST /classic-models/api/auth/login/
 
 # Response
 {
-  "access": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
-  "refresh": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+  "access": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ii4uLiJ9...",
+  "refresh": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ii4uLiJ9...",
   "user": { ... }
 }
 
@@ -194,6 +194,11 @@ POST /classic-models/api/auth/login/
 curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   http://localhost:8000/classic-models/api/v1/products/
 ```
+
+Gateway-friendly validation endpoints:
+
+- `GET /classic-models/api/auth/.well-known/jwks.json` (JWKS for RS256 validation)
+- `GET /classic-models/api/auth/.well-known/openid-configuration` (minimal OIDC discovery)
 
 #### 2. API Key Authentication (System-Level Access)
 
@@ -233,8 +238,10 @@ API_KEY=your-secure-api-key-here
 - `GET /classic-models/api/redoc/` - ReDoc documentation
 - `GET /classic-models/api/schema/` - OpenAPI schema
 - `POST /classic-models/api/auth/login/` - User login
-- `POST /classic-models/api/auth/register/` - User registration
+- `POST /classic-models/api/auth/signup/` - User registration
 - `POST /classic-models/api/auth/refresh/` - Token refresh
+- `GET /classic-models/api/auth/.well-known/jwks.json` - JWKS (public key set)
+- `GET /classic-models/api/auth/.well-known/openid-configuration` - OIDC discovery (minimal)
 
 #### Protected Endpoints (JWT Required)
 - `GET /classic-models/api/auth/me/` - Current user info
@@ -326,9 +333,11 @@ The collection uses Bearer token authentication configured at the collection lev
 
 #### Endpoints Without Authentication
 - API Documentation (`/api/docs/`, `/api/schema/`, `/api/redoc/`)
-- Register User (`/api/auth/register/`)
+- Register User (`/api/auth/signup/`)
 - Login User (`/api/auth/login/`)
 - Refresh Token (`/api/auth/refresh/`)
+- JWKS (`/api/auth/.well-known/jwks.json`)
+- OIDC discovery (`/api/auth/.well-known/openid-configuration`)
 
 #### Endpoints With Authentication (Inherit from Collection)
 - Get Current User (`/api/auth/me/`)

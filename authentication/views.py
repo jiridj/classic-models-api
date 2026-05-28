@@ -24,6 +24,8 @@ from .serializers import (
     SignupResponseSerializer,
     UserSerializer,
 )
+from .jwt_tokens import mint_refresh_for_user
+from .jwt_serializers import CustomTokenRefreshSerializer
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
@@ -47,7 +49,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.validated_data["user"]
-            refresh = RefreshToken.for_user(user)
+            refresh = mint_refresh_for_user(user)
 
             return Response(
                 {
@@ -65,6 +67,7 @@ class CustomTokenRefreshView(TokenRefreshView):
     """Custom token refresh view with throttling."""
 
     throttle_classes = [TokenRefreshThrottle]
+    serializer_class = CustomTokenRefreshSerializer
 
     @extend_schema(
         operation_id="token_refresh",

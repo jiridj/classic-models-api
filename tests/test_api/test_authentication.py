@@ -3,6 +3,8 @@ Tests for authentication API endpoints.
 """
 
 import pytest
+import jwt
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
@@ -125,6 +127,21 @@ class TestAuthenticationAPI:
         assert "user" in response.data
         assert response.data["user"]["username"] == user.username
         assert response.data["user"]["email"] == user.email
+
+        # Token should include issuer/audience and kid header for gateway validation.
+        access = response.data["access"]
+        header = jwt.get_unverified_header(access)
+        assert "kid" in header
+
+        decoded = jwt.decode(
+            access,
+            key=settings.JWT_PUBLIC_KEY_PEM,
+            algorithms=["RS256"],
+            audience=settings.JWT_AUDIENCE,
+            issuer=settings.JWT_ISSUER,
+        )
+        assert decoded["iss"] == settings.JWT_ISSUER
+        assert decoded["aud"] == settings.JWT_AUDIENCE
 
     @pytest.mark.django_db
     def test_login_invalid_credentials(self, api_client):
@@ -270,6 +287,18 @@ class TestAuthenticationAPI:
 
         assert response.status_code == status.HTTP_200_OK
         assert "access" in response.data
+
+        header = jwt.get_unverified_header(response.data["access"])
+        assert "kid" in header
+
+    @pytest.mark.django_db
+    def test_jwks_endpoint_publishes_key(self, api_client):
+        url = reverse("jwks")
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        assert "keys" in response.data
+        assert len(response.data["keys"]) == 1
+        assert response.data["keys"][0]["kid"] == settings.JWT_KEY_ID
 
     @pytest.mark.django_db
     def test_token_refresh_invalid_token(self, api_client):
