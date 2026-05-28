@@ -68,6 +68,35 @@ EOF
 
 ## Step 4: Configure Environment Variables
 
+### 4.0 Generate RS256 JWT keys (recommended)
+
+If you want the API to issue **RS256** JWTs and publish a usable **JWKS** for gateways, generate an RSA keypair on the NAS and mount it into the API container.
+
+Generate keys (do **not** store these in the repo):
+
+```bash
+mkdir -p /share/Container/classic-models-api/secrets/jwt
+cd /share/Container/classic-models-api/secrets/jwt
+
+# Generate 2048-bit RSA keypair
+openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out jwt_private.pem
+openssl rsa -in jwt_private.pem -pubout -out jwt_public.pem
+
+# Lock down permissions
+chmod 600 jwt_private.pem
+chmod 644 jwt_public.pem
+```
+
+Then ensure your `docker-compose.nas.yml` mounts these files into the API container as:
+
+- `/run/secrets/jwt_private.pem`
+- `/run/secrets/jwt_public.pem`
+
+And set in `.env`:
+
+- `JWT_PRIVATE_KEY_FILE=/run/secrets/jwt_private.pem`
+- `JWT_PUBLIC_KEY_FILE=/run/secrets/jwt_public.pem`
+
 ### 4.1 Create environment file
 
 ```bash
