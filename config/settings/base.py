@@ -7,7 +7,7 @@ BASE_DIR = Path(__file__).resolve().parents[2]
 
 def get_version():
     """Get version from environment variable or default."""
-    return os.environ.get("API_VERSION", "4.6.2")
+    return os.environ.get("API_VERSION", "4.7.0")
 
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key")
@@ -145,14 +145,6 @@ SPECTACULAR_SETTINGS = {
         "- **Access**: Full read/write/delete permissions\n"
         "- **Configuration**: Set `API_KEY` environment variable\n"
         "- **Use Case**: Automated scripts, testing, system integrations\n\n"
-        "## Demo Credentials\n\n"
-        "### JWT Authentication\n"
-        "For testing JWT authentication:\n"
-        "- **Username**: `demo`\n"
-        "- **Password**: `demo123`\n\n"
-        "### API Key Authentication\n"
-        "For testing API key authentication:\n"
-        "- **Demo API Key**: `GzIGzQD0pdtAi2LvYZCvJDhZZH2w87AaPZI_hFlF5BY`\n\n"
         "## Base Path\n\n"
         "All endpoints are served at `/classic-models` base path.\n\n"
         "## Public Endpoints\n\n"
@@ -198,25 +190,44 @@ SPECTACULAR_SETTINGS = {
 }
 
 # JWT Settings
+def _read_optional_file(path: str | None) -> str | None:
+    if not path:
+        return None
+    try:
+        return Path(path).read_text(encoding="utf-8")
+    except OSError:
+        return None
+
+
+JWT_ISSUER = os.environ.get("JWT_ISSUER")
+JWT_AUDIENCE = os.environ.get("JWT_AUDIENCE")
+JWT_PRIVATE_KEY_PEM = os.environ.get("JWT_PRIVATE_KEY_PEM") or _read_optional_file(
+    os.environ.get("JWT_PRIVATE_KEY_FILE")
+)
+JWT_PUBLIC_KEY_PEM = os.environ.get("JWT_PUBLIC_KEY_PEM") or _read_optional_file(
+    os.environ.get("JWT_PUBLIC_KEY_FILE")
+)
+JWT_KEY_ID = os.environ.get("JWT_KEY_ID")
+
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
     "UPDATE_LAST_LOGIN": True,
-    "ALGORITHM": "HS256",
-    "SIGNING_KEY": SECRET_KEY,
-    "VERIFYING_KEY": None,
-    "AUDIENCE": None,
-    "ISSUER": None,
+    "ALGORITHM": "RS256" if (JWT_PRIVATE_KEY_PEM and JWT_PUBLIC_KEY_PEM) else "HS256",
+    "SIGNING_KEY": JWT_PRIVATE_KEY_PEM or SECRET_KEY,
+    "VERIFYING_KEY": JWT_PUBLIC_KEY_PEM,
+    "AUDIENCE": JWT_AUDIENCE,
+    "ISSUER": JWT_ISSUER,
     "JWK_URL": None,
-    "LEEWAY": 0,
+    "LEEWAY": int(os.environ.get("JWT_LEEWAY_SECONDS", "0")),
     "AUTH_HEADER_TYPES": ("Bearer",),
     "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
     "USER_ID_FIELD": "id",
     "USER_ID_CLAIM": "user_id",
     "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
-    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+    "AUTH_TOKEN_CLASSES": ("authentication.jwt_tokens.CustomAccessToken",),
     "TOKEN_TYPE_CLAIM": "token_type",
     "TOKEN_USER_CLASS": "rest_framework_simplejwt.models.TokenUser",
     "JTI_CLAIM": "jti",

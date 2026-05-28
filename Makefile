@@ -56,7 +56,8 @@ stop: ## Stop the containers
 
 test: ## Run the test suite
 	@echo "$(BLUE)Running test suite...$(NC)"
-	pytest
+	@docker-compose up -d
+	@docker-compose exec -T api pytest
 	@echo "$(GREEN)✓ All tests completed$(NC)"
 
 postman-test: ## Run Postman collection tests

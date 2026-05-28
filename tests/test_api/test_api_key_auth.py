@@ -61,6 +61,15 @@ class TestApiKeyAuthentication:
     def test_api_key_grants_full_access(self):
         """Test that API key grants full access to protected endpoints"""
         with patch.dict(os.environ, {"API_KEY": self.test_api_key}):
+            # Ensure referenced ProductLine exists in test DB
+            from classicmodels.models import ProductLine
+
+            ProductLine.objects.create(
+                productline="Classic Cars",
+                textdescription="Classic cars",
+                htmldescription="<p>Classic cars</p>",
+            )
+
             # Test GET (read)
             response = self.client.get(
                 self.products_url, HTTP_X_API_KEY=self.test_api_key
@@ -69,15 +78,15 @@ class TestApiKeyAuthentication:
 
             # Test POST (create) - should have permission
             product_data = {
-                "productCode": "TEST_API_KEY_001",
-                "productName": "Test Product via API Key",
-                "productLine": "Classic Cars",
-                "productScale": "1:10",
-                "productVendor": "Test Vendor",
-                "productDescription": "Test product created with API key",
-                "quantityInStock": 100,
-                "buyPrice": "50.00",
-                "MSRP": "75.00",
+                "productcode": "TSTKEY0001",
+                "productname": "Test Product via API Key",
+                "productline": "Classic Cars",
+                "productscale": "1:10",
+                "productvendor": "Test Vendor",
+                "productdescription": "Test product created with API key",
+                "quantityinstock": 100,
+                "buyprice": "50.00",
+                "msrp": "75.00",
             }
             response = self.client.post(
                 self.products_url,
@@ -85,7 +94,7 @@ class TestApiKeyAuthentication:
                 format="json",
                 HTTP_X_API_KEY=self.test_api_key,
             )
-            assert response.status_code == status.HTTP_201_CREATED
+            assert response.status_code == status.HTTP_201_CREATED, response.data
 
     def test_api_key_works_alongside_jwt(self):
         """Test that API key authentication works as alternative to JWT"""

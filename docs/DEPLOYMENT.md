@@ -4,7 +4,7 @@
 
 This application is **always** served at the `/classic-models` base path in all environments. This simplifies reverse proxy configuration and ensures consistent URLs across local development and production.
 
-> **Note**: For local development setup, see the [Quick Start](README.md#-quick-start) section in the main README. For QNAP NAS deployment, see [NAS_DEPLOYMENT.md](NAS_DEPLOYMENT.md).
+> **Note**: For local development setup, see the [Quick Start](../README.md#-quick-start) section in the main README. For QNAP NAS deployment, see [NAS_DEPLOYMENT.md](NAS_DEPLOYMENT.md).
 
 ## Base Path
 
@@ -31,39 +31,18 @@ open http://localhost:8000/classic-models/api/docs/
 curl http://localhost:8000/classic-models/api/auth/login/
 ```
 
-### 2. AWS Production (ECS Fargate)
+### 2. Production (VPS NGINX reverse proxy)
 
-**Direct Access**: `http://[aws-ip]:8000/classic-models`  
-**Via Traefik Proxy**: `https://router.jiridj.be/classic-models`
+**Public Access**: `https://jiridj.be/classic-models`
 
-Both access methods use the same base path, which simplifies Traefik configuration.
+In production, traffic terminates TLS on your VPS (Let's Encrypt), and NGINX proxies requests to your upstream deployment (e.g. QNAP via myqnapcloud).
 
-## Traefik Reverse Proxy Configuration
+#### NGINX configuration notes
 
-**Critical**: Configure Traefik to **NOT strip the prefix**
+- Do **not** strip the `/classic-models` prefix. Forward the full request URI upstream.
+- Forward `Host` and `X-Forwarded-Proto https` so Django can build correct absolute URLs (for the OIDC discovery doc and Swagger servers list).
 
-```yaml
-# Traefik configuration (do NOT use strip_prefix)
-routers:
-  classic-models:
-    rule: "PathPrefix(`/classic-models`)"
-    service: classic-models-service
-
-services:
-  classic-models-service:
-    loadBalancer:
-      servers:
-        - url: "http://aws-ip:8000"
-```
-
-**How it works:**
-1. Client requests: `https://router.jiridj.be/classic-models/api/docs/`
-2. Traefik matches: PathPrefix `/classic-models`
-3. Traefik forwards: `http://aws-ip:8000/classic-models/api/docs/` (full path)
-4. Django receives: `/classic-models/api/docs/`
-5. Django routes correctly ✅
-
-## Environment Variables for AWS Deployment
+## Environment variables (production)
 
 ```bash
 # Database Configuration
@@ -76,10 +55,15 @@ MYSQL_PASSWORD=<your-password>
 # Django Configuration
 DEBUG=0
 SECRET_KEY=<your-secret-key>
-ALLOWED_HOSTS=router.jiridj.be,<your-aws-domain>,<your-aws-ip>
+ALLOWED_HOSTS=jiridj.be,<your-upstream-host>,localhost
 
-# Proxy support is enabled by default in settings
-# No additional environment variables needed!
+# JWT (RS256 + JWKS) for API gateways (recommended)
+JWT_ISSUER=https://jiridj.be/classic-models
+JWT_AUDIENCE=classic-models-api
+JWT_PRIVATE_KEY_FILE=/run/secrets/jwt_private.pem
+JWT_PUBLIC_KEY_FILE=/run/secrets/jwt_public.pem
+
+# Proxy support is enabled by default in settings (X-Forwarded-* headers)
 ```
 
 ## Testing Different Access Methods
@@ -98,26 +82,18 @@ curl -X POST http://localhost:8000/classic-models/api/auth/login/ \
 curl http://localhost:8000/classic-models/api/v1/products/
 ```
 
-### AWS Direct Access
+### Production via VPS (NGINX)
 ```bash
 # API Documentation
-curl http://aws-ip:8000/classic-models/api/docs/
+curl https://jiridj.be/classic-models/api/docs/
 
 # Login
-curl -X POST http://aws-ip:8000/classic-models/api/auth/login/ \
+curl -X POST https://jiridj.be/classic-models/api/auth/login/ \
   -H "Content-Type: application/json" \
   -d '{"username": "demo", "password": "demo123"}'
-```
 
-### AWS via Traefik Proxy
-```bash
-# API Documentation
-curl https://router.jiridj.be/classic-models/api/docs/
-
-# Login
-curl -X POST https://router.jiridj.be/classic-models/api/auth/login/ \
-  -H "Content-Type: application/json" \
-  -d '{"username": "demo", "password": "demo123"}'
+# JWKS (public key set)
+curl https://jiridj.be/classic-models/api/auth/.well-known/jwks.json
 ```
 
 ## Troubleshooting
@@ -130,15 +106,6 @@ curl -X POST https://router.jiridj.be/classic-models/api/auth/login/ \
 
 ❌ Wrong: `http://localhost:8000/api/docs/`  
 ✅ Correct: `http://localhost:8000/classic-models/api/docs/`
-
-### Issue: Traefik returns 404
-
-**Symptoms**: Direct access works but Traefik returns 404
-
-**Solutions**:
-1. Verify Traefik PathPrefix rule: `PathPrefix(\`/classic-models\`)`
-2. Ensure Traefik is NOT using `strip_prefix`
-3. Check Traefik is forwarding the full path to Django
 
 ### Issue: API docs redirect incorrectly
 
@@ -153,7 +120,7 @@ curl -X POST https://router.jiridj.be/classic-models/api/auth/login/ \
 
 **Symptoms**: Browser shows CORS errors when accessing through Traefik
 
-**Solution**: Ensure `ALLOWED_HOSTS` includes the Traefik domain: `router.jiridj.be`
+**Solution**: Ensure `ALLOWED_HOSTS` includes your public domain: `jiridj.be`
 
 ## Postman Testing
 
@@ -169,15 +136,14 @@ Both environments use the same `/classic-models` base path.
 
 ## Summary
 
-| Access Method | Full URL Example | Traefik Config |
-|---------------|------------------|----------------|
-| **Local Dev** | `http://localhost:8000/classic-models/api/docs/` | N/A |
-| **AWS Direct** | `http://aws-ip:8000/classic-models/api/docs/` | N/A |
-| **AWS via Traefik** | `https://router.jiridj.be/classic-models/api/docs/` | PathPrefix, NO strip_prefix |
+| Access Method | Full URL Example |
+|---------------|------------------|
+| **Local Dev** | `http://localhost:8000/classic-models/api/docs/` |
+| **Production via VPS (NGINX)** | `https://jiridj.be/classic-models/api/docs/` |
 
 **Key Benefits:**
 - ✅ Consistent URL structure across all environments
-- ✅ Simple Traefik configuration (no prefix stripping needed)
+- ✅ Simple NGINX configuration (no prefix stripping needed)
 - ✅ No environment variable configuration for base path
 - ✅ Works with direct access and reverse proxy
 - ✅ Easier to reason about and debug

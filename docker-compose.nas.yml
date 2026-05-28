@@ -35,6 +35,12 @@ services:
       - SECRET_KEY=${SECRET_KEY:-your-secret-key-here}
       - ALLOWED_HOSTS=${ALLOWED_HOSTS:-*}
       - API_KEY=${API_KEY}
+      - JWT_ISSUER=${JWT_ISSUER}
+      - JWT_AUDIENCE=${JWT_AUDIENCE}
+      - JWT_LEEWAY_SECONDS=${JWT_LEEWAY_SECONDS:-0}
+      - JWT_PRIVATE_KEY_FILE=${JWT_PRIVATE_KEY_FILE:-/run/secrets/jwt_private.pem}
+      - JWT_PUBLIC_KEY_FILE=${JWT_PUBLIC_KEY_FILE:-/run/secrets/jwt_public.pem}
+      - JWT_KEY_ID=${JWT_KEY_ID:-}
       - DATABASE_URL=mysql://${MYSQL_USER:-classicuser}:${MYSQL_PASSWORD:-classicpass}@mysql:3306/${MYSQL_DATABASE:-classicmodels}
       - MYSQL_HOST=mysql
       - MYSQL_PORT=3306
@@ -46,6 +52,9 @@ services:
         condition: service_healthy
     networks:
       - classic-models-network
+    volumes:
+      - ./secrets/jwt/jwt_private.pem:/run/secrets/jwt_private.pem:ro
+      - ./secrets/jwt/jwt_public.pem:/run/secrets/jwt_public.pem:ro
 
 volumes:
   mysql_data:

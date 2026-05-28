@@ -68,6 +68,35 @@ EOF
 
 ## Step 4: Configure Environment Variables
 
+### 4.0 Generate RS256 JWT keys (recommended)
+
+If you want the API to issue **RS256** JWTs and publish a usable **JWKS** for gateways, generate an RSA keypair on the NAS and mount it into the API container.
+
+Generate keys (do **not** store these in the repo):
+
+```bash
+mkdir -p /share/Container/classic-models-api/secrets/jwt
+cd /share/Container/classic-models-api/secrets/jwt
+
+# Generate 2048-bit RSA keypair
+openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out jwt_private.pem
+openssl rsa -in jwt_private.pem -pubout -out jwt_public.pem
+
+# Lock down permissions
+chmod 600 jwt_private.pem
+chmod 644 jwt_public.pem
+```
+
+Then ensure your `docker-compose.nas.yml` mounts these files into the API container as:
+
+- `/run/secrets/jwt_private.pem`
+- `/run/secrets/jwt_public.pem`
+
+And set in `.env`:
+
+- `JWT_PRIVATE_KEY_FILE=/run/secrets/jwt_private.pem`
+- `JWT_PUBLIC_KEY_FILE=/run/secrets/jwt_public.pem`
+
 ### 4.1 Create environment file
 
 ```bash
@@ -85,6 +114,13 @@ GITHUB_REPOSITORY=your-username/classic-models-api
 DEBUG=0
 SECRET_KEY=your-very-secure-secret-key-here-change-this
 ALLOWED_HOSTS=your-nas-ip,your-domain.com,localhost
+
+# JWT (RS256 + JWKS) for API gateways (recommended)
+# Use the public URL clients will call through your reverse proxy.
+JWT_ISSUER=https://your-domain.com/classic-models
+JWT_AUDIENCE=classic-models-api
+JWT_PRIVATE_KEY_FILE=/run/secrets/jwt_private.pem
+JWT_PUBLIC_KEY_FILE=/run/secrets/jwt_public.pem
 
 # MySQL Configuration
 MYSQL_ROOT_PASSWORD=your-secure-root-password
