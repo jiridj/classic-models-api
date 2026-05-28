@@ -1,0 +1,32 @@
+# Global settings
+global:
+  openshift: true
+
+# API Application Configuration
+replicaCount: 2
+
+image:
+  repository: ghcr.io/fabien-sanglier-ibm/classic-models-api
+  pullPolicy: IfNotPresent
+  tag: v4.6.3-1
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# Resource limits for production
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 200m
+    memory: 512Mi
+
+# Enable autoscaling
+autoscaling:
+  enabled: false
+
+# Route configuration (OpenShift)
+route:
+  enabled: true
