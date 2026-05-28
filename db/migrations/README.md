@@ -2,7 +2,7 @@
 
 This directory contains migration scripts for database schema changes.
 
-> **Note**: For general project information, see [README.md](../../README.md). For deployment instructions, see [DEPLOYMENT.md](../../DEPLOYMENT.md).
+> **Note**: For general project information, see [README.md](../../README.md). For deployment instructions, see [`docs/DEPLOYMENT.md`](../../docs/DEPLOYMENT.md).
 
 ## Migration: Add ID Columns (v4.1.0)
 

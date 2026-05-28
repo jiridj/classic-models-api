@@ -171,9 +171,9 @@ def django_client():
 @pytest.fixture
 def authenticated_api_client(api_client, user):
     """API client with authentication."""
-    from rest_framework_simplejwt.tokens import RefreshToken
+    from authentication.jwt_tokens import mint_refresh_for_user
 
-    refresh = RefreshToken.for_user(user)
+    refresh = mint_refresh_for_user(user)
     api_client.credentials(HTTP_AUTHORIZATION=f"Bearer {refresh.access_token}")
     return api_client
 

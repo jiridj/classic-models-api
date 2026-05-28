@@ -111,6 +111,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # REST Framework configuration
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
+        "authentication.api_key_auth.ApiKeyAuthentication",
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
@@ -131,18 +132,62 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_RATES": {},
 }
 
+# Enable API key auth tests
+os.environ.setdefault("API_KEY", "test-api-key-12345")
+
 # JWT Configuration
+JWT_ISSUER = "https://classic-models.test/issuer"
+JWT_AUDIENCE = "classic-models-api"
+JWT_KEY_ID = "test-key-1"
+JWT_PRIVATE_KEY_PEM = """-----BEGIN PRIVATE KEY-----
+MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDP2B+0CX+vtS0G
+qJybQVK5WrW6G86LUAmVp+ftdXkSc0UwJDwTimEDuu1pIrOJHgvvuCzaiLR7HQvV
+OtTNDp4EC9ZSPLTLc6V+ncNKHNA7AWW3kU1dpmlAsbxZJdWcjRdL6XLSpOinKeDV
+QJMAfmVtyf5HMtEKhirUEd8pHu3APWM9ZgQlot44+3kWzAP1Rk23O89IyBuzQnGa
+e9sLSGuGH9VjyZCmb6+O21iS9YPOijDZklHVg6A6ksrhYoJSpPjZFrhCwkfMXG2Z
+6vqHbJ5UkXZtWokTbgUx0BHtvyJFJog42SpEV1qk6DNL5kbsweaCIZ/hQxu0Dby6
+zMu7yPEXAgMBAAECggEARZcQbmBrzzHzRHJ6FQWXJBZ6GDktO7ntq50Pa5NUmVfd
+B5RqRQSlHPGeggArarKTvozE/9qby0jbaGaNT6cgQyyPcvN+eUxcUfuSoqLpGYiL
+PR46cCvCu/WGobaoQgV/klw0pNCwUSAVdnFrhtPLNCpYqBAcq9BmUKE3PfZsFlwc
+gTonYab+kmKX9xPrvPKVmv3IloWVKCkGKcXLfWNfpIm0A7S1fnmDRZIm/D7vHD8K
+oiA5w6VFXYZgrlLz6LJyhfOx6Ml8/AzzoeNMljIsP57v14r0qZf+NRK1dKIfwaUq
+kqB38SKyVrEr3VRk23T7lBuGoBJGoZRIT6+fpPTp2QKBgQD6B4BnoDxNO1bOKXFy
+0awcIgNpf+qsmCLhtPJSYa2+5A0XHrQuyDWk+g/QnPHIEoeTmrxFBB34YMz171Qg
+kkEAg8+p6upmyxYPWX4TBZeMZ3BWMZfjmLwEExKLBMTUB4s8CZ7MaAJojVJDlzjn
+Uv4kjMtmUCkDusHnMzlfmJ5kywKBgQDUzru1pze7618VhFgYhQyx36kIIiK/vJwx
+SG93tXWEEcPe4ocDNwJoBJpKpf6Plf+p+8E/9EGnBlSa610j6TgrzSwthbYwP/XQ
+ZkLORDxKdA0ltg1Jb2T44fhVBQ1vLZnZMHbT9FuIIbHWGnoVvb8OO8RNYaG4otkJ
+P3ojFgjnZQKBgEY0iQeP5J7DBLLKzEIzQaJ8onyjIF/qMBE0X75mEwVAv7Q4ONvR
+984lMP+gsfs9yLfXgPnYGBpABA0icHrc1kewu0S446yNZdpVhKMOtOkFunNZZY7Q
+uipiuJg0dJgcrinjgaVfpx14YRr9gUri8N2OcyZ9Z6bWb8/dgESpdABVAoGARK1L
+Cr6iT/UPxIPnYlJd3HGPvV421KXrykPUJU/cUvjgu2djpvfzwNnraTfUxUXlMlha
+72bGYT67wxs9/b7gL9KQ9Uf3me6qR80YtjRzOJvnOkpcU1ytu1xBpj5xLXYL9nmb
+f5+WgoJNQAlfaPDJXbCQE2D0rf9wB3oC0pvj17kCgYEA3z+jh5zwsHJpkzg3lGTX
+2XzmZKuJFs307khp44ILct4kNK074JtCUaYbExMlo5pCodZL5w8rDmz2ZZBpR4qN
+fzpGCVu+Ng+I0bEk/3Iy/ZYBXVdQFt6j5YAh1+nolOm4VLuDHWoCc9CwrHAr5Wz7
+uhOgHUkMCho7H5vzHf0qTNQ=
+-----END PRIVATE KEY-----"""
+JWT_PUBLIC_KEY_PEM = """-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAz9gftAl/r7UtBqicm0FS
+uVq1uhvOi1AJlafn7XV5EnNFMCQ8E4phA7rtaSKziR4L77gs2oi0ex0L1TrUzQ6e
+BAvWUjy0y3Olfp3DShzQOwFlt5FNXaZpQLG8WSXVnI0XS+ly0qTopyng1UCTAH5l
+bcn+RzLRCoYq1BHfKR7twD1jPWYEJaLeOPt5FswD9UZNtzvPSMgbs0JxmnvbC0hr
+hh/VY8mQpm+vjttYkvWDzoow2ZJR1YOgOpLK4WKCUqT42Ra4QsJHzFxtmer6h2ye
+VJF2bVqJE24FMdAR7b8iRSaIONkqRFdapOgzS+ZG7MHmgiGf4UMbtA28uszLu8jx
+FwIDAQAB
+-----END PUBLIC KEY-----"""
+
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
     "UPDATE_LAST_LOGIN": False,
-    "ALGORITHM": "HS256",
-    "SIGNING_KEY": SECRET_KEY,
-    "VERIFYING_KEY": None,
-    "AUDIENCE": None,
-    "ISSUER": None,
+    "ALGORITHM": "RS256",
+    "SIGNING_KEY": JWT_PRIVATE_KEY_PEM,
+    "VERIFYING_KEY": JWT_PUBLIC_KEY_PEM,
+    "AUDIENCE": JWT_AUDIENCE,
+    "ISSUER": JWT_ISSUER,
     "JWK_URL": None,
     "LEEWAY": 0,
     "AUTH_HEADER_TYPES": ("Bearer",),
@@ -150,7 +195,7 @@ SIMPLE_JWT = {
     "USER_ID_FIELD": "id",
     "USER_ID_CLAIM": "user_id",
     "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
-    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+    "AUTH_TOKEN_CLASSES": ("authentication.jwt_tokens.CustomAccessToken",),
     "TOKEN_TYPE_CLAIM": "token_type",
     "JTI_CLAIM": "jti",
     "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",

@@ -48,11 +48,11 @@ class TestOrderDetailAPI:
     def test_retrieve_order_detail_authenticated(
         self, authenticated_api_client, order_detail
     ):
-        """Test retrieving order details by order number when authenticated."""
+        """Test retrieving order details for an order when authenticated."""
         url = reverse(
-            "classicmodels:orderdetail-detail",
+            "classicmodels:order-order-details",
             kwargs={
-                "orderNumber": order_detail.ordernumber.ordernumber,
+                "ordernumber": order_detail.ordernumber.ordernumber,
             },
         )
         response = authenticated_api_client.get(url)
@@ -72,9 +72,9 @@ class TestOrderDetailAPI:
     def test_retrieve_order_detail_unauthenticated(self, api_client, order_detail):
         """Test retrieving order details when not authenticated."""
         url = reverse(
-            "classicmodels:orderdetail-detail",
+            "classicmodels:order-order-details",
             kwargs={
-                "orderNumber": order_detail.ordernumber.ordernumber,
+                "ordernumber": order_detail.ordernumber.ordernumber,
             },
         )
         response = api_client.get(url)
@@ -85,8 +85,8 @@ class TestOrderDetailAPI:
     def test_retrieve_nonexistent_order_detail(self, authenticated_api_client):
         """Test retrieving order details for a non-existent order."""
         url = reverse(
-            "classicmodels:orderdetail-detail",
-            kwargs={"orderNumber": 99999},
+            "classicmodels:order-order-details",
+            kwargs={"ordernumber": 99999},
         )
         response = authenticated_api_client.get(url)
 
@@ -229,7 +229,7 @@ class TestOrderDetailAPI:
     ):
         """Test updating an order detail when authenticated."""
         url = reverse(
-            "classicmodels:orderdetail-item-detail",
+            "classicmodels:orderdetail-detail",
             kwargs={
                 "orderNumber": order_detail.ordernumber.ordernumber,
                 "productCode": order_detail.productcode.productcode,
@@ -253,7 +253,7 @@ class TestOrderDetailAPI:
     def test_update_order_detail_unauthenticated(self, api_client, order_detail):
         """Test updating an order detail when not authenticated."""
         url = reverse(
-            "classicmodels:orderdetail-item-detail",
+            "classicmodels:orderdetail-detail",
             kwargs={
                 "orderNumber": order_detail.ordernumber.ordernumber,
                 "productCode": order_detail.productcode.productcode,
@@ -277,7 +277,7 @@ class TestOrderDetailAPI:
     ):
         """Test partially updating an order detail when authenticated."""
         url = reverse(
-            "classicmodels:orderdetail-item-detail",
+            "classicmodels:orderdetail-detail",
             kwargs={
                 "orderNumber": order_detail.ordernumber.ordernumber,
                 "productCode": order_detail.productcode.productcode,
@@ -300,7 +300,7 @@ class TestOrderDetailAPI:
     ):
         """Test partially updating an order detail when not authenticated."""
         url = reverse(
-            "classicmodels:orderdetail-item-detail",
+            "classicmodels:orderdetail-detail",
             kwargs={
                 "orderNumber": order_detail.ordernumber.ordernumber,
                 "productCode": order_detail.productcode.productcode,
@@ -318,7 +318,7 @@ class TestOrderDetailAPI:
     ):
         """Test deleting an order detail when authenticated."""
         url = reverse(
-            "classicmodels:orderdetail-item-detail",
+            "classicmodels:orderdetail-detail",
             kwargs={
                 "orderNumber": order_detail.ordernumber.ordernumber,
                 "productCode": order_detail.productcode.productcode,
@@ -335,7 +335,7 @@ class TestOrderDetailAPI:
     def test_delete_order_detail_unauthenticated(self, api_client, order_detail):
         """Test deleting an order detail when not authenticated."""
         url = reverse(
-            "classicmodels:orderdetail-item-detail",
+            "classicmodels:orderdetail-detail",
             kwargs={
                 "orderNumber": order_detail.ordernumber.ordernumber,
                 "productCode": order_detail.productcode.productcode,
@@ -349,7 +349,7 @@ class TestOrderDetailAPI:
     def test_delete_nonexistent_order_detail(self, authenticated_api_client, order):
         """Test deleting an order detail that doesn't exist."""
         url = reverse(
-            "classicmodels:orderdetail-item-detail",
+            "classicmodels:orderdetail-detail",
             kwargs={"orderNumber": order.ordernumber, "productCode": "NONEXISTENT"},
         )
         response = authenticated_api_client.delete(url)
@@ -834,9 +834,9 @@ class TestOrderDetailAPI:
     ):
         """Test order detail relationships in API response."""
         url = reverse(
-            "classicmodels:orderdetail-detail",
+            "classicmodels:order-order-details",
             kwargs={
-                "orderNumber": order_detail.ordernumber.ordernumber,
+                "ordernumber": order_detail.ordernumber.ordernumber,
             },
         )
         response = authenticated_api_client.get(url)

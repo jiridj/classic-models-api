@@ -306,7 +306,7 @@ docker-compose exec web python manage.py shell
 - **Authentication Class**: `authentication/api_key_auth.py`
 - **Settings Configuration**: `config/settings/base.py`
 - **Tests**: `tests/test_api/test_api_key_auth.py`
-- **Documentation**: `README.md`, `API_KEY_AUTHENTICATION.md`
+- **Documentation**: `README.md`, `docs/API_KEY_AUTHENTICATION.md`
 
 ## API Documentation
 
