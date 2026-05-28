@@ -31,6 +31,7 @@ This demo application showcases a complete REST API implementation using Django 
    ```bash
    git clone <repository-url>
    cd classic-models-api
+   cp env.example .env
    make start
    ```
 
@@ -199,6 +200,48 @@ Gateway-friendly validation endpoints:
 
 - `GET /classic-models/api/auth/.well-known/jwks.json` (JWKS for RS256 validation)
 - `GET /classic-models/api/auth/.well-known/openid-configuration` (minimal OIDC discovery)
+
+##### RS256 keys in Docker Compose (local)
+
+For RS256, place your keypair in the repo:
+
+- `./secrets/jwt/jwt_private.pem`
+- `./secrets/jwt/jwt_public.pem`
+
+`docker-compose.yml` mounts these into the API container at:
+
+- `/run/secrets/jwt_private.pem`
+- `/run/secrets/jwt_public.pem`
+
+Then set in your `.env`:
+
+```bash
+JWT_ISSUER=http://localhost:8000/classic-models
+JWT_AUDIENCE=classic-models-api
+JWT_PRIVATE_KEY_FILE=/run/secrets/jwt_private.pem
+JWT_PUBLIC_KEY_FILE=/run/secrets/jwt_public.pem
+```
+
+Restart/recreate the container:
+
+```bash
+docker-compose up -d --force-recreate api
+```
+
+##### Verify RS256 signature with jwt.io
+
+1. Login and copy the `access` token:
+
+```bash
+curl -s -X POST "http://localhost:8000/classic-models/api/auth/login/" \
+  -H "Content-Type: application/json" \
+  -d '{"username":"demo","password":"demo123"}'
+```
+
+2. Fetch the JWKS and use the matching public key on `jwt.io`:
+
+- JWKS: `http://localhost:8000/classic-models/api/auth/.well-known/jwks.json`
+- Algorithm: `RS256`
 
 #### 2. API Key Authentication (System-Level Access)
 
@@ -393,9 +436,9 @@ The API is served at the `/classic-models` base path in all environments for con
 ### Deployment Options
 
 - **Local Development**: See [Quick Start](#-quick-start) section above
-- **Production Deployment**: See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed instructions
-- **QNAP NAS Deployment**: See [NAS_DEPLOYMENT.md](NAS_DEPLOYMENT.md) for NAS-specific setup
-- **Release Management**: See [RELEASE_MANAGEMENT.md](RELEASE_MANAGEMENT.md) for versioning and releases
+- **Production Deployment**: See [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) for detailed instructions
+- **QNAP NAS Deployment**: See [`docs/NAS_DEPLOYMENT.md`](docs/NAS_DEPLOYMENT.md) for NAS-specific setup
+- **Release Management**: See [`docs/RELEASE_MANAGEMENT.md`](docs/RELEASE_MANAGEMENT.md) for versioning and releases
 
 ## 🛠️ Development
 
@@ -479,10 +522,12 @@ make health-check
 
 ## 📚 Additional Documentation
 
-- **[DEPLOYMENT.md](DEPLOYMENT.md)** - Production deployment guide with reverse proxy configuration
-- **[NAS_DEPLOYMENT.md](NAS_DEPLOYMENT.md)** - QNAP NAS deployment instructions
-- **[RELEASE_MANAGEMENT.md](RELEASE_MANAGEMENT.md)** - Version management and release process
-- **[RATE_LIMITING.md](RATE_LIMITING.md)** - Rate limiting configuration and best practices
+- **[`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)** - Production deployment guide with reverse proxy configuration
+- **[`docs/NAS_DEPLOYMENT.md`](docs/NAS_DEPLOYMENT.md)** - QNAP NAS deployment instructions
+- **[`docs/RELEASE_MANAGEMENT.md`](docs/RELEASE_MANAGEMENT.md)** - Version management and release process
+- **[`docs/RATE_LIMITING.md`](docs/RATE_LIMITING.md)** - Rate limiting configuration and best practices
+- **[`docs/API_KEY_AUTHENTICATION.md`](docs/API_KEY_AUTHENTICATION.md)** - API key authentication docs
+- **[`docs/APIC_DATAPOWER_JWT.md`](docs/APIC_DATAPOWER_JWT.md)** - API Connect/DataPower JWT integration notes
 - **[tests/README.md](tests/README.md)** - Comprehensive testing documentation
 - **[db/migrations/README.md](db/migrations/README.md)** - Database migration guide
 

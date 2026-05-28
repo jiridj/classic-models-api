@@ -86,6 +86,13 @@ DEBUG=0
 SECRET_KEY=your-very-secure-secret-key-here-change-this
 ALLOWED_HOSTS=your-nas-ip,your-domain.com,localhost
 
+# JWT (RS256 + JWKS) for API gateways (recommended)
+# Use the public URL clients will call through your reverse proxy.
+JWT_ISSUER=https://your-domain.com/classic-models
+JWT_AUDIENCE=classic-models-api
+JWT_PRIVATE_KEY_FILE=/run/secrets/jwt_private.pem
+JWT_PUBLIC_KEY_FILE=/run/secrets/jwt_public.pem
+
 # MySQL Configuration
 MYSQL_ROOT_PASSWORD=your-secure-root-password
 MYSQL_DATABASE=classicmodels

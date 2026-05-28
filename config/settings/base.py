@@ -186,10 +186,23 @@ SPECTACULAR_SETTINGS = {
 }
 
 # JWT Settings
+def _read_optional_file(path: str | None) -> str | None:
+    if not path:
+        return None
+    try:
+        return Path(path).read_text(encoding="utf-8")
+    except OSError:
+        return None
+
+
 JWT_ISSUER = os.environ.get("JWT_ISSUER")
 JWT_AUDIENCE = os.environ.get("JWT_AUDIENCE")
-JWT_PRIVATE_KEY_PEM = os.environ.get("JWT_PRIVATE_KEY_PEM")
-JWT_PUBLIC_KEY_PEM = os.environ.get("JWT_PUBLIC_KEY_PEM")
+JWT_PRIVATE_KEY_PEM = os.environ.get("JWT_PRIVATE_KEY_PEM") or _read_optional_file(
+    os.environ.get("JWT_PRIVATE_KEY_FILE")
+)
+JWT_PUBLIC_KEY_PEM = os.environ.get("JWT_PUBLIC_KEY_PEM") or _read_optional_file(
+    os.environ.get("JWT_PUBLIC_KEY_FILE")
+)
 JWT_KEY_ID = os.environ.get("JWT_KEY_ID")
 
 SIMPLE_JWT = {

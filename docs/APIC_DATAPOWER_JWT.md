@@ -26,8 +26,10 @@ Set these environment variables for RS256 + gateway-friendly validation:
 
 - **`JWT_ISSUER`**: issuer string to place in `iss`
 - **`JWT_AUDIENCE`**: audience string to place in `aud`
-- **`JWT_PRIVATE_KEY_PEM`**: RSA private key (PEM) used to sign
-- **`JWT_PUBLIC_KEY_PEM`**: matching RSA public key (PEM) used to verify + serve via JWKS
+- **`JWT_PRIVATE_KEY_FILE`** (preferred): path to RSA private key PEM (mounted file) used to sign
+- **`JWT_PUBLIC_KEY_FILE`** (preferred): path to RSA public key PEM (mounted file) used to verify + serve via JWKS
+- **`JWT_PRIVATE_KEY_PEM`** (optional): RSA private key PEM provided directly via env var
+- **`JWT_PUBLIC_KEY_PEM`** (optional): RSA public key PEM provided directly via env var
 - **`JWT_KEY_ID`** (optional): key id to emit as JWT header `kid` and JWKS `kid`
 - **`JWT_LEEWAY_SECONDS`** (optional): clock skew leeway in seconds (0 by default)
 

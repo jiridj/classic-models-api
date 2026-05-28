@@ -151,6 +151,9 @@ static_root/
 .env.production
 .env.test
 
+# Secrets
+secrets/jwt/
+
 # Database
 *.db
 *.sqlite

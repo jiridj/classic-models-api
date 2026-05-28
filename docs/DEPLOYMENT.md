@@ -4,7 +4,7 @@
 
 This application is **always** served at the `/classic-models` base path in all environments. This simplifies reverse proxy configuration and ensures consistent URLs across local development and production.
 
-> **Note**: For local development setup, see the [Quick Start](README.md#-quick-start) section in the main README. For QNAP NAS deployment, see [NAS_DEPLOYMENT.md](NAS_DEPLOYMENT.md).
+> **Note**: For local development setup, see the [Quick Start](../README.md#-quick-start) section in the main README. For QNAP NAS deployment, see [NAS_DEPLOYMENT.md](NAS_DEPLOYMENT.md).
 
 ## Base Path
 
@@ -78,8 +78,13 @@ DEBUG=0
 SECRET_KEY=<your-secret-key>
 ALLOWED_HOSTS=router.jiridj.be,<your-aws-domain>,<your-aws-ip>
 
-# Proxy support is enabled by default in settings
-# No additional environment variables needed!
+# JWT (RS256 + JWKS) for API gateways (recommended)
+JWT_ISSUER=https://router.jiridj.be/classic-models
+JWT_AUDIENCE=classic-models-api
+JWT_PRIVATE_KEY_FILE=/run/secrets/jwt_private.pem
+JWT_PUBLIC_KEY_FILE=/run/secrets/jwt_public.pem
+
+# Proxy support is enabled by default in settings (X-Forwarded-* headers)
 ```
 
 ## Testing Different Access Methods

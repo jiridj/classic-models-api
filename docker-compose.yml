@@ -33,6 +33,12 @@ services:
       - DEBUG=1
       - API_VERSION=${API_VERSION:-1.0.0}
       - API_KEY=${API_KEY}
+      - JWT_ISSUER=${JWT_ISSUER}
+      - JWT_AUDIENCE=${JWT_AUDIENCE}
+      - JWT_LEEWAY_SECONDS=${JWT_LEEWAY_SECONDS:-0}
+      - JWT_PRIVATE_KEY_FILE=${JWT_PRIVATE_KEY_FILE:-/run/secrets/jwt_private.pem}
+      - JWT_PUBLIC_KEY_FILE=${JWT_PUBLIC_KEY_FILE:-/run/secrets/jwt_public.pem}
+      - JWT_KEY_ID=${JWT_KEY_ID:-}
       - DATABASE_URL=mysql://classicuser:classicpass@mysql:3306/classicmodels
       - MYSQL_HOST=mysql
       - MYSQL_PORT=3306
@@ -46,6 +52,8 @@ services:
       - classic-models-network
     volumes:
       - .:/app
+      - ./secrets/jwt/jwt_private.pem:/run/secrets/jwt_private.pem:ro
+      - ./secrets/jwt/jwt_public.pem:/run/secrets/jwt_public.pem:ro
 
 volumes:
   # Named volume for MySQL data - remove this volume to recreate database
