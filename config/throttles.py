@@ -59,6 +59,17 @@ class RegisterThrottle(throttling.AnonRateThrottle):
     rate = "50/hour"
 
 
+class OAuthTokenThrottle(throttling.AnonRateThrottle):
+    """
+    Throttle OAuth token endpoint to prevent brute-force credential stuffing.
+
+    Allow 50 requests per hour per IP address.
+    """
+
+    scope = "oauth_token"
+    rate = "50/hour"
+
+
 class TokenRefreshThrottle(throttling.UserRateThrottle):
     """
     Throttle token refresh requests.

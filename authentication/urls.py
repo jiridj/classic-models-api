@@ -9,8 +9,9 @@ from .views import (
     signup_view,
 )
 from .well_known import jwks_view, openid_configuration_view
+from .oauth_views import authorize_view, token_view, revoke_view
 
-urlpatterns = [
+auth_urlpatterns = [
     path("login/", CustomTokenObtainPairView.as_view(), name="login"),
     path("logout/", logout_view, name="logout"),
     path("signup/", signup_view, name="signup"),
@@ -24,3 +25,11 @@ urlpatterns = [
         name="openid_configuration",
     ),
 ]
+
+oauth_urlpatterns = [
+    path("authorize/", authorize_view, name="oauth_authorize"),
+    path("token/", token_view, name="oauth_token"),
+    path("token/revoke/", revoke_view, name="oauth_revoke"),
+]
+
+urlpatterns = auth_urlpatterns

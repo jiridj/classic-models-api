@@ -100,6 +100,7 @@ REST_FRAMEWORK = {
         "write": "200/min",  # 200 write requests per minute per user
         "burst": "1000/min",  # 1000 burst requests per minute per user
         "demo_rate_limit": "5/min",  # 5 requests per minute per IP (public demo)
+        "oauth_token": "50/hour",  # 50 OAuth token requests per hour per IP
         # Default rates
         "anon": "200/hour",  # Anonymous users
         "user": "1000/min",  # Authenticated users
@@ -196,6 +197,9 @@ JWT_PUBLIC_KEY_PEM = os.environ.get("JWT_PUBLIC_KEY_PEM") or _read_optional_file
     os.environ.get("JWT_PUBLIC_KEY_FILE")
 )
 JWT_KEY_ID = os.environ.get("JWT_KEY_ID")
+
+# OAuth 2.0 Authorization Code expiry (seconds). Default: 10 minutes.
+OAUTH_AUTH_CODE_EXPIRY_SECONDS = int(os.environ.get("OAUTH_AUTH_CODE_EXPIRY_SECONDS", "600"))
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),

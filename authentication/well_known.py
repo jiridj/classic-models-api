@@ -32,11 +32,17 @@ def jwks_view(request):
 @permission_classes([AllowAny])
 def openid_configuration_view(request):
     issuer = getattr(settings, "JWT_ISSUER", None)
-    jwks_path = "/classic-models/api/auth/.well-known/jwks.json"
 
     payload = {
         "issuer": issuer,
-        "jwks_uri": _absolute_url(request, jwks_path),
+        "jwks_uri": _absolute_url(request, "/classic-models/api/auth/.well-known/jwks.json"),
+        "authorization_endpoint": _absolute_url(request, "/classic-models/api/oauth/authorize/"),
+        "token_endpoint": _absolute_url(request, "/classic-models/api/oauth/token/"),
+        "revocation_endpoint": _absolute_url(request, "/classic-models/api/oauth/token/revoke/"),
+        "response_types_supported": ["code"],
+        "grant_types_supported": ["authorization_code", "refresh_token"],
+        "code_challenge_methods_supported": ["S256"],
+        "token_endpoint_auth_methods_supported": ["client_secret_post"],
     }
     resp = Response(payload)
     resp["Cache-Control"] = "public, max-age=900"

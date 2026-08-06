@@ -57,6 +57,24 @@ def django_setup(django_db_setup, django_db_blocker):
                 schema_editor.create_model(model)
 
 
+@pytest.fixture
+def oauth_client():
+    """Create a test OAuth client with a known plaintext secret attached as _raw_secret."""
+    import secrets as _secrets
+    from authentication.models import OAuthClient
+
+    raw_secret = _secrets.token_urlsafe(32)
+    client = OAuthClient(
+        name="Test OAuth Client",
+        redirect_uris="https://example.com/callback",
+    )
+    client.set_secret(raw_secret)
+    client.save()
+    # Attach plaintext secret so tests can use it without needing to know the hash.
+    client._raw_secret = raw_secret
+    return client
+
+
 @pytest.fixture(autouse=True, scope="session")
 def disable_throttling(django_setup):
     """Disable throttling for all tests by patching throttle classes."""
@@ -80,6 +98,7 @@ def disable_throttling(django_setup):
         TokenRefreshThrottle,
         LogoutThrottle,
         CurrentUserThrottle,
+        OAuthTokenThrottle,
     )
 
     # Store original allow_request methods
@@ -90,6 +109,7 @@ def disable_throttling(django_setup):
     TokenRefreshThrottle._original_allow_request = TokenRefreshThrottle.allow_request
     LogoutThrottle._original_allow_request = LogoutThrottle.allow_request
     CurrentUserThrottle._original_allow_request = CurrentUserThrottle.allow_request
+    OAuthTokenThrottle._original_allow_request = OAuthTokenThrottle.allow_request
 
     # Create a no-op allow_request method
     def allow_request_always_true(self, request, view):
@@ -103,6 +123,7 @@ def disable_throttling(django_setup):
     TokenRefreshThrottle.allow_request = allow_request_always_true
     LogoutThrottle.allow_request = allow_request_always_true
     CurrentUserThrottle.allow_request = allow_request_always_true
+    OAuthTokenThrottle.allow_request = allow_request_always_true
 
     # Store original throttle classes for restoration if needed
     BaseModelViewSet._original_throttle_classes = BaseModelViewSet.throttle_classes
@@ -133,6 +154,7 @@ def disable_throttling(django_setup):
     TokenRefreshThrottle.allow_request = TokenRefreshThrottle._original_allow_request
     LogoutThrottle.allow_request = LogoutThrottle._original_allow_request
     CurrentUserThrottle.allow_request = CurrentUserThrottle._original_allow_request
+    OAuthTokenThrottle.allow_request = OAuthTokenThrottle._original_allow_request
 
     BaseModelViewSet.throttle_classes = getattr(
         BaseModelViewSet, "_original_throttle_classes", []
