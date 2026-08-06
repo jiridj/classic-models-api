@@ -121,16 +121,27 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": (
         "API for the Classic Models tutorial database with multiple authentication options.\n\n"
         "## Authentication Methods\n\n"
-        "This API supports two authentication methods:\n\n"
-        "### 1. JWT (JSON Web Token) Authentication\n\n"
-        "Standard user authentication for regular access:\n\n"
+        "This API supports three authentication methods:\n\n"
+        "### 1. OAuth 2.0 (Authorization Code + PKCE)\n\n"
+        "Standards-compliant OAuth 2.0 IDP flow — recommended for third-party application "
+        "integrations such as watsonx Orchestrate:\n\n"
+        "1. **Register client**: `manage.py create_oauth_client <name> <redirect_uri>`\n"
+        "2. **Authorize**: GET `/classic-models/api/oauth/authorize/` — user logs in via browser\n"
+        "3. **Exchange code**: POST `/classic-models/api/oauth/token/` — "
+        "`grant_type=authorization_code` + PKCE verifier\n"
+        "4. **Use token**: `Authorization: Bearer <access_token>`\n"
+        "5. **Refresh**: POST `/classic-models/api/oauth/token/` — `grant_type=refresh_token`\n"
+        "6. **Revoke**: POST `/classic-models/api/oauth/token/revoke/`\n\n"
+        "OIDC discovery: `GET /classic-models/api/auth/.well-known/openid-configuration`\n\n"
+        "### 2. JWT Authentication\n\n"
+        "Direct user authentication — suitable for first-party clients and testing:\n\n"
         "1. **Login**: POST `/classic-models/api/auth/login/` with username and password\n"
-        "2. **Use Token**: Include the access token in the Authorization header: `Bearer <access_token>`\n"
-        "3. **Refresh**: Use POST `/classic-models/api/auth/refresh/` to get a new access token\n"
-        "4. **Logout**: POST `/classic-models/api/auth/logout/` to invalidate the refresh token\n\n"
-        "### 2. API Key Authentication\n\n"
+        "2. **Use Token**: `Authorization: Bearer <access_token>`\n"
+        "3. **Refresh**: POST `/classic-models/api/oauth/token/` — `grant_type=refresh_token`\n"
+        "4. **Logout**: POST `/classic-models/api/auth/logout/`\n\n"
+        "### 3. API Key Authentication\n\n"
         "System-level authentication with full admin access (demo purposes):\n\n"
-        "- **Header**: Include `X-API-Key: your-api-key` in your requests\n"
+        "- **Header**: `X-API-Key: your-api-key`\n"
         "- **Access**: Full read/write/delete permissions\n"
         "- **Configuration**: Set `API_KEY` environment variable\n"
         "- **Use Case**: Automated scripts, testing, system integrations\n\n"
@@ -138,10 +149,11 @@ SPECTACULAR_SETTINGS = {
         "All endpoints are served at `/classic-models` base path.\n\n"
         "## Public Endpoints\n\n"
         "- API documentation (this page)\n"
-        "- Authentication endpoints (`/classic-models/api/auth/`)\n\n"
+        "- Authentication endpoints (`/classic-models/api/auth/`)\n"
+        "- OAuth 2.0 endpoints (`/classic-models/api/oauth/`)\n\n"
         "## Protected Endpoints\n\n"
         "- All Classic Models data endpoints (`/classic-models/api/v1/`)\n"
-        "- Require either JWT token OR API key"
+        "- Require either a JWT/OAuth Bearer token OR API key"
     ),
     "VERSION": get_version(),
     "SERVE_INCLUDE_SCHEMA": False,
@@ -166,6 +178,7 @@ SPECTACULAR_SETTINGS = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
     "TAGS": [
+        {"name": "OAuth 2.0", "description": "OAuth 2.0 Authorization Code + PKCE IDP endpoints (RFC 6749, RFC 7636, RFC 7009)"},
         {"name": "Authentication", "description": "User authentication and management"},
         {"name": "Product Lines", "description": "Product line categories"},
         {"name": "Products", "description": "Product catalog"},

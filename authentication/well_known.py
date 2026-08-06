@@ -1,4 +1,6 @@
 from django.conf import settings
+from drf_spectacular.utils import OpenApiResponse, extend_schema, inline_serializer
+from rest_framework import serializers
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -11,6 +13,28 @@ def _absolute_url(request, path: str) -> str:
     return f"{scheme}://{request.get_host()}{path}"
 
 
+@extend_schema(
+    operation_id="jwks",
+    summary="JSON Web Key Set (JWKS)",
+    tags=["Authentication"],
+    description=(
+        "Returns the public key set used to verify JWT signatures (RFC 7517). "
+        "Consumers can use this endpoint to validate `Authorization: Bearer` tokens "
+        "without contacting the API on every request.\n\n"
+        "Response is cached for 15 minutes (`Cache-Control: public, max-age=900`).\n\n"
+        "Returns an empty key set when the API is configured with HS256 (symmetric) signing."
+    ),
+    responses={
+        200: OpenApiResponse(
+            response=inline_serializer(
+                name="JWKSResponse",
+                fields={"keys": serializers.ListField(child=serializers.DictField())},
+            ),
+            description="JWKS document",
+        )
+    },
+    auth=[],
+)
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def jwks_view(request):
@@ -28,6 +52,37 @@ def jwks_view(request):
     return resp
 
 
+@extend_schema(
+    operation_id="openid_configuration",
+    summary="OpenID Connect Discovery Document",
+    tags=["Authentication"],
+    description=(
+        "OpenID Connect discovery document (RFC 8414 / OpenID Connect Discovery 1.0). "
+        "Returns the server's OAuth 2.0 endpoint URLs and supported capabilities. "
+        "OAuth clients can use this endpoint for automatic configuration.\n\n"
+        "Response is cached for 15 minutes (`Cache-Control: public, max-age=900`)."
+    ),
+    responses={
+        200: OpenApiResponse(
+            response=inline_serializer(
+                name="OIDCConfigurationResponse",
+                fields={
+                    "issuer": serializers.CharField(allow_null=True),
+                    "jwks_uri": serializers.CharField(),
+                    "authorization_endpoint": serializers.CharField(),
+                    "token_endpoint": serializers.CharField(),
+                    "revocation_endpoint": serializers.CharField(),
+                    "response_types_supported": serializers.ListField(child=serializers.CharField()),
+                    "grant_types_supported": serializers.ListField(child=serializers.CharField()),
+                    "code_challenge_methods_supported": serializers.ListField(child=serializers.CharField()),
+                    "token_endpoint_auth_methods_supported": serializers.ListField(child=serializers.CharField()),
+                },
+            ),
+            description="OIDC discovery document",
+        )
+    },
+    auth=[],
+)
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def openid_configuration_view(request):
@@ -47,4 +102,3 @@ def openid_configuration_view(request):
     resp = Response(payload)
     resp["Cache-Control"] = "public, max-age=900"
     return resp
-
