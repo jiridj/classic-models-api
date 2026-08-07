@@ -4,7 +4,7 @@
 
 This application is **always** served at the `/classic-models` base path in all environments. This simplifies reverse proxy configuration and ensures consistent URLs across local development and production.
 
-> **Note**: For local development setup, see the [Quick Start](../README.md#-quick-start) section in the main README. For QNAP NAS deployment, see [NAS_DEPLOYMENT.md](NAS_DEPLOYMENT.md).
+> **Note**: For local development setup, see the [Quick Start](../README.md#-quick-start) section in the main README. For Kubernetes/OpenShift deployment see [HELM_DEPLOYMENT.md](HELM_DEPLOYMENT.md). For QNAP NAS deployment, see [NAS_DEPLOYMENT.md](NAS_DEPLOYMENT.md).
 
 ## Base Path
 

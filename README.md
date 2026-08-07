@@ -456,7 +456,9 @@ The API is served at the `/classic-models` base path in all environments for con
 ### Deployment Options
 
 - **Local Development**: See [Quick Start](#-quick-start) section above
-- **Production Deployment**: See [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) for detailed instructions
+- **Docker / Production**: See [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) for reverse proxy and environment configuration
+- **Kubernetes / OpenShift (Helm)**: See [`docs/HELM_DEPLOYMENT.md`](docs/HELM_DEPLOYMENT.md) for Helm chart installation and configuration
+- **Building & publishing your own image**: See [`docs/BUILD_AND_DEPLOY.md`](docs/BUILD_AND_DEPLOY.md) for GitHub Actions and GHCR setup
 - **QNAP NAS Deployment**: See [`docs/NAS_DEPLOYMENT.md`](docs/NAS_DEPLOYMENT.md) for NAS-specific setup
 - **Release Management**: See [`docs/RELEASE_MANAGEMENT.md`](docs/RELEASE_MANAGEMENT.md) for versioning and releases
 
@@ -544,7 +546,9 @@ make health-check
 
 - **[`docs/OAUTH_AUTHENTICATION.md`](docs/OAUTH_AUTHENTICATION.md)** - OAuth 2.0 setup: client registration, token lifecycle, watsonx Orchestrate configuration
 - **[`docs/OAUTH_MANUAL_TESTING.md`](docs/OAUTH_MANUAL_TESTING.md)** - Step-by-step OAuth flow testing with `curl`
-- **[`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)** - Production deployment guide with reverse proxy configuration
+- **[`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)** - Docker / production deployment with reverse proxy configuration
+- **[`docs/HELM_DEPLOYMENT.md`](docs/HELM_DEPLOYMENT.md)** - Kubernetes / OpenShift deployment with Helm
+- **[`docs/BUILD_AND_DEPLOY.md`](docs/BUILD_AND_DEPLOY.md)** - Building and publishing Docker images via GitHub Actions
 - **[`docs/NAS_DEPLOYMENT.md`](docs/NAS_DEPLOYMENT.md)** - QNAP NAS deployment instructions
 - **[`docs/RELEASE_MANAGEMENT.md`](docs/RELEASE_MANAGEMENT.md)** - Version management and release process
 - **[`docs/RATE_LIMITING.md`](docs/RATE_LIMITING.md)** - Rate limiting configuration and best practices
