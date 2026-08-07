@@ -20,6 +20,8 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema, inline_serializer
 from rest_framework import serializers
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.settings import api_settings as jwt_settings
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -87,18 +89,16 @@ def _token_response(refresh) -> JsonResponse:
 # ---------------------------------------------------------------------------
 
 @extend_schema(
-    operation_id="oauth_authorize",
-    summary="OAuth 2.0 Authorization Endpoint",
+    methods=["GET"],
+    operation_id="oauth_authorize_get",
+    summary="OAuth 2.0 Authorization — Show Login Form",
     tags=["OAuth 2.0"],
     description=(
         "Authorization endpoint per RFC 6749 §4.1.1 and RFC 7636 (PKCE).\n\n"
-        "**GET** — Validates the OAuth parameters and renders the login form for the "
-        "resource owner (user) to authenticate.\n\n"
-        "**POST** — Processes the submitted credentials. On success redirects to "
-        "`redirect_uri?code=<code>&state=<state>`. On invalid credentials re-renders "
-        "the form with an error message.\n\n"
-        "Errors that cannot safely redirect (unknown `client_id`, unregistered "
-        "`redirect_uri`) return HTTP 400 directly per RFC 6749 §4.1.2.1."
+        "Validates the OAuth parameters and renders the login form for the "
+        "resource owner (user) to authenticate. Errors that cannot safely redirect "
+        "(unknown `client_id`, unregistered `redirect_uri`) return HTTP 400 directly "
+        "per RFC 6749 §4.1.2.1."
     ),
     parameters=[
         OpenApiParameter(name="response_type", location=OpenApiParameter.QUERY, required=True,
@@ -117,12 +117,47 @@ def _token_response(refresh) -> JsonResponse:
                          description="Space-separated list of requested scopes (optional; currently unused).", type=str),
     ],
     responses={
-        200: OpenApiResponse(description="Login form rendered (GET) or invalid credentials re-render (POST)"),
-        302: OpenApiResponse(description="Redirect to `redirect_uri` with `code` and `state` on success, or `error` on failure"),
+        200: OpenApiResponse(description="Login form HTML rendered successfully"),
         400: OpenApiResponse(description="Invalid `client_id` or `redirect_uri` — cannot redirect"),
     },
     auth=[],
 )
+@extend_schema(
+    methods=["POST"],
+    operation_id="oauth_authorize_post",
+    summary="OAuth 2.0 Authorization — Submit Credentials",
+    tags=["OAuth 2.0"],
+    description=(
+        "Processes the submitted login form credentials. On success issues a "
+        "short-lived authorization code and redirects to "
+        "`redirect_uri?code=<code>&state=<state>`. On invalid credentials "
+        "re-renders the form with an error message.\n\n"
+        "Errors that cannot safely redirect (unknown `client_id`, unregistered "
+        "`redirect_uri`) return HTTP 400 directly per RFC 6749 §4.1.2.1."
+    ),
+    request=inline_serializer(
+        name="OAuthAuthorizeRequest",
+        fields={
+            "response_type": serializers.CharField(help_text='Must be `"code"`.'),
+            "client_id": serializers.UUIDField(help_text="Registered OAuth client identifier."),
+            "redirect_uri": serializers.CharField(help_text="Must exactly match a registered redirect URI."),
+            "code_challenge": serializers.CharField(help_text="BASE64URL(SHA-256(code_verifier)) — PKCE challenge."),
+            "code_challenge_method": serializers.CharField(help_text='Must be `"S256"`.'),
+            "state": serializers.CharField(required=False, help_text="Opaque state value echoed back in the redirect."),
+            "scope": serializers.CharField(required=False, help_text="Space-separated scopes (optional; currently unused)."),
+            "username": serializers.CharField(help_text="Resource owner username."),
+            "password": serializers.CharField(help_text="Resource owner password."),
+        },
+    ),
+    responses={
+        302: OpenApiResponse(description="Redirect to `redirect_uri` with `code` and `state` on success, or `error` on failure"),
+        200: OpenApiResponse(description="Invalid credentials — login form re-rendered with error message"),
+        400: OpenApiResponse(description="Invalid `client_id` or `redirect_uri` — cannot redirect"),
+    },
+    auth=[],
+)
+@api_view(["GET", "POST"])
+@permission_classes([AllowAny])
 def authorize_view(request):
     """
     GET  — validate OAuth parameters and render the login form.
@@ -297,6 +332,8 @@ def _redirect(url: str):
     },
     auth=[],
 )
+@api_view(["POST"])
+@permission_classes([AllowAny])
 @csrf_exempt
 def token_view(request):
     if request.method != "POST":
@@ -433,6 +470,8 @@ def _grant_refresh_token(request):
     },
     auth=[],
 )
+@api_view(["POST"])
+@permission_classes([AllowAny])
 @csrf_exempt
 def revoke_view(request):
     if request.method != "POST":
