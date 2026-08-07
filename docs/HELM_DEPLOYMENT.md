@@ -752,9 +752,9 @@ For advanced monitoring and management, consider:
 
 ### Documentation
 
-- [Helm Chart README](helm/classic-models-api/README.md) - Detailed chart documentation
+- [Helm Chart README](../helm/classic-models-api/README.md) - Detailed chart documentation
 - [OpenShift Deployment](OPENSHIFT_DEPLOYMENT.md) - OpenShift-specific guide
-- [Main README](README.md) - Project overview
+- [Main README](../README.md) - Project overview
 - [Bitnami MySQL Chart](https://github.com/bitnami/charts/tree/main/bitnami/mysql) - MySQL dependency docs
 
 ### Helm Resources
