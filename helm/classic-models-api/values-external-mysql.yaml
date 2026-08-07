@@ -1,0 +1,96 @@
+# Example values for using an external MySQL database
+# This configuration disables the chart-managed MySQL and connects to an existing database
+
+# Note: Liveness and readiness probes use /classic-models/api/schema/
+# which has AllowAny permission to avoid authentication issues
+
+# Global settings
+global:
+  openshift: false
+  security:
+    # Allow bitnamilegacy images (Bitnami moved images to legacy registry)
+    allowInsecureImages: true
+
+# API Application Configuration
+replicaCount: 2
+
+image:
+  repository: classic-models-api
+  pullPolicy: IfNotPresent
+  tag: ""
+
+app:
+  debug: false
+  apiVersion: "1.0.0"
+  # IMPORTANT: Generate a secure secret key for production
+  secretKey: "CHANGE-ME-IN-PRODUCTION"
+  apiKey: ""
+  allowedHosts: "*"
+
+# Route configuration (OpenShift)
+route:
+  enabled: false
+
+# Ingress configuration (Kubernetes)
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: classic-models-api.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: classic-models-api-tls
+      hosts:
+        - classic-models-api.example.com
+
+# Resource limits
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 256Mi
+
+# External MySQL Configuration
+# This example shows how to connect to an external MySQL database
+mysql:
+  # Disable chart-managed MySQL
+  enabled: false
+  
+  # External MySQL connection details
+  # REQUIRED: Hostname or IP address of the external MySQL server
+  externalHost: "mysql.example.com"
+  
+  # OPTIONAL: MySQL port (default: 3306)
+  externalPort: 3306
+  
+  # Database authentication credentials
+  # These must match your external MySQL database configuration
+  auth:
+    # Database name (must exist on the external MySQL server)
+    database: "classicmodels"
+    
+    # MySQL username with access to the database
+    username: "classicuser"
+    
+    # MySQL password
+    # IMPORTANT: Use a secure password in production
+    # Consider using --set mysql.auth.password=<password> or external secrets
+    password: "CHANGE-ME-IN-PRODUCTION"
+    
+    # Root password is not used for external MySQL
+    rootPassword: ""
+
+# Note: When using external MySQL, you are responsible for:
+# 1. Ensuring the MySQL server is accessible from the Kubernetes/OpenShift cluster
+# 2. Creating the database and user with appropriate permissions
+# 3. Initializing the database schema (e.g., running db/mysqlsampledatabase.sql)
+# 4. Managing backups and high availability
+# 5. Ensuring network connectivity and firewall rules allow connections
+
+# Made with Bob

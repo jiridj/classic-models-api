@@ -1,0 +1,136 @@
+# OpenShift-specific values for classic-models-api
+# This file contains OpenShift-optimized configuration
+
+# Note: Liveness and readiness probes use /classic-models/api/schema/
+# which has AllowAny permission to avoid authentication issues
+
+# Global settings
+global:
+  openshift: true
+  security:
+    # Allow bitnamilegacy images (Bitnami moved images to legacy registry)
+    allowInsecureImages: true
+
+# API Application Configuration
+replicaCount: 2
+
+image:
+  # For OpenShift internal registry, use format:
+  # image-registry.openshift-image-registry.svc:5000/<namespace>/<image-name>
+  repository: classic-models-api
+  pullPolicy: IfNotPresent
+  tag: ""
+
+app:
+  debug: false
+  apiVersion: "1.0.0"
+  secretKey: "change-me-in-production"
+  apiKey: ""
+  allowedHosts: "*"
+
+# Route configuration (OpenShift)
+route:
+  enabled: true
+  host: ""  # Leave empty to auto-generate
+  path: /
+  tls:
+    enabled: true
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+
+# Ingress disabled for OpenShift (use Route instead)
+ingress:
+  enabled: false
+
+# Resource limits
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 256Mi
+
+# Autoscaling
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+
+# MySQL Configuration
+# Two options:
+# 1. Chart-managed MySQL (mysql.enabled: true) - deploys MySQL using Bitnami chart
+# 2. External MySQL (mysql.enabled: false) - connects to existing MySQL database
+mysql:
+  # Set to false to use an external MySQL database
+  enabled: true
+  
+  # External MySQL configuration (used when mysql.enabled is false)
+  externalHost: ""  # e.g., "mysql.myproject.svc.cluster.local" or external hostname
+  externalPort: 3306
+  
+  # Chart-managed MySQL configuration (only used when mysql.enabled is true)
+  # Use Bitnami MySQL image from legacy registry
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/mysql
+    tag: 8.4.5-debian-12-r0
+  
+  # Database authentication (used for both chart-managed and external MySQL)
+  auth:
+    rootPassword: "rootpassword"
+    database: "classicmodels"
+    username: "classicuser"
+    password: "classicpass"
+  
+  primary:
+    persistence:
+      enabled: true
+      size: 10Gi
+    
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1Gi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+    
+    # CRITICAL for OpenShift: Disable Bitnami's security contexts
+    # OpenShift will automatically assign UIDs from the project's allowed range
+    podSecurityContext:
+      enabled: false
+    containerSecurityContext:
+      enabled: false
+  
+  # Initialize with Classic Models data
+  # RECOMMENDED: Use --set-file to pass the SQL file:
+  #   helm install classic-models-api ./helm/classic-models-api \
+  #     -f values-openshift.yaml \
+  #     --set-file mysql.initdbScripts.01-init\.sql=db/mysqlsampledatabase.sql
+  #
+  # ALTERNATIVE: Use existing ConfigMap:
+  #   oc create configmap mysql-init-script --from-file=01-init.sql=db/mysqlsampledatabase.sql
+  #   helm install classic-models-api ./helm/classic-models-api \
+  #     -f values-openshift.yaml \
+  #     --set mysql.initdbScriptsConfigMap=mysql-init-script
+  initdbScripts: {}
+  
+  # Use existing ConfigMap for init scripts (alternative to initdbScripts)
+  initdbScriptsConfigMap: ""
+  # initdbScriptsConfigMap: "mysql-init-script"
+
+# Service account
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# Pod security context - let OpenShift handle it
+podSecurityContext: {}
+
+# Container security context - let OpenShift handle it
+securityContext: {}
+
+# Made with Bob

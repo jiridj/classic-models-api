@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "classic-models-api.fullname" . }}
+  labels:
+    {{- include "classic-models-api.labels" . | nindent 4 }}
+data:
+  debug: {{ .Values.app.debug | quote }}
+  api-version: {{ .Values.app.apiVersion | quote }}
+  allowed-hosts: {{ .Values.app.allowedHosts | quote }}
+
+# Made with Bob
