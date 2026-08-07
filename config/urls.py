@@ -7,11 +7,14 @@ from drf_spectacular.views import (
 )
 from rest_framework.permissions import AllowAny
 
+from authentication.urls import oauth_urlpatterns
+
 # All URLs are served under /classic-models base path
 urlpatterns = [
     path("classic-models/admin/", admin.site.urls),
     path("classic-models/api/v1/", include("api.v1.urls")),
     path("classic-models/api/auth/", include("authentication.urls")),
+    path("classic-models/api/oauth/", include(oauth_urlpatterns)),
     # OpenAPI schema and docs (public access)
     path(
         "classic-models/api/schema/",
