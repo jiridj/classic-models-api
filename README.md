@@ -170,9 +170,26 @@ erDiagram
 
 ### Authentication
 
-The API supports two authentication methods:
+The API supports three authentication methods:
 
-#### 1. JWT (JSON Web Token) Authentication
+#### 1. OAuth 2.0 (Authorization Code + PKCE)
+
+Standards-compliant OAuth 2.0 flow — recommended for third-party integrations such as watsonx Orchestrate. Clients authenticate users via a browser login; the API issues short-lived, RS256-signed access tokens with user identity embedded.
+
+1. **Register a client** (server-side, once): `manage.py create_oauth_client <name> <redirect-uri>`
+2. **Authorize**: direct the user's browser to `GET /classic-models/api/oauth/authorize/`
+3. **Exchange**: `POST /classic-models/api/oauth/token/` — `grant_type=authorization_code` + PKCE verifier
+4. **Call API**: `Authorization: Bearer <access_token>`
+5. **Refresh**: `POST /classic-models/api/oauth/token/` — `grant_type=refresh_token`
+6. **Revoke**: `POST /classic-models/api/oauth/token/revoke/`
+
+OIDC auto-discovery: `GET /classic-models/api/auth/.well-known/openid-configuration`
+
+See **[`docs/OAUTH_AUTHENTICATION.md`](docs/OAUTH_AUTHENTICATION.md)** for the full reference, including client registration, token lifecycle, and watsonx Orchestrate configuration.
+
+---
+
+#### 2. JWT (JSON Web Token) Authentication
 
 Standard user authentication with JWT tokens:
 
@@ -243,7 +260,7 @@ curl -s -X POST "http://localhost:8000/classic-models/api/auth/login/" \
 - JWKS: `http://localhost:8000/classic-models/api/auth/.well-known/jwks.json`
 - Algorithm: `RS256`
 
-#### 2. API Key Authentication (System-Level Access)
+#### 3. API Key Authentication (System-Level Access)
 
 For demo/testing purposes, you can use an API key for system-level access with full admin privileges:
 
@@ -284,7 +301,10 @@ API_KEY=your-secure-api-key-here
 - `POST /classic-models/api/auth/signup/` - User registration
 - `POST /classic-models/api/auth/refresh/` - Token refresh
 - `GET /classic-models/api/auth/.well-known/jwks.json` - JWKS (public key set)
-- `GET /classic-models/api/auth/.well-known/openid-configuration` - OIDC discovery (minimal)
+- `GET /classic-models/api/auth/.well-known/openid-configuration` - OIDC discovery
+- `GET /classic-models/api/oauth/authorize/` - OAuth 2.0 authorization (login form)
+- `POST /classic-models/api/oauth/token/` - OAuth 2.0 token endpoint
+- `POST /classic-models/api/oauth/token/revoke/` - OAuth 2.0 token revocation
 
 #### Protected Endpoints (JWT Required)
 - `GET /classic-models/api/auth/me/` - Current user info
@@ -522,6 +542,8 @@ make health-check
 
 ## 📚 Additional Documentation
 
+- **[`docs/OAUTH_AUTHENTICATION.md`](docs/OAUTH_AUTHENTICATION.md)** - OAuth 2.0 setup: client registration, token lifecycle, watsonx Orchestrate configuration
+- **[`docs/OAUTH_MANUAL_TESTING.md`](docs/OAUTH_MANUAL_TESTING.md)** - Step-by-step OAuth flow testing with `curl`
 - **[`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)** - Production deployment guide with reverse proxy configuration
 - **[`docs/NAS_DEPLOYMENT.md`](docs/NAS_DEPLOYMENT.md)** - QNAP NAS deployment instructions
 - **[`docs/RELEASE_MANAGEMENT.md`](docs/RELEASE_MANAGEMENT.md)** - Version management and release process
