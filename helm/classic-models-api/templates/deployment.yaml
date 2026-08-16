@@ -96,9 +96,23 @@ spec:
         - name: MYSQL_PORT
           value: {{ include "classic-models-api.mysql.port" . | quote }}
         - name: MYSQL_DATABASE
+          {{- if .Values.externalSecrets.dbDatabase.name }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "classic-models-api.dbDatabaseSecretName" . }}
+              key: {{ include "classic-models-api.dbDatabaseSecretKey" . }}
+          {{- else }}
           value: {{ include "classic-models-api.mysql.database" . }}
+          {{- end }}
         - name: MYSQL_USER
+          {{- if .Values.externalSecrets.dbUsername.name }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "classic-models-api.dbUsernameSecretName" . }}
+              key: {{ include "classic-models-api.dbUsernameSecretKey" . }}
+          {{- else }}
           value: {{ include "classic-models-api.mysql.username" . }}
+          {{- end }}
         - name: MYSQL_PASSWORD
           valueFrom:
             secretKeyRef:

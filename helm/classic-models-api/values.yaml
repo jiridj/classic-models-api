@@ -59,7 +59,7 @@ externalDB:
 # When a name is provided, the chart will NOT store that value in its own
 # managed Secret and will instead reference the pre-existing Kubernetes Secret.
 # Each value may point to a different Secret object.
-# If ALL three names are set, the chart-managed Secret is skipped entirely.
+# If ALL secret names are set, the chart-managed Secret is skipped entirely.
 externalSecrets:
   # Django SECRET_KEY
   djangoSecretKey:
@@ -69,10 +69,18 @@ externalSecrets:
   apiKey:
     name: ""   # Name of the existing Kubernetes Secret
     key: ""    # Key inside that Secret (e.g. "api-key")
-  # Database password (externalDB.password is ignored when this is set)
+  # Database password — externalDB.password is ignored when this is set
   mysqlPassword:
     name: ""   # Name of the existing Kubernetes Secret (e.g. "my-db-secrets")
     key: ""    # Key inside that Secret (e.g. "mysql-password")
+  # Database username — takes precedence over externalDB.username when set
+  dbUsername:
+    name: ""   # Name of the existing Kubernetes Secret
+    key: ""    # Key inside that Secret (e.g. "db-username")
+  # Database name — takes precedence over externalDB.database when set
+  dbDatabase:
+    name: ""   # Name of the existing Kubernetes Secret
+    key: ""    # Key inside that Secret (e.g. "db-database")
 
 # Service configuration
 service:

@@ -75,17 +75,53 @@ Database port (externalDB.port, default 3306).
 {{- end }}
 
 {{/*
-Database name (externalDB.database, default "classicmodels").
+Database name — falls back to externalDB.database; externalSecrets.dbDatabase takes precedence in deployment.
 */}}
 {{- define "classic-models-api.mysql.database" -}}
 {{- default "classicmodels" .Values.externalDB.database }}
 {{- end }}
 
 {{/*
-Database username (externalDB.username, default "classicuser").
+Database username — falls back to externalDB.username; externalSecrets.dbUsername takes precedence in deployment.
 */}}
 {{- define "classic-models-api.mysql.username" -}}
 {{- default "classicuser" .Values.externalDB.username }}
+{{- end }}
+
+{{/*
+Secret name that holds the database username (when using externalSecrets.dbUsername).
+*/}}
+{{- define "classic-models-api.dbUsernameSecretName" -}}
+{{- .Values.externalSecrets.dbUsername.name }}
+{{- end }}
+
+{{/*
+Key inside the secret that holds the database username.
+*/}}
+{{- define "classic-models-api.dbUsernameSecretKey" -}}
+{{- if .Values.externalSecrets.dbUsername.key -}}
+{{- .Values.externalSecrets.dbUsername.key -}}
+{{- else -}}
+db-username
+{{- end -}}
+{{- end }}
+
+{{/*
+Secret name that holds the database name (when using externalSecrets.dbDatabase).
+*/}}
+{{- define "classic-models-api.dbDatabaseSecretName" -}}
+{{- .Values.externalSecrets.dbDatabase.name }}
+{{- end }}
+
+{{/*
+Key inside the secret that holds the database name.
+*/}}
+{{- define "classic-models-api.dbDatabaseSecretKey" -}}
+{{- if .Values.externalSecrets.dbDatabase.key -}}
+{{- .Values.externalSecrets.dbDatabase.key -}}
+{{- else -}}
+db-database
+{{- end -}}
 {{- end }}
 
 {{/*
