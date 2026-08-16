@@ -4,8 +4,8 @@
 
 # Global settings
 global:
-  # Set to true if deploying on OpenShift
-  openshift: "false"
+  # Set to true if deploying on OpenShift (boolean or string "true"/"false")
+  openshift: false
   security:
     # Allow bitnamilegacy images (Bitnami moved images to legacy registry)
     allowInsecureImages: true
@@ -42,12 +42,12 @@ app:
   allowedHosts: "*"
 
 # External Database Configuration
-# Used when mysql.enabled is false.
-# Set externalDB.host (required) plus the other connection details.
+# Connection details for the MySQL / MariaDB instance managed outside this chart
+# (e.g. created by an operator, a cloud-managed service, or another deployment).
 # externalDB.password is ignored when externalSecrets.mysqlPassword.name is set —
 # in that case the password is sourced from the referenced Kubernetes Secret.
 externalDB:
-  host: ""        # Required when mysql.enabled=false (e.g. "mysql.example.com" or "10.0.0.5")
+  host: ""        # Required — hostname or IP (e.g. "mysql.example.com", "10.0.0.5")
   port: 3306
   database: "classicmodels"
   username: "classicuser"
@@ -69,11 +69,9 @@ externalSecrets:
   apiKey:
     name: ""   # Name of the existing Kubernetes Secret
     key: ""    # Key inside that Secret (e.g. "api-key")
-  # MySQL / external DB password.
-  # When set, externalDB.password (and mysql.auth.password for chart-managed MySQL)
-  # are ignored and the password is sourced from this Secret instead.
+  # Database password (externalDB.password is ignored when this is set)
   mysqlPassword:
-    name: ""   # Name of the existing Kubernetes Secret (e.g. "my-mysql-secrets")
+    name: ""   # Name of the existing Kubernetes Secret (e.g. "my-db-secrets")
     key: ""    # Key inside that Secret (e.g. "mysql-password")
 
 # Service configuration
@@ -149,20 +147,11 @@ readinessProbe:
   timeoutSeconds: 3
   failureThreshold: 3
 
-# Init container to wait for MySQL
+# Init container to wait for the database to become reachable
 initContainers:
-  waitForMysql:
+  waitForDB:
     enabled: true
     image: busybox:1.35
-    command:
-      - sh
-      - -c
-      - |
-        until nc -z {{ include "classic-models-api.mysql.fullname" . }} 3306; do
-          echo "Waiting for MySQL to be ready..."
-          sleep 2
-        done
-        echo "MySQL is ready!"
 
 # Pod annotations
 podAnnotations: {}
@@ -198,69 +187,5 @@ serviceAccount:
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
-
-# MySQL Configuration
-# Two options:
-# 1. Chart-managed MySQL (mysql.enabled: true) - deploys MySQL using Bitnami chart
-# 2. External DB    (mysql.enabled: false) - use the externalDB block above
-mysql:
-  # Set to false to use an external database (configure via externalDB above)
-  enabled: false
-
-  # Chart-managed MySQL configuration (Bitnami MySQL Chart)
-  # See: https://github.com/bitnami/charts/tree/main/bitnami/mysql
-  # Only used when mysql.enabled is true
-  
-  # Use Bitnami MySQL image from legacy registry
-  # Bitnami images are now in docker.io/bitnamilegacy
-  image:
-    registry: docker.io
-    repository: bitnamilegacy/mysql
-    tag: 8.4.5-debian-12-r0
-  
-  # Database authentication for chart-managed MySQL
-  auth:
-    rootPassword: "rootpassword"
-    database: "classicmodels"
-    username: "classicuser"
-    password: "classicpass"
-  
-  primary:
-    persistence:
-      enabled: true
-      size: 10Gi
-      # storageClass: ""
-    
-    resources:
-      limits:
-        cpu: 500m
-        memory: 1Gi
-      requests:
-        cpu: 250m
-        memory: 512Mi
-    
-    # OpenShift-specific: Disable security contexts to use OpenShift's assigned UIDs
-    # OpenShift automatically assigns UIDs from the project's range
-    podSecurityContext:
-      enabled: false
-    containerSecurityContext:
-      enabled: false
-    
-  # Initialize database with Classic Models schema
-  # RECOMMENDED: Use --set-file to pass the SQL file:
-  #   helm install classic-models-api ./helm/classic-models-api \
-  #     --set-file mysql.initdbScripts.01-init\.sql=db/mysqlsampledatabase.sql
-  #
-  # ALTERNATIVE: Use existing ConfigMap:
-  #   kubectl create configmap mysql-init-script --from-file=01-init.sql=db/mysqlsampledatabase.sql
-  #   helm install classic-models-api ./helm/classic-models-api \
-  #     --set mysql.initdbScriptsConfigMap=mysql-init-script
-  initdbScripts: {}
-    # 01-init.sql: |
-    #   # SQL content here (not recommended for large files)
-  
-  # Use existing ConfigMap for init scripts (alternative to initdbScripts)
-  initdbScriptsConfigMap: ""
-  # initdbScriptsConfigMap: "mysql-init-script"
 
 # Made with Bob

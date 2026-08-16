@@ -1,4 +1,4 @@
-{{- if and .Values.route.enabled .Values.global.openshift }}
+{{- if and .Values.route.enabled (eq (.Values.global.openshift | toString) "true") }}
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:

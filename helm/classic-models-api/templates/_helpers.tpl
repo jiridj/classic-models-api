@@ -61,59 +61,31 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
-MySQL fullname
-*/}}
-{{- define "classic-models-api.mysql.fullname" -}}
-{{- if .Values.mysql.fullnameOverride }}
-{{- .Values.mysql.fullnameOverride | trunc 63 | trimSuffix "-" }}
-{{- else }}
-{{- $name := default "mysql" .Values.mysql.nameOverride }}
-{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
-{{- end }}
-{{- end }}
-
-{{/*
-Database host: chart-managed MySQL service name, or externalDB.host.
+Database host (externalDB.host — required).
 */}}
 {{- define "classic-models-api.mysql.servicename" -}}
-{{- if .Values.mysql.enabled }}
-{{- include "classic-models-api.mysql.fullname" . }}
-{{- else }}
-{{- required "externalDB.host is required when mysql.enabled is false" .Values.externalDB.host }}
-{{- end }}
+{{- required "externalDB.host is required" .Values.externalDB.host }}
 {{- end }}
 
 {{/*
-Database port: chart-managed MySQL port, or externalDB.port.
+Database port (externalDB.port, default 3306).
 */}}
 {{- define "classic-models-api.mysql.port" -}}
-{{- if .Values.mysql.enabled }}
-{{- default 3306 .Values.mysql.primary.service.port }}
-{{- else }}
 {{- default 3306 .Values.externalDB.port }}
 {{- end }}
-{{- end }}
 
 {{/*
-Database name: chart-managed MySQL auth.database, or externalDB.database.
+Database name (externalDB.database, default "classicmodels").
 */}}
 {{- define "classic-models-api.mysql.database" -}}
-{{- if .Values.mysql.enabled }}
-{{- default "classicmodels" .Values.mysql.auth.database }}
-{{- else }}
 {{- default "classicmodels" .Values.externalDB.database }}
-{{- end }}
 {{- end }}
 
 {{/*
-Database username: chart-managed MySQL auth.username, or externalDB.username.
+Database username (externalDB.username, default "classicuser").
 */}}
 {{- define "classic-models-api.mysql.username" -}}
-{{- if .Values.mysql.enabled }}
-{{- default "classicuser" .Values.mysql.auth.username }}
-{{- else }}
 {{- default "classicuser" .Values.externalDB.username }}
-{{- end }}
 {{- end }}
 
 {{/*

@@ -34,24 +34,24 @@ spec:
       serviceAccountName: {{ include "classic-models-api.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      {{- if .Values.initContainers.waitForMysql.enabled }}
+      {{- if .Values.initContainers.waitForDB.enabled }}
       initContainers:
-      - name: wait-for-mysql
-        image: {{ .Values.initContainers.waitForMysql.image }}
+      - name: wait-for-db
+        image: {{ .Values.initContainers.waitForDB.image }}
         env:
-        - name: MYSQL_HOST
+        - name: DB_HOST
           value: {{ include "classic-models-api.mysql.servicename" . | quote }}
-        - name: MYSQL_PORT
+        - name: DB_PORT
           value: {{ include "classic-models-api.mysql.port" . | quote }}
         command:
         - sh
         - -c
         - |
-          until nc -z "$MYSQL_HOST" "$MYSQL_PORT"; do
-            echo "Waiting for MySQL at $MYSQL_HOST:$MYSQL_PORT to be ready..."
+          until nc -z "$DB_HOST" "$DB_PORT"; do
+            echo "Waiting for database at $DB_HOST:$DB_PORT to be ready..."
             sleep 2
           done
-          echo "MySQL is ready!"
+          echo "Database is ready!"
       {{- end }}
       containers:
       - name: {{ .Chart.Name }}

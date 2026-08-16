@@ -50,14 +50,11 @@ API Endpoints:
   - API Docs: /classic-models/api/docs/
   - ReDoc: /classic-models/api/redoc/
 
-{{- if .Values.mysql.enabled }}
-
-MySQL Database:
-  - Host: {{ include "classic-models-api.mysql.servicename" . }}
-  - Port: {{ include "classic-models-api.mysql.port" . }}
+Database (external):
+  - Host:     {{ .Values.externalDB.host | default "<not set — required>" }}
+  - Port:     {{ include "classic-models-api.mysql.port" . }}
   - Database: {{ include "classic-models-api.mysql.database" . }}
   - Username: {{ include "classic-models-api.mysql.username" . }}
-{{- end }}
 
 To check the status of your deployment:
   kubectl get pods -n {{ .Release.Namespace }} -l app.kubernetes.io/instance={{ .Release.Name }}
