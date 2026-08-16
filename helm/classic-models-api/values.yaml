@@ -33,11 +33,48 @@ app:
   debug: false
   apiVersion: "1.0.0"
   # Django secret key - generate with: python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+  # Ignored when externalSecrets.djangoSecretKey.name is set.
   secretKey: "change-me-in-production"
-  # Optional API key for system-level access
+  # Optional API key for system-level access.
+  # Ignored when externalSecrets.apiKey.name is set.
   apiKey: ""
   # Allowed hosts (comma-separated)
   allowedHosts: "*"
+
+# External Database Configuration
+# Used when mysql.enabled is false.
+# Set externalDB.host (required) plus the other connection details.
+# externalDB.password is ignored when externalSecrets.mysqlPassword.name is set —
+# in that case the password is sourced from the referenced Kubernetes Secret.
+externalDB:
+  host: ""        # Required when mysql.enabled=false (e.g. "mysql.example.com" or "10.0.0.5")
+  port: 3306
+  database: "classicmodels"
+  username: "classicuser"
+  # Plain-text password. Leave blank and set externalSecrets.mysqlPassword instead
+  # to avoid embedding credentials in values files.
+  password: ""
+
+# External secret references
+# When a name is provided, the chart will NOT store that value in its own
+# managed Secret and will instead reference the pre-existing Kubernetes Secret.
+# Each value may point to a different Secret object.
+# If ALL three names are set, the chart-managed Secret is skipped entirely.
+externalSecrets:
+  # Django SECRET_KEY
+  djangoSecretKey:
+    name: ""   # Name of the existing Kubernetes Secret (e.g. "my-app-secrets")
+    key: ""    # Key inside that Secret (e.g. "django-secret-key")
+  # Optional API_KEY (only mounted when name is set or app.apiKey is non-empty)
+  apiKey:
+    name: ""   # Name of the existing Kubernetes Secret
+    key: ""    # Key inside that Secret (e.g. "api-key")
+  # MySQL / external DB password.
+  # When set, externalDB.password (and mysql.auth.password for chart-managed MySQL)
+  # are ignored and the password is sourced from this Secret instead.
+  mysqlPassword:
+    name: ""   # Name of the existing Kubernetes Secret (e.g. "my-mysql-secrets")
+    key: ""    # Key inside that Secret (e.g. "mysql-password")
 
 # Service configuration
 service:
@@ -165,16 +202,11 @@ serviceAccount:
 # MySQL Configuration
 # Two options:
 # 1. Chart-managed MySQL (mysql.enabled: true) - deploys MySQL using Bitnami chart
-# 2. External MySQL (mysql.enabled: false) - connects to existing MySQL database
+# 2. External DB    (mysql.enabled: false) - use the externalDB block above
 mysql:
-  # Set to false to use an external MySQL database
-  enabled: true
-  
-  # External MySQL configuration (used when mysql.enabled is false)
-  # Required when mysql.enabled is false
-  externalHost: ""  # e.g., "mysql.example.com" or "10.0.0.5"
-  externalPort: 3306
-  
+  # Set to false to use an external database (configure via externalDB above)
+  enabled: false
+
   # Chart-managed MySQL configuration (Bitnami MySQL Chart)
   # See: https://github.com/bitnami/charts/tree/main/bitnami/mysql
   # Only used when mysql.enabled is true
@@ -186,7 +218,7 @@ mysql:
     repository: bitnamilegacy/mysql
     tag: 8.4.5-debian-12-r0
   
-  # Database authentication (used for both chart-managed and external MySQL)
+  # Database authentication for chart-managed MySQL
   auth:
     rootPassword: "rootpassword"
     database: "classicmodels"

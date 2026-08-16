@@ -82,14 +82,14 @@ spec:
         - name: SECRET_KEY
           valueFrom:
             secretKeyRef:
-              name: {{ include "classic-models-api.fullname" . }}
-              key: django-secret-key
-        {{- if .Values.app.apiKey }}
+              name: {{ include "classic-models-api.secretKeySecretName" . }}
+              key: {{ include "classic-models-api.secretKeySecretKey" . }}
+        {{- if or .Values.app.apiKey .Values.externalSecrets.apiKey.name }}
         - name: API_KEY
           valueFrom:
             secretKeyRef:
-              name: {{ include "classic-models-api.fullname" . }}
-              key: api-key
+              name: {{ include "classic-models-api.apiKeySecretName" . }}
+              key: {{ include "classic-models-api.apiKeySecretKey" . }}
         {{- end }}
         - name: MYSQL_HOST
           value: {{ include "classic-models-api.mysql.servicename" . }}
@@ -102,8 +102,8 @@ spec:
         - name: MYSQL_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ include "classic-models-api.fullname" . }}
-              key: mysql-password
+              name: {{ include "classic-models-api.mysqlPasswordSecretName" . }}
+              key: {{ include "classic-models-api.mysqlPasswordSecretKey" . }}
         {{- if .Values.livenessProbe }}
         livenessProbe:
           {{- toYaml .Values.livenessProbe | nindent 12 }}

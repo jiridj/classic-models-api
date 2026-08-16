@@ -73,39 +73,47 @@ MySQL fullname
 {{- end }}
 
 {{/*
-MySQL service name
+Database host: chart-managed MySQL service name, or externalDB.host.
 */}}
 {{- define "classic-models-api.mysql.servicename" -}}
 {{- if .Values.mysql.enabled }}
 {{- include "classic-models-api.mysql.fullname" . }}
 {{- else }}
-{{- required "mysql.externalHost is required when mysql.enabled is false" .Values.mysql.externalHost }}
+{{- required "externalDB.host is required when mysql.enabled is false" .Values.externalDB.host }}
 {{- end }}
 {{- end }}
 
 {{/*
-MySQL port
+Database port: chart-managed MySQL port, or externalDB.port.
 */}}
 {{- define "classic-models-api.mysql.port" -}}
 {{- if .Values.mysql.enabled }}
 {{- default 3306 .Values.mysql.primary.service.port }}
 {{- else }}
-{{- default 3306 .Values.mysql.externalPort }}
+{{- default 3306 .Values.externalDB.port }}
 {{- end }}
 {{- end }}
 
 {{/*
-MySQL database name
+Database name: chart-managed MySQL auth.database, or externalDB.database.
 */}}
 {{- define "classic-models-api.mysql.database" -}}
+{{- if .Values.mysql.enabled }}
 {{- default "classicmodels" .Values.mysql.auth.database }}
+{{- else }}
+{{- default "classicmodels" .Values.externalDB.database }}
+{{- end }}
 {{- end }}
 
 {{/*
-MySQL username
+Database username: chart-managed MySQL auth.username, or externalDB.username.
 */}}
 {{- define "classic-models-api.mysql.username" -}}
+{{- if .Values.mysql.enabled }}
 {{- default "classicuser" .Values.mysql.auth.username }}
+{{- else }}
+{{- default "classicuser" .Values.externalDB.username }}
+{{- end }}
 {{- end }}
 
 {{/*
@@ -114,4 +122,73 @@ Image name
 {{- define "classic-models-api.image" -}}
 {{- $tag := .Values.image.tag | default .Chart.AppVersion }}
 {{- printf "%s:%s" .Values.image.repository $tag }}
+{{- end }}
+
+{{/*
+Secret name that holds the Django SECRET_KEY.
+Returns the external secret name when configured, otherwise the chart-managed secret.
+*/}}
+{{- define "classic-models-api.secretKeySecretName" -}}
+{{- if .Values.externalSecrets.djangoSecretKey.name -}}
+{{- .Values.externalSecrets.djangoSecretKey.name -}}
+{{- else -}}
+{{- include "classic-models-api.fullname" . -}}
+{{- end -}}
+{{- end }}
+
+{{/*
+Key inside the secret that holds the Django SECRET_KEY.
+*/}}
+{{- define "classic-models-api.secretKeySecretKey" -}}
+{{- if .Values.externalSecrets.djangoSecretKey.key -}}
+{{- .Values.externalSecrets.djangoSecretKey.key -}}
+{{- else -}}
+django-secret-key
+{{- end -}}
+{{- end }}
+
+{{/*
+Secret name that holds the API_KEY.
+Returns the external secret name when configured, otherwise the chart-managed secret.
+*/}}
+{{- define "classic-models-api.apiKeySecretName" -}}
+{{- if .Values.externalSecrets.apiKey.name -}}
+{{- .Values.externalSecrets.apiKey.name -}}
+{{- else -}}
+{{- include "classic-models-api.fullname" . -}}
+{{- end -}}
+{{- end }}
+
+{{/*
+Key inside the secret that holds the API_KEY.
+*/}}
+{{- define "classic-models-api.apiKeySecretKey" -}}
+{{- if .Values.externalSecrets.apiKey.key -}}
+{{- .Values.externalSecrets.apiKey.key -}}
+{{- else -}}
+api-key
+{{- end -}}
+{{- end }}
+
+{{/*
+Secret name that holds the MySQL password.
+Returns the external secret name when configured, otherwise the chart-managed secret.
+*/}}
+{{- define "classic-models-api.mysqlPasswordSecretName" -}}
+{{- if .Values.externalSecrets.mysqlPassword.name -}}
+{{- .Values.externalSecrets.mysqlPassword.name -}}
+{{- else -}}
+{{- include "classic-models-api.fullname" . -}}
+{{- end -}}
+{{- end }}
+
+{{/*
+Key inside the secret that holds the MySQL password.
+*/}}
+{{- define "classic-models-api.mysqlPasswordSecretKey" -}}
+{{- if .Values.externalSecrets.mysqlPassword.key -}}
+{{- .Values.externalSecrets.mysqlPassword.key -}}
+{{- else -}}
+mysql-password
+{{- end -}}
 {{- end }}
