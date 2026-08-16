@@ -91,7 +91,7 @@ service:
 
 # Route configuration (OpenShift)
 route:
-  enabled: true
+  enabled: false
   host: ""  # Leave empty to auto-generate
   path: /
   tls:

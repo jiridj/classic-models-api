@@ -7,15 +7,12 @@ To learn more about the release, try:
   $ helm status {{ .Release.Name }}
   $ helm get all {{ .Release.Name }}
 
-{{- if .Values.global.openshift }}
-{{- if .Values.route.enabled }}
+{{- if and .Values.route.enabled (eq (.Values.global.openshift | toString) "true") }}
 
 The Classic Models API is accessible via OpenShift Route:
 
   Route URL: https://{{ include "classic-models-api.fullname" . }}-{{ .Release.Namespace }}.apps.<your-cluster-domain>
-
 {{- end }}
-{{- else }}
 {{- if .Values.ingress.enabled }}
 
 The Classic Models API is accessible via Ingress:
@@ -23,7 +20,8 @@ The Classic Models API is accessible via Ingress:
 {{- range .Values.ingress.hosts }}
   http{{ if $.Values.ingress.tls }}s{{ end }}://{{ .host }}{{ range .paths }}{{ .path }}{{ end }}
 {{- end }}
-{{- else }}
+{{- end }}
+{{- if and (not .Values.route.enabled) (not .Values.ingress.enabled) }}
 
 Get the application URL by running these commands:
 
@@ -41,7 +39,6 @@ Get the application URL by running these commands:
   export CONTAINER_PORT=$(kubectl get pod --namespace {{ .Release.Namespace }} $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
   echo "Visit http://127.0.0.1:8000 to use your application"
   kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8000:$CONTAINER_PORT
-{{- end }}
 {{- end }}
 {{- end }}
 
