@@ -18,13 +18,4 @@ maintainers:
   - name: Fabien Sanglier
     email: fabien.sanglier@ibm.com
 
-# Dependencies
-dependencies:
-  - name: mysql
-    version: "12.3.5"
-    repository: "oci://registry-1.docker.io/bitnamicharts"
-    condition: mysql.enabled
-    tags:
-      - database
-
 # Made with Bob
