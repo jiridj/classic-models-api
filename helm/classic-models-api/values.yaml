@@ -139,7 +139,7 @@ autoscaling:
 # This avoids authentication issues with health checks
 livenessProbe:
   httpGet:
-    path: /classic-models/api/schema/
+    path: /classic-models/api/docs/
     port: http
   initialDelaySeconds: 60
   periodSeconds: 10
@@ -148,7 +148,7 @@ livenessProbe:
 
 readinessProbe:
   httpGet:
-    path: /classic-models/api/schema/
+    path: /classic-models/api/docs/
     port: http
   initialDelaySeconds: 30
   periodSeconds: 5
