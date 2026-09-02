@@ -2,7 +2,7 @@ apiVersion: v2
 name: classic-models-api
 description: A Helm chart for Classic Models API - Django REST Framework application
 type: application
-version: 1.0.0
+version: 1.1.0
 appVersion: "v4.x"
 keywords:
   - django
@@ -17,14 +17,5 @@ maintainers:
     email: jiri.dejagere@ibm.com
   - name: Fabien Sanglier
     email: fabien.sanglier@ibm.com
-
-# Dependencies
-dependencies:
-  - name: mysql
-    version: "12.3.5"
-    repository: https://charts.bitnami.com/bitnami
-    condition: mysql.enabled
-    tags:
-      - database
 
 # Made with Bob

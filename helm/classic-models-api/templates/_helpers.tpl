@@ -61,51 +61,67 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
-MySQL fullname
-*/}}
-{{- define "classic-models-api.mysql.fullname" -}}
-{{- if .Values.mysql.fullnameOverride }}
-{{- .Values.mysql.fullnameOverride | trunc 63 | trimSuffix "-" }}
-{{- else }}
-{{- $name := default "mysql" .Values.mysql.nameOverride }}
-{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
-{{- end }}
-{{- end }}
-
-{{/*
-MySQL service name
+Database host (externalDB.host — required).
 */}}
 {{- define "classic-models-api.mysql.servicename" -}}
-{{- if .Values.mysql.enabled }}
-{{- include "classic-models-api.mysql.fullname" . }}
-{{- else }}
-{{- required "mysql.externalHost is required when mysql.enabled is false" .Values.mysql.externalHost }}
-{{- end }}
+{{- required "externalDB.host is required" .Values.externalDB.host }}
 {{- end }}
 
 {{/*
-MySQL port
+Database port (externalDB.port, default 3306).
 */}}
 {{- define "classic-models-api.mysql.port" -}}
-{{- if .Values.mysql.enabled }}
-{{- default 3306 .Values.mysql.primary.service.port }}
-{{- else }}
-{{- default 3306 .Values.mysql.externalPort }}
-{{- end }}
+{{- default 3306 .Values.externalDB.port }}
 {{- end }}
 
 {{/*
-MySQL database name
+Database name — falls back to externalDB.database; externalSecrets.dbDatabase takes precedence in deployment.
 */}}
 {{- define "classic-models-api.mysql.database" -}}
-{{- default "classicmodels" .Values.mysql.auth.database }}
+{{- default "classicmodels" .Values.externalDB.database }}
 {{- end }}
 
 {{/*
-MySQL username
+Database username — falls back to externalDB.username; externalSecrets.dbUsername takes precedence in deployment.
 */}}
 {{- define "classic-models-api.mysql.username" -}}
-{{- default "classicuser" .Values.mysql.auth.username }}
+{{- default "classicuser" .Values.externalDB.username }}
+{{- end }}
+
+{{/*
+Secret name that holds the database username (when using externalSecrets.dbUsername).
+*/}}
+{{- define "classic-models-api.dbUsernameSecretName" -}}
+{{- .Values.externalSecrets.dbUsername.name }}
+{{- end }}
+
+{{/*
+Key inside the secret that holds the database username.
+*/}}
+{{- define "classic-models-api.dbUsernameSecretKey" -}}
+{{- if .Values.externalSecrets.dbUsername.key -}}
+{{- .Values.externalSecrets.dbUsername.key -}}
+{{- else -}}
+db-username
+{{- end -}}
+{{- end }}
+
+{{/*
+Secret name that holds the database name (when using externalSecrets.dbDatabase).
+*/}}
+{{- define "classic-models-api.dbDatabaseSecretName" -}}
+{{- .Values.externalSecrets.dbDatabase.name }}
+{{- end }}
+
+{{/*
+Key inside the secret that holds the database name.
+*/}}
+{{- define "classic-models-api.dbDatabaseSecretKey" -}}
+{{- if .Values.externalSecrets.dbDatabase.key -}}
+{{- .Values.externalSecrets.dbDatabase.key -}}
+{{- else -}}
+db-database
+{{- end -}}
 {{- end }}
 
 {{/*
@@ -114,4 +130,73 @@ Image name
 {{- define "classic-models-api.image" -}}
 {{- $tag := .Values.image.tag | default .Chart.AppVersion }}
 {{- printf "%s:%s" .Values.image.repository $tag }}
+{{- end }}
+
+{{/*
+Secret name that holds the Django SECRET_KEY.
+Returns the external secret name when configured, otherwise the chart-managed secret.
+*/}}
+{{- define "classic-models-api.secretKeySecretName" -}}
+{{- if .Values.externalSecrets.djangoSecretKey.name -}}
+{{- .Values.externalSecrets.djangoSecretKey.name -}}
+{{- else -}}
+{{- include "classic-models-api.fullname" . -}}
+{{- end -}}
+{{- end }}
+
+{{/*
+Key inside the secret that holds the Django SECRET_KEY.
+*/}}
+{{- define "classic-models-api.secretKeySecretKey" -}}
+{{- if .Values.externalSecrets.djangoSecretKey.key -}}
+{{- .Values.externalSecrets.djangoSecretKey.key -}}
+{{- else -}}
+django-secret-key
+{{- end -}}
+{{- end }}
+
+{{/*
+Secret name that holds the API_KEY.
+Returns the external secret name when configured, otherwise the chart-managed secret.
+*/}}
+{{- define "classic-models-api.apiKeySecretName" -}}
+{{- if .Values.externalSecrets.apiKey.name -}}
+{{- .Values.externalSecrets.apiKey.name -}}
+{{- else -}}
+{{- include "classic-models-api.fullname" . -}}
+{{- end -}}
+{{- end }}
+
+{{/*
+Key inside the secret that holds the API_KEY.
+*/}}
+{{- define "classic-models-api.apiKeySecretKey" -}}
+{{- if .Values.externalSecrets.apiKey.key -}}
+{{- .Values.externalSecrets.apiKey.key -}}
+{{- else -}}
+api-key
+{{- end -}}
+{{- end }}
+
+{{/*
+Secret name that holds the MySQL password.
+Returns the external secret name when configured, otherwise the chart-managed secret.
+*/}}
+{{- define "classic-models-api.mysqlPasswordSecretName" -}}
+{{- if .Values.externalSecrets.mysqlPassword.name -}}
+{{- .Values.externalSecrets.mysqlPassword.name -}}
+{{- else -}}
+{{- include "classic-models-api.fullname" . -}}
+{{- end -}}
+{{- end }}
+
+{{/*
+Key inside the secret that holds the MySQL password.
+*/}}
+{{- define "classic-models-api.mysqlPasswordSecretKey" -}}
+{{- if .Values.externalSecrets.mysqlPassword.key -}}
+{{- .Values.externalSecrets.mysqlPassword.key -}}
+{{- else -}}
+mysql-password
+{{- end -}}
 {{- end }}

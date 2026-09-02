@@ -124,9 +124,24 @@ The following table lists the configurable parameters of the Classic Models API 
 | `image.tag` | Image tag (overrides chart appVersion) | `""` |
 | `app.debug` | Enable Django debug mode | `false` |
 | `app.apiVersion` | API version | `"1.0.0"` |
-| `app.secretKey` | Django secret key | `"change-me-in-production"` |
-| `app.apiKey` | Optional API key for system access | `""` |
+| `app.secretKey` | Django secret key (ignored when `externalSecrets.djangoSecretKey.name` is set) | `"change-me-in-production"` |
+| `app.apiKey` | Optional API key for system access (ignored when `externalSecrets.apiKey.name` is set) | `""` |
 | `app.allowedHosts` | Allowed hosts (comma-separated) | `"*"` |
+
+### External Secret Parameters
+
+The chart supports referencing pre-existing Kubernetes Secrets for all sensitive values.
+When you provide an external secret name, the chart **will not** create its own `Secret`
+resource for that value and will instead mount the one you specify.
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `externalSecrets.djangoSecretKey.name` | Name of an existing Secret holding the Django `SECRET_KEY` | `""` |
+| `externalSecrets.djangoSecretKey.key` | Key inside that Secret | `"django-secret-key"` |
+| `externalSecrets.apiKey.name` | Name of an existing Secret holding the optional `API_KEY` | `""` |
+| `externalSecrets.apiKey.key` | Key inside that Secret | `"api-key"` |
+| `externalSecrets.mysqlPassword.name` | Name of an existing Secret holding the MySQL password | `""` |
+| `externalSecrets.mysqlPassword.key` | Key inside that Secret | `"mysql-password"` |
 
 ### Service Parameters
 
@@ -186,7 +201,7 @@ The chart supports two MySQL deployment modes:
 | `mysql.enabled` | Enable chart-managed MySQL (set to false for external) | `true` |
 | `mysql.auth.database` | Database name | `"classicmodels"` |
 | `mysql.auth.username` | Database username | `"classicuser"` |
-| `mysql.auth.password` | Database password | `"classicpass"` |
+| `mysql.auth.password` | Database password (ignored when `externalSecrets.mysqlPassword.name` is set) | `"classicpass"` |
 
 #### External MySQL Parameters (when mysql.enabled is false)
 
@@ -252,7 +267,32 @@ helm install classic-models-api ./helm/classic-models-api \
   --set mysql.auth.password="secure-password"
 ```
 
-### Example 4: High Availability Setup
+### Example 4: Using Externally-Managed Secrets
+
+Pre-create your secrets, then install the chart without embedding any sensitive values:
+
+```bash
+# 1. Create the secrets (do this once, outside of Helm)
+kubectl create secret generic my-app-secrets \
+  --from-literal=django-secret-key="$(python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())')" \
+  --from-literal=api-key="$(python -c 'import secrets; print(secrets.token_urlsafe(32))')"
+
+kubectl create secret generic my-mysql-secrets \
+  --from-literal=mysql-password="$(openssl rand -base64 32)"
+
+# 2. Install the chart, referencing those secrets
+helm install classic-models-api ./helm/classic-models-api \
+  -f helm/classic-models-api/values-external-secrets.yaml \
+  --set externalSecrets.djangoSecretKey.name=my-app-secrets \
+  --set externalSecrets.apiKey.name=my-app-secrets \
+  --set externalSecrets.mysqlPassword.name=my-mysql-secrets
+```
+
+You can also manage the Secrets with [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets),
+[External Secrets Operator](https://external-secrets.io/), or HashiCorp Vault — any tool that
+materialises a standard Kubernetes `Secret` object before the chart is installed.
+
+### Example 5: High Availability Setup
 
 ```bash
 helm install classic-models-api ./helm/classic-models-api \
@@ -267,6 +307,40 @@ helm install classic-models-api ./helm/classic-models-api \
   --set mysql.primary.persistence.size=50Gi \
   --set-file mysql.initdbScripts.01-init\.sql=db/mysqlsampledatabase.sql
 ```
+
+## Secret Management
+
+### Default behaviour (chart-managed Secret)
+
+By default the chart creates a single `Secret` named after the Helm release that
+holds `django-secret-key`, `mysql-password`, and (optionally) `api-key`.
+This is fine for development but **not recommended for production** as the values
+must be passed to Helm on every install/upgrade.
+
+### External secrets (recommended for production)
+
+Set any combination of `externalSecrets.*` values to point at a pre-existing
+Kubernetes Secret.  For each value that has an external reference:
+
+- The key is **not** written into the chart-managed Secret.
+- If **all three** values have external references, the chart-managed `Secret`
+  resource is **skipped entirely**.
+- Each value may live in a **different** Secret object.
+
+```yaml
+externalSecrets:
+  djangoSecretKey:
+    name: "vault-injected-app-secrets"   # managed by Vault / ESO / Sealed Secrets
+    key: "django-secret-key"
+  apiKey:
+    name: "vault-injected-app-secrets"
+    key: "api-key"
+  mysqlPassword:
+    name: "vault-injected-mysql-secrets"
+    key: "mysql-password"
+```
+
+See [`values-external-secrets.yaml`](values-external-secrets.yaml) for a complete example.
 
 ## Upgrading
 

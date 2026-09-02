@@ -7,15 +7,12 @@ To learn more about the release, try:
   $ helm status {{ .Release.Name }}
   $ helm get all {{ .Release.Name }}
 
-{{- if .Values.global.openshift }}
-{{- if .Values.route.enabled }}
+{{- if and .Values.route.enabled (eq (.Values.global.openshift | toString) "true") }}
 
 The Classic Models API is accessible via OpenShift Route:
 
   Route URL: https://{{ include "classic-models-api.fullname" . }}-{{ .Release.Namespace }}.apps.<your-cluster-domain>
-
 {{- end }}
-{{- else }}
 {{- if .Values.ingress.enabled }}
 
 The Classic Models API is accessible via Ingress:
@@ -23,7 +20,8 @@ The Classic Models API is accessible via Ingress:
 {{- range .Values.ingress.hosts }}
   http{{ if $.Values.ingress.tls }}s{{ end }}://{{ .host }}{{ range .paths }}{{ .path }}{{ end }}
 {{- end }}
-{{- else }}
+{{- end }}
+{{- if and (not .Values.route.enabled) (not .Values.ingress.enabled) }}
 
 Get the application URL by running these commands:
 
@@ -43,21 +41,17 @@ Get the application URL by running these commands:
   kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8000:$CONTAINER_PORT
 {{- end }}
 {{- end }}
-{{- end }}
 
 API Endpoints:
   - API Base: /classic-models/api/v1/
   - API Docs: /classic-models/api/docs/
   - ReDoc: /classic-models/api/redoc/
 
-{{- if .Values.mysql.enabled }}
-
-MySQL Database:
-  - Host: {{ include "classic-models-api.mysql.servicename" . }}
-  - Port: {{ include "classic-models-api.mysql.port" . }}
+Database (external):
+  - Host:     {{ .Values.externalDB.host | default "<not set — required>" }}
+  - Port:     {{ include "classic-models-api.mysql.port" . }}
   - Database: {{ include "classic-models-api.mysql.database" . }}
   - Username: {{ include "classic-models-api.mysql.username" . }}
-{{- end }}
 
 To check the status of your deployment:
   kubectl get pods -n {{ .Release.Namespace }} -l app.kubernetes.io/instance={{ .Release.Name }}
