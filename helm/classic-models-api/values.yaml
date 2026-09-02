@@ -135,11 +135,22 @@ autoscaling:
   # targetMemoryUtilizationPercentage: 80
 
 # Liveness and readiness probes
-# Using /classic-models/api/schema/ endpoint which has AllowAny permission
-# This avoids authentication issues with health checks
+#
+# livenessProbe  → GET /health
+#   Plain Django view outside the classic-models/ prefix.
+#   Fast and lightweight: only checks that the process is alive and the DB
+#   connection is reachable. No DRF overhead, no authentication required.
+#   A failure here means Kubernetes should *restart* the pod.
+#
+# readinessProbe → GET /classic-models/health
+#   DRF APIView inside the classic-models/ prefix (AllowAny, no throttle).
+#   Exercises the full Django + DRF middleware stack and runs a lightweight
+#   ORM query to confirm migrations are applied and the app is ready to serve
+#   traffic. A failure here removes the pod from the Service endpoint slice
+#   without triggering a restart.
 livenessProbe:
   httpGet:
-    path: /classic-models/api/docs/
+    path: /health
     port: http
   initialDelaySeconds: 60
   periodSeconds: 10
@@ -148,7 +159,7 @@ livenessProbe:
 
 readinessProbe:
   httpGet:
-    path: /classic-models/api/docs/
+    path: /classic-models/health
     port: http
   initialDelaySeconds: 30
   periodSeconds: 5

@@ -1,8 +1,10 @@
 # OpenShift-specific values for classic-models-api
 # This file contains OpenShift-optimized configuration
 
-# Note: Liveness and readiness probes use /classic-models/api/schema/
-# which has AllowAny permission to avoid authentication issues
+# Note: Liveness and readiness probes use dedicated health endpoints:
+#   livenessProbe  → GET /health                (plain Django, DB ping)
+#   readinessProbe → GET /classic-models/health (DRF stack + ORM query)
+# Override the probe paths here if you need environment-specific settings.
 
 # Global settings
 global:

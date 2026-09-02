@@ -1,5 +1,7 @@
 from django.contrib import admin
 from django.urls import include, path
+
+from config.health import health, ReadinessView
 from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularRedocView,
@@ -11,6 +13,8 @@ from authentication.urls import oauth_urlpatterns
 
 # All URLs are served under /classic-models base path
 urlpatterns = [
+    path("health", health, name="liveness"),
+    path("classic-models/health", ReadinessView.as_view(), name="readiness"),
     path("classic-models/admin/", admin.site.urls),
     path("classic-models/api/v1/", include("api.v1.urls")),
     path("classic-models/api/auth/", include("authentication.urls")),
